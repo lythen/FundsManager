@@ -20,6 +20,8 @@ namespace FundsManager.Models
         public DateTime log_time { get {return _log_time; } set { _log_time = value; } }
         [StringLength(150),Required]
         public string log_ip { get; set; }
+        [StringLength(500)]
+        public string log_device { get; set; }
 
     }
 }

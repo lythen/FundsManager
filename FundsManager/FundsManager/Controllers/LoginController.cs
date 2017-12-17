@@ -141,6 +141,7 @@ namespace FundsManager.Controllers
                 log_ip = ip,
                  log_target= user.user_id.ToString(),
                   log_type=1,
+                log_device = loginDev
             };
             user.user_login_times++;
             db.Sys_Log.Add(log);
