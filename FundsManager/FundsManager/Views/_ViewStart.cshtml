@@ -1,3 +1,49 @@
-﻿@{ 
-    Layout = "Shared/_Layout.cshtml";
+﻿@{
+    if (Request.Browser.MobileDeviceModel.ToLower() == "unknown")
+    {
+        var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+        string[] cs = { "sys_info", "subadmin", "dictionary" };
+        //var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+        if (cs.Contains(controller))
+        {
+            Layout = "Shared/managerLayout.cshtml";
+        }
+        else if (controller == "student")
+        {
+            Layout = "Shared/studentLayout.cshtml";
+        }
+        else if (controller == "course")
+        {
+            Layout = "Shared/courseLayout.cshtml";
+        }
+        else if (controller == "teacher")
+        {
+            Layout = "Shared/teacherLayout.cshtml";
+        }
+        else if (controller == "error" || controller == "home")
+        {
+            Layout = "Shared/_w_main.cshtml";
+        }
+        else { Layout = "Shared/_Layout.cshtml"; }
+
+    }
+    else
+    {
+        var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+        var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
+        var ac = controller + action;
+        string[] acs = { "home", "homeindex", "teacherteachercourses", "courserollcall", "courserollcalllist", "error", "errorindex", "loginindex" };
+        if (!acs.Contains(ac))
+        {
+            HttpContext.Current.Response.RedirectToRoute(new { controller = "Error", action = "Index", err = "无法找到页面" });
+        }
+        else if (ac == "loginindex")
+        {
+
+        }
+        else
+        {
+            Layout = "Shared/_m_main.cshtml";
+        }
+    }
 }

@@ -1,0 +1,204 @@
+﻿@model WeChatForTraining.ViewModel.LoginModel
+@{
+    ViewBag.Title = "登陆";
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css" />
+    <link href="~/content/screen.min.css" rel="stylesheet" />
+    <script src="~/scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/scripts/cookie.js"></script>
+    <style>
+        body {
+            margin-top: 15px;
+            background-color: white;
+        }
+
+        html {
+            background-color: white;
+        }
+
+        @@media(min-width: 992px) {
+            body {
+                width: 100%;
+                text-align: center;
+            }
+
+            form {
+                margin-left: auto;
+                margin-right: auto;
+                margin-top: 35px;
+                width: 400px;
+            }
+
+            .form-horizontal .form-group {
+                margin-left: 0px;
+                margin-right: 0px;
+            }
+
+            .col-sm-10 {
+                width: 300px;
+                padding-left: 0px;
+                padding-right: 0px;
+                text-align: left;
+            }
+
+            .col-sm-2 {
+                width: 100px;
+            }
+
+            h4 {
+                text-align: left;
+                height: 100px;
+                line-height: 100px;
+            }
+        }
+
+        @@media(max-width: 991px) {
+            .btn-info {
+                width: 100%;
+            }
+
+            .main-header h1 {
+                font-size: 1.5em;
+                line-height: 53px;
+                height: 53px;
+                margin-top: 0px;
+                margin-bottom: 0px;
+                text-align: left;
+            }
+
+            .main-header {
+                height: 53px;
+                padding: 0px;
+            }
+
+                .main-header .col-xs-12 {
+                    padding-left: 20px;
+                }
+
+                .main-header .container {
+                    padding-left: 0px;
+                }
+
+            .container-fluid {
+                padding-right: 5px;
+                padding-left: 5px;
+            }
+
+            form {
+                padding-right: 10px;
+                padding-left: 10px;
+                margin-top: 15px;
+            }
+
+            #password {
+                width: 70%;
+            }
+
+            #imgCode {
+                width: 25%;
+            }
+
+            .form-group .col-sm-10 {
+                width: 73%;
+                display: inline-block;
+            }
+
+            .form-group label:first-child {
+                width: 25%;
+                padding-right: 0px;
+            }
+
+            .form-group .col-sm-offset-2 {
+                width: 100%;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+
+            .col-sm-offset-2 .btn-info {
+                font-size: 1.5em;
+                background-color: RGB(68,152,218);
+            }
+        }
+    </style>
+    </head>
+<body>
+    <header class="main-header" style="background-color:RGB(68,152,218)">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h1>广州市跃飞教育培训有限公司</h1>
+                </div>
+            </div>
+        </div>
+    </header>
+    @using (Html.BeginForm("Index", "Login", FormMethod.Post, new { @class = "form-horizontal",@id="form1" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.token);
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-2 control-label">姓名：</label>
+            <div class="col-sm-10">
+                @Html.EditorFor(model => model.userName, new { htmlAttributes = new { @class = "form-control", @id = "userName", @placeholder = "请输入姓名" } })
+                @Html.ValidationMessageFor(model => model.userName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label">密码：</label>
+            <div class="col-sm-10">
+                @Html.PasswordFor(model => model.password, new { @class = "form-control", @id = "password", @placeholder = "请输入密码" })
+                @Html.ValidationMessageFor(model => model.password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label">验证码：</label>
+            <div class="col-sm-10">
+                @Html.EditorFor(model => model.checkCode, new { htmlAttributes = new { @class = "form-control", @id = "password", @placeholder = "请输入图形验证码", @style = "display:inline-block;" } })
+                @Html.ValidationMessageFor(model => model.checkCode, "", new { @class = "text-danger" })
+                <img id="imgCode" style="height:34px;" />
+            </div>
+        </div>
+        @*<div class="form-group">
+            <label for="inputPassword3" class="col-sm-2 control-label">登陆角色：</label>
+            <div class="col-sm-10">
+                <div class="checkbox">
+                    @Html.DropDownListFor(model => model.role, ViewBag.ddlRoles as List<SelectListItem>, "----请选择----", new { @class = "select form-control" })
+                    @Html.ValidationMessageFor(model => model.role, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>*@
+        <div class="form-group">
+            <label class="col-sm-2 control-label">&nbsp;</label>
+            <div class="col-sm-10">
+                @Html.CheckBoxFor(model => model.isRemember, new { @id = "rememberme" })<label for="rememberme" style="padding-left:0px;width:auto;">记住姓名</label>
+            </div>
+        </div>
+        <div class="form-group">
+
+            <div class="col-md-10" style="color:red;">
+                @ViewBag.msg
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10" style="text-align:right;">
+                <button type="submit" class="btn btn-info">登 陆</button>
+            </div>
+        </div>
+    }
+</body>
+</html>
+    <script>
+        $(function () {
+            $("#imgCode").attr("src", '@Url.RouteUrl(new { controller = "ValidateCode", action = "GetCode", t = DateTime.Now.Ticks })');
+            $("#imgCode").click(function () {
+                var t = (new Date()).valueOf();
+                $("#imgCode").attr("src", '@Url.RouteUrl(new { controller = "ValidateCode", action = "GetCode"})?t=' + (new Date()).valueOf());
+            });
+
+        });
+    </script>

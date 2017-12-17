@@ -22,5 +22,7 @@ namespace FundsManager.DAL
         public DbSet<User_Extend> User_Extend { get; set; }
         public DbSet<User_Info> User_Info { get; set; }
         public DbSet<User_vs_Role> User_vs_Role { get; set; }
+        public DbSet<Role_vs_Controller> Role_vs_Controller{ get; set; }
+        public DbSet<Sys_Controller> Sys_Controller { get; set; }
     }
 }

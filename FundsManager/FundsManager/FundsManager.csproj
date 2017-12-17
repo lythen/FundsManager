@@ -151,6 +151,8 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-3.2.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.2.1.min.map" />
+    <Content Include="Views\Error\Index.cshtml" />
+    <Content Include="Views\Login\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -162,16 +164,24 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Common\DataCache.cs" />
+    <Compile Include="Common\DEncrypt\DEncrypt.cs" />
+    <Compile Include="Common\DEncrypt\DESEncrypt.cs" />
+    <Compile Include="Common\DEncrypt\HashEncode.cs" />
+    <Compile Include="Common\DEncrypt\MD5Encrypt.cs" />
+    <Compile Include="Common\DEncrypt\RSACryption.cs" />
     <Compile Include="Common\DropDownListExtensions.cs" />
     <Compile Include="Common\IDCardHelper.cs" />
     <Compile Include="Common\ImageFun.cs" />
     <Compile Include="Common\IpHelper.cs" />
     <Compile Include="Common\PageValidate.cs" />
+    <Compile Include="Common\PasswordUnit.cs" />
     <Compile Include="Common\TokenProccessor.cs" />
     <Compile Include="Common\WeeK.cs" />
     <Compile Include="Controllers\DBCaches.cs" />
     <Compile Include="Controllers\DropDownList.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\ValidateCodeController.cs" />
     <Compile Include="Controllers\wxAuthorizeAttribute.cs" />
     <Compile Include="DAL\FundsContext.cs" />
@@ -190,16 +200,17 @@
     <Compile Include="Models\Funds_Apply_Child.cs" />
     <Compile Include="Models\Process_Original.cs" />
     <Compile Include="Models\Process_Respond.cs" />
+    <Compile Include="Models\Role_vs_Controller.cs" />
     <Compile Include="Models\SelectOption.cs" />
+    <Compile Include="Models\Sys_Controller.cs" />
     <Compile Include="Models\Sys_Log.cs" />
     <Compile Include="Models\User_Extend.cs" />
     <Compile Include="Models\User_Info.cs" />
     <Compile Include="Models\User_vs_Role.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\LoginModel.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ViewModels\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

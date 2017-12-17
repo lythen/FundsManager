@@ -7,6 +7,8 @@ namespace FundsManager.Models
     /// </summary>
     public class User_Info
     {
+        private int _user_state = 0;
+        private int _user_login_times = 0;
         [Key]
         public int user_id { get; set; }
         [StringLength(50)]
@@ -23,5 +25,7 @@ namespace FundsManager.Models
         public string user_password { get; set; }
         [StringLength(10)]
         public string user_salt { get; set; }
+        public int user_state { get { return _user_state; } set { _user_state = value; } }
+        public int user_login_times { get { return _user_login_times; } set { _user_login_times = value; } }
     }
 }
