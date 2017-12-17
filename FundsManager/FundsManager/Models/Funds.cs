@@ -1,0 +1,24 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FundsManager.Models
+{
+    /// <summary>
+    /// 经费表
+    /// </summary>
+    public class Funds
+    {
+        [Key]
+        public int f_id { get; set; }
+        [StringLength(100)]
+        public string f_name { get; set; }
+        [StringLength(100)]
+        public string f_source { get; set; }
+        [DataType(DataType.Currency)]
+        public decimal f_amount { get; set; }
+        [DataType(DataType.Currency)]
+        public decimal f_balance { get; set; }
+        public int f_manager { get; set; }
+        [StringLength(2000)]
+        public string f_info { get; set; }
+    }
+}

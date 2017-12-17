@@ -161,15 +161,44 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Common\DataCache.cs" />
+    <Compile Include="Common\DropDownListExtensions.cs" />
+    <Compile Include="Common\IDCardHelper.cs" />
+    <Compile Include="Common\ImageFun.cs" />
+    <Compile Include="Common\IpHelper.cs" />
+    <Compile Include="Common\PageValidate.cs" />
+    <Compile Include="Common\TokenProccessor.cs" />
+    <Compile Include="Common\WeeK.cs" />
+    <Compile Include="Controllers\DBCaches.cs" />
+    <Compile Include="Controllers\DropDownList.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ValidateCodeController.cs" />
+    <Compile Include="Controllers\wxAuthorizeAttribute.cs" />
+    <Compile Include="DAL\FundsContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\HandleErrorAttribute.cs" />
+    <Compile Include="Models\Dic_Apply_State.cs" />
+    <Compile Include="Models\Dic_Department.cs" />
+    <Compile Include="Models\Dic_Log_Type.cs" />
+    <Compile Include="Models\Dic_Post.cs" />
+    <Compile Include="Models\Dic_Respond_State.cs" />
+    <Compile Include="Models\Dic_Role.cs" />
+    <Compile Include="Models\Funds.cs" />
+    <Compile Include="Models\Funds_Apply.cs" />
+    <Compile Include="Models\Funds_Apply_Child.cs" />
+    <Compile Include="Models\Process_Original.cs" />
+    <Compile Include="Models\Process_Respond.cs" />
+    <Compile Include="Models\SelectOption.cs" />
+    <Compile Include="Models\Sys_Log.cs" />
+    <Compile Include="Models\User_Extend.cs" />
+    <Compile Include="Models\User_Info.cs" />
+    <Compile Include="Models\User_vs_Role.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
+    <Folder Include="ViewModels\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
