@@ -37,4 +37,7 @@ namespace FundsManager.ViewModels
         public int roleId { get; set; }
         public string roleName { get; set; }
     }
+    public class LoginUserData:UserModel
+    {
+    }
 }

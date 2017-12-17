@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/Content/bootstrap.min.css" />
+    <link href="~/content/screen.min.css" rel="stylesheet" />
+    <style>
+        .col-sm-4 {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .col-md-4 {
+            width: 200px;
+        }
+
+        .sidebar .widget {
+            padding: 0px;
+            width: 200px;
+        }
+
+        .container-fluid {
+            margin-left: 220px;
+            margin-right: 0px;
+            padding: 0px;
+        }
+
+        .col-md-8 {
+            padding: 0px;
+        }
+
+        .main-content {
+            background-color: white;
+            padding: 20px 10px 20px 10px;
+        }
+
+        .menu li {
+            font-weight: bold;
+        }
+
+        .col-xs-12 h1 {
+            text-align: left;
+            padding-left: 220px;
+        }
+
+        .main-navigation .menu {
+            text-align: left;
+            padding-left: 185px;
+        }
+        .content-wrap .container{
+            width:100%;
+        }
+    </style>
+</head>
+<body>
+    @RenderPage("_top.cshtml")
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <aside class="col-md-4 sidebar">
+                    @RenderPage("_logout.cshtml")
+                    <div class="widget">
+                        <div class="list-group">
+                            @Html.RouteLink("系统信息", new { controller = "Sys_Info", action = "Index", id = "1" }, new { @class = "list-group-item sys_info" })
+                            @Html.RouteLink("校区设置", new { controller = "Dictionary", action = "SysSchoolList" }, new { @class = "list-group-item sysschool" })
+                            @Html.RouteLink("科目设置", new { controller = "Dictionary", action = "SysSubjectList" }, new { @class = "list-group-item syssubject" })
+                                                        @Html.RouteLink("清除缓存", new { controller = "Sys_Info", action = "DeleteCache" }, new { @class = "list-group-item deletecache" })
+                                                        @Html.RouteLink("访问权限", new { controller = "Sys_Info", action = "ControllerRoles" }, new { @class = "list-group-item controllerroles" })
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="container-fluid">
+                    <main class="col-md-8 main-content" style="min-height:500px;">
+                        @RenderBody()
+                    </main>
+                </div>
+            </div>
+        </div>
+    </section>
+    @RenderSection("scripts", false)
+</body>
+</html>
+<script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script>
+    $(function () {
+        var w = $('.content-wrap').width();
+        $('.col-md-8').width(w - 255);
+    });
+</script>

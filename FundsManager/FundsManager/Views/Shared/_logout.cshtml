@@ -1,0 +1,27 @@
+﻿@{ 
+    var name = Server.UrlDecode(Request.Cookies["name"].Value.ToString());
+}
+<style>
+    .sidebar .widget2 {
+        background: #fff;
+        padding: 15px 16px 5px 16px;
+        font-size:14px;
+        margin-bottom:5px;
+}
+        .widget .title {
+            margin-bottom:0px;
+        }
+        .widget .community {
+            padding-top:5px;
+        }
+</style>
+<div class="widget widget2">
+    <h5 class="title">欢迎！&nbsp;@name</h5>
+    <div class="content community">
+        <p>
+            <a href="@Url.RouteUrl(new { controller = "Login", action = "Logout" })" title="注销当前登陆" target="_top" onclick="return confirm('是否退出当前登陆?');">
+                <i class="fa fa-comments"></i> 退出登陆
+            </a>
+        </p>
+    </div>
+</div>

@@ -66,7 +66,7 @@ namespace FundsManager.Controllers
                 ViewBag.msg = "用户不存在。";
                 return View(model);
             }
-            string password = PasswordUnit.getPassword(model.password, user.user_salt);
+            string password = PageValidate.InputText(PasswordUnit.getPassword(model.password, user.user_salt), 40);
             if (password != user.user_password)
             {
                 ViewBag.msg = "用户密码不正确，请重新输入。";
