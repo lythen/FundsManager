@@ -8,8 +8,6 @@ namespace FundsManager.Common
         static Regex reg = new Regex(@"\d");
         public static string getPassword(string psw,string salt)
         {
-            if (salt == "")
-                salt = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper();
             int first = 0;
             Match m = reg.Match(salt);
             if (m != null) first = PageValidate.FilterParam(m.Value);
@@ -48,7 +46,7 @@ namespace FundsManager.Common
 
                 }
             }
-            return FormsAuthentication.HashPasswordForStoringInConfigFile(new string(newpasw), "MD5");
+            return new string(newpasw);
         }
     }
 }

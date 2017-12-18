@@ -72,8 +72,6 @@ namespace FundsManager.Controllers
                 ViewBag.msg = "用户密码不正确，请重新输入。";
                 return View(model);
             }
-            
-            
             if (user.user_state == 0)
             {
                 ViewBag.msg = "您的帐号被锁定,暂时无法登陆。";

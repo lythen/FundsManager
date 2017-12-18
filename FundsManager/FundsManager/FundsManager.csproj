@@ -171,6 +171,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Common\DataCache.cs" />
+    <Compile Include="Common\DEncrypt\AESEncrypt.cs" />
     <Compile Include="Common\DEncrypt\DEncrypt.cs" />
     <Compile Include="Common\DEncrypt\DESEncrypt.cs" />
     <Compile Include="Common\DEncrypt\HashEncode.cs" />
