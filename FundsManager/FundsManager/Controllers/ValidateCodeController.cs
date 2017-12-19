@@ -3,8 +3,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Web.Mvc;
-using System.Web;
-using System.Web.Security;
 namespace FundsManager.Controllers
 {
     public class ValidateCodeController : Controller

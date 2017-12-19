@@ -1,5 +1,9 @@
 ﻿@{ 
-    var name = Server.UrlDecode(Request.Cookies["name"].Value.ToString());
+    string name="";
+    if (Request.Cookies["realname"] != null)
+    {
+        name = Server.UrlDecode(Request.Cookies["realname"].Value.ToString());
+    }
 }
 <style>
     .sidebar .widget2 {

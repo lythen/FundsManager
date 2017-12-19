@@ -9,6 +9,7 @@ using System.Web;
 using FundsManager.ViewModels;
 using FundsManager.Common;
 using System.Data.Entity;
+using FundsManager.Common.DEncrypt;
 
 namespace FundsManager.Controllers
 {
@@ -18,21 +19,12 @@ namespace FundsManager.Controllers
         // GET: Login
         public ActionResult Index()
         {
-            //List<SelectOption> options = DropDownList.SysRolesSelect();
-            //ViewBag.ddlRoles = DropDownList.SetDropDownList(options);
-            if (HttpContext.Request.Cookies["username"] != null)
-            {
-                ViewBag.username = HttpContext.Request.Cookies["username"].Value;
-                ViewBag.remberme = "checked";
-            }
-            ViewBag.LoginState = "";
             LoginModel model = new LoginModel();
-            if (Request.Cookies["name"] != null)
+            if (Request.Cookies["username"] != null)
             {
-                model.userName =Server.UrlDecode(Request.Cookies["name"].Value);
+                model.userName = Server.UrlDecode(Request.Cookies["username"].Value);
                 model.isRemember = true;
             }
-            //if (Request.Cookies["role"] != null) model.role = PageValidate.FilterParam(Request.Cookies["role"].Value);
             return View(model);
         }
         public ActionResult Register()
@@ -50,7 +42,7 @@ namespace FundsManager.Controllers
                 ViewBag.msg = "验证码已过期，请点击验证码刷新后重新输入密码码。";
                 return View(model);
             }
-            if(model.checkCode.ToUpper()!= Session["checkCode"].ToString())
+            if (model.checkCode.ToUpper() != Session["checkCode"].ToString())
             {
                 ViewBag.msg = "验证码不正确。";
                 return View(model);
@@ -61,13 +53,14 @@ namespace FundsManager.Controllers
                         join uvr in db.User_vs_Role
                         on p.user_id equals uvr.uvr_user_id
                         where p.user_name == model.userName
-                        select p).FirstOrDefault();
+                        select p
+                        ).FirstOrDefault();
             if (user == null)
             {
                 ViewBag.msg = "用户不存在。";
                 return View(model);
             }
-            string password = PageValidate.InputText(PasswordUnit.getPassword(model.password, user.user_salt), 40).ToUpper();
+            string password = AESEncrypt.Encrypt(PasswordUnit.getPassword(PageValidate.InputText(model.password,40).ToUpper(), user.user_salt));
             if (password != user.user_password)
             {
                 ViewBag.msg = "用户密码不正确，请重新输入。";
@@ -85,45 +78,26 @@ namespace FundsManager.Controllers
             }
             //验证权限
             var role = (from uvr in db.User_vs_Role
-                         join r in db.Dic_Role
-                         on uvr.uvr_role_id equals r.role_id
-                         where uvr.uvr_user_id == user.user_id
-                         select new LoginRole
-                         {
-                             roleId = r.role_id,
-                             roleName = r.role_name
-                         }).FirstOrDefault();
-            if (role == null|| role.roleId==0|| role.roleId> 5)
+                        join r in db.Dic_Role
+                        on uvr.uvr_role_id equals r.role_id
+                        where uvr.uvr_user_id == user.user_id
+                        select new LoginRole
+                        {
+                            roleId = r.role_id,
+                            roleName = r.role_name
+                        }).FirstOrDefault();
+            if (role == null || role.roleId == 0 || role.roleId > 5)
             {
                 ViewBag.msg = "没有权限登陆所选角色。";
                 return View(model);
             }
             //功能权限
             var controlroles = (from r in db.Dic_Role
-                         join rvc in db.Role_vs_Controller
-                         on r.role_id equals rvc.rvc_role_id
-                         where r.role_id == role.roleId
-                         select rvc.rvc_controller
+                                join rvc in db.Role_vs_Controller
+                                on r.role_id equals rvc.rvc_role_id
+                                where r.role_id == role.roleId
+                                select rvc.rvc_controller
                        ).ToArray();
-            Session["LoginRole"] = role;
-            Session["ControlRoles"] = controlroles;
-            Session["UserInfo"] = user;
-            DataCache.SetCache("user-roles-" + user.user_id, role);
-            HttpCookie cookie;
-            if (model.isRemember)
-            {
-                cookie = new HttpCookie("name", Server.UrlEncode(model.userName));
-                cookie.Expires = DateTime.Now.AddHours(1);
-                Response.AppendCookie(cookie);
-            }
-            else if (Request.Cookies["username"] != null) Response.Cookies.Remove("username");
-
-            //cookie = new HttpCookie("role", role.roleId.ToString());
-            //cookie.Expires = DateTime.Now.AddYears(1);
-            //Response.AppendCookie(cookie);
-
-            FormsAuthentication.SetAuthCookie(user.user_id.ToString(), true);
-
             string ip = IpHelper.GetIP();
             string loginDev = string.Format("{0}-{1}-{2}-{3}-{4}"
                 , Request.Browser.Id
@@ -138,14 +112,36 @@ namespace FundsManager.Controllers
                 log_time = DateTime.Now,
                 log_user_id = user.user_id,
                 log_ip = ip,
-                 log_target= user.user_id.ToString(),
-                  log_type=1,
+                log_target = user.user_id.ToString(),
+                log_type = 1,
                 log_device = loginDev
             };
             user.user_login_times++;
             db.Sys_Log.Add(log);
             db.Entry(user).State = EntityState.Modified;
             db.SaveChanges();
+
+            user.ToDecrypt();
+            user.DeletePassword();
+
+            Session["LoginRole"] = role;
+            Session["ControlRoles"] = controlroles;
+            Session["UserInfo"] = user;
+            DataCache.SetCache("user-roles-" + user.user_id, role);
+            HttpCookie cookie;
+            if (model.isRemember)
+            {
+                cookie = new HttpCookie("username", Server.UrlEncode(model.userName));
+                cookie.Expires = DateTime.Now.AddHours(1);
+                Response.AppendCookie(cookie);
+            }
+            else if (Request.Cookies["username"] != null) Response.Cookies.Remove("username");
+
+            cookie = new HttpCookie("realname", Server.UrlEncode(user.real_name));
+            cookie.Expires = DateTime.Now.AddHours(1);
+            Response.AppendCookie(cookie);
+
+            FormsAuthentication.SetAuthCookie(user.user_id.ToString(), true);
             return RedirectToRoute(new { controller = "Home", action = "Index" });
         }
         public ActionResult LogOut()

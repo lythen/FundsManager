@@ -1,6 +1,6 @@
 ﻿@model FundsManager.ViewModels.LoginModel
 @{
-    ViewBag.Title = "登陆";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-登陆";
 }
 <!DOCTYPE html>
 
@@ -133,7 +133,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-xs-12">
-                    <h1>广州市跃飞教育培训有限公司</h1>
+                    <h1>管理系统</h1>
                 </div>
             </div>
         </div>
@@ -158,20 +158,11 @@
         <div class="form-group">
             <label for="inputPassword3" class="col-sm-2 control-label">验证码：</label>
             <div class="col-sm-10">
-                @Html.EditorFor(model => model.checkCode, new { htmlAttributes = new { @class = "form-control", @id = "password", @placeholder = "请输入图形验证码", @style = "display:inline-block;" } })
+                @Html.EditorFor(model => model.checkCode, new { htmlAttributes = new { @class = "form-control", @placeholder = "请输入图形验证码", @style = "display:inline-block;" } })
                 @Html.ValidationMessageFor(model => model.checkCode, "", new { @class = "text-danger" })
                 <img id="imgCode" style="height:34px;" />
             </div>
         </div>
-        @*<div class="form-group">
-            <label for="inputPassword3" class="col-sm-2 control-label">登陆角色：</label>
-            <div class="col-sm-10">
-                <div class="checkbox">
-                    @Html.DropDownListFor(model => model.role, ViewBag.ddlRoles as List<SelectListItem>, "----请选择----", new { @class = "select form-control" })
-                    @Html.ValidationMessageFor(model => model.role, "", new { @class = "text-danger" })
-                </div>
-            </div>
-        </div>*@
         <div class="form-group">
             <label class="col-sm-2 control-label">&nbsp;</label>
             <div class="col-sm-10">

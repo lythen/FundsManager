@@ -1,0 +1,95 @@
+﻿@model FundsManager.ViewModels.SiteInfo
+
+@{
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "系统信息";
+}
+<style>
+    .table{width:700px;margin-right:auto;margin-left:auto;}
+</style>
+<div>
+    <h4>系统信息</h4>
+    <hr />
+    <table class="table table-striped">
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.name)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.name)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.company)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.company)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.introduce)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.introduce)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.companyAddress)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.companyAddress)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.companyPhone)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.companyPhone)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.companyEmail)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.companyEmail)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.managerName)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.managerName)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.manaterPhone)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.manaterPhone)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.managerEmail)
+            </td>
+
+            <td>
+                @Html.DisplayFor(model => model.managerEmail)
+            </td>
+        </tr>
+</table>
+</div>

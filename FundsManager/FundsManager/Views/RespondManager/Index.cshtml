@@ -1,0 +1,63 @@
+﻿@model IEnumerable<FundsManager.Models.Process_Respond>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.pr_apply_number)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.pr_user_id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.pr_number)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.pr_time)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.pr_content)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.pr_state)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.pr_apply_number)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.pr_user_id)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.pr_number)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.pr_time)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.pr_content)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.pr_state)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.pr_id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.pr_id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.pr_id })
+        </td>
+    </tr>
+}
+
+</table>

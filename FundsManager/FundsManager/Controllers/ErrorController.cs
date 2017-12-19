@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
 using FundsManager.DAL;
 
-namespace WeChatForTraining.Controllers
+namespace FundsManager.Controllers
 {
     public class ErrorController : Controller
     {

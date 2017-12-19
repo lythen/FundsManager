@@ -1,0 +1,87 @@
+﻿@model IEnumerable<FundsManager.Models.User_Info>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.user_name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.real_name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.user_certificate_type)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.user_certificate_no)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.user_mobile)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.user_email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.user_password)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.user_salt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.user_state)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.user_login_times)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.user_name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.real_name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.user_certificate_type)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.user_certificate_no)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.user_mobile)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.user_email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.user_password)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.user_salt)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.user_state)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.user_login_times)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.user_id }) |
+            @Html.ActionLink("Details", "Details", new { id=item.user_id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.user_id })
+        </td>
+    </tr>
+}
+
+</table>

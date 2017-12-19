@@ -2,30 +2,7 @@
     if (Request.Browser.MobileDeviceModel.ToLower() == "unknown")
     {
         var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
-        string[] cs = { "sys_info", "subadmin", "dictionary" };
-        //var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
-        if (cs.Contains(controller))
-        {
-            Layout = "Shared/managerLayout.cshtml";
-        }
-        else if (controller == "student")
-        {
-            Layout = "Shared/studentLayout.cshtml";
-        }
-        else if (controller == "course")
-        {
-            Layout = "Shared/courseLayout.cshtml";
-        }
-        else if (controller == "teacher")
-        {
-            Layout = "Shared/teacherLayout.cshtml";
-        }
-        else if (controller == "error" || controller == "home")
-        {
-            Layout = "Shared/_w_main.cshtml";
-        }
-        else { Layout = "Shared/_Layout.cshtml"; }
-
+        Layout = string.Format("Shared/_{0}.cshtml", controller);
     }
     else
     {

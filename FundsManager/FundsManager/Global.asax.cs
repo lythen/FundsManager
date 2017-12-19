@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Web.Mvc;
 using System.Web.Routing;
-
+using FundsManager.Common;
 namespace FundsManager
 {
     public class Global : System.Web.HttpApplication
@@ -36,6 +36,7 @@ namespace FundsManager
             if (ex != null)
             {
                 Trace.TraceError(ex.ToString());
+                ErrorUnit.WriteErrorLog(ex.ToString(), e.GetType().ToString());
             }
         }
 

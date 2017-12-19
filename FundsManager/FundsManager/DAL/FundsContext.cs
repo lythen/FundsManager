@@ -25,9 +25,6 @@ namespace FundsManager.DAL
         public DbSet<User_vs_Role> User_vs_Role { get; set; }
         public DbSet<Role_vs_Controller> Role_vs_Controller{ get; set; }
         public DbSet<Sys_Controller> Sys_Controller { get; set; }
-        public override int SaveChanges()
-        {
-            return base.SaveChanges();
-        }
+        public DbSet<Sys_SiteInfo> Sys_SiteInfo { get; set; }
     }
 }

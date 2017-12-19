@@ -1,0 +1,66 @@
+﻿@model FundsManager.Models.Funds
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Funds</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.f_name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.f_name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.f_source)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.f_source)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.f_amount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.f_amount)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.f_balance)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.f_balance)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.f_manager)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.f_manager)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.f_info)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.f_info)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.f_id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

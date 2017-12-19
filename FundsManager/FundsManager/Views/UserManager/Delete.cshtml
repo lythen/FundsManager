@@ -1,0 +1,104 @@
+﻿@model FundsManager.Models.User_Info
+
+@{
+    ViewBag.Title = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>User_Info</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.user_name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.real_name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.real_name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_certificate_type)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_certificate_type)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_certificate_no)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_certificate_no)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_mobile)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_mobile)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_password)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_password)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_salt)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_salt)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_state)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_state)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_login_times)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_login_times)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

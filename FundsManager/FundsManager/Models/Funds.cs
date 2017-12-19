@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using System;
 namespace FundsManager.Models
 {
     /// <summary>
@@ -11,6 +11,9 @@ namespace FundsManager.Models
         public int f_id { get; set; }
         [StringLength(100)]
         public string f_name { get; set; }
+        [StringLength(4)]
+        public string f_in_year { get; set; }
+        public DateTime f_expireDate { get; set; }
         [StringLength(100)]
         public string f_source { get; set; }
         [DataType(DataType.Currency)]

@@ -1,4 +1,7 @@
-﻿namespace FundsManager.ViewModels
+﻿using FundsManager.Common.DEncrypt;
+using System.ComponentModel.DataAnnotations;
+
+namespace FundsManager.ViewModels
 {
     public class UserModel
     {
@@ -28,4 +31,5 @@
         /// </summary>
         public string roleName { get; set; }
     }
+    
 }

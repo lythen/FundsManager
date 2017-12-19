@@ -3,6 +3,7 @@ using FundsManager.Models;
 using FundsManager.ViewModels;
 using System.Web.Mvc;
 using System.Linq;
+using FundsManager.Common.DEncrypt;
 namespace FundsManager.Controllers
 {
     public class HomeController : Controller
@@ -22,7 +23,7 @@ namespace FundsManager.Controllers
                                 where u.user_id == id
                                 select new UserModel
                                 {
-                                    name = u.user_name,
+                                    name = u.real_name,
                                     times = u.user_login_times
                                 }).FirstOrDefault();
                 var loginInfo = (from l in db.Sys_Log
@@ -36,6 +37,7 @@ namespace FundsManager.Controllers
                     userInfo.lastTime = loginInfo.log_time.ToString("yyyy年MM月dd日 HH时mm分");
                     userInfo.roleName = role.roleName;
                 }
+                userInfo.name = AESEncrypt.Decrypt(userInfo.name);
                 //如果是有批复权限的，显示待批复列表
                 return View(userInfo);
             }
