@@ -16,8 +16,10 @@ namespace FundsManager.Models
         private string _user_password;
         [Key]
         public int user_id { get; set; }
+        [StringLength(20),Required]
+        public string user_name { get; set; }
         [StringLength(50)]
-        public string user_name { get { return string.IsNullOrEmpty(_user_name) ? "" : AESEncrypt.Decrypt(_user_name); } set { _user_name = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
+        public string real_name { get { return string.IsNullOrEmpty(_user_name) ? "" : AESEncrypt.Decrypt(_user_name); } set { _user_name = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
         [StringLength(50)]
         public string user_certificate_type{get;set;}
         [StringLength(20)]
