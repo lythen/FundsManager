@@ -35,16 +35,26 @@ namespace FundsManager.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Index([Bind(Include = "userName,password,checkCode,isRemember")]LoginModel model)
         {
+            if (Session["ErrorPsw"] == null) Session["ErrorPsw"] = 0;
+            int errTimes = (int)Session["ErrorPsw"];
+            if (errTimes >= 0)
+            {
+                ViewBag.msg = "失败次数过多，请1小时后再尝试。";
+                return View(model);
+            }
             //List<SelectOption> options = DropDownList.SysRolesSelect();
             //ViewBag.ddlRoles = DropDownList.SetDropDownList(options);
             if (Session["checkCode"] == null)
             {
                 ViewBag.msg = "验证码已过期，请点击验证码刷新后重新输入密码码。";
+                errTimes++;
+                Session["ErrorPsw"] = errTimes;
                 return View(model);
             }
             if (model.checkCode.ToUpper() != Session["checkCode"].ToString())
             {
                 ViewBag.msg = "验证码不正确。";
+                
                 return View(model);
             }
 
