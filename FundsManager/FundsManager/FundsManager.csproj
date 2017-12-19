@@ -140,6 +140,7 @@
     <Content Include="Scripts\jquery-3.2.1.min.js" />
     <Content Include="Scripts\jquery-3.2.1.slim.js" />
     <Content Include="Scripts\jquery-3.2.1.slim.min.js" />
+    <Content Include="Scripts\jquery.md5.js" />
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>

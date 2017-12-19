@@ -55,6 +55,7 @@ namespace FundsManager.Controllers
                 ViewBag.msg = "验证码不正确。";
                 return View(model);
             }
+
             //验证帐号密码
             var user = (from p in db.User_Info
                         join uvr in db.User_vs_Role
@@ -66,7 +67,7 @@ namespace FundsManager.Controllers
                 ViewBag.msg = "用户不存在。";
                 return View(model);
             }
-            string password = PageValidate.InputText(PasswordUnit.getPassword(model.password, user.user_salt), 40);
+            string password = PageValidate.InputText(PasswordUnit.getPassword(model.password, user.user_salt), 40).ToUpper();
             if (password != user.user_password)
             {
                 ViewBag.msg = "用户密码不正确，请重新输入。";
