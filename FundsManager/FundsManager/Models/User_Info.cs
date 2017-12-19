@@ -18,18 +18,18 @@ namespace FundsManager.Models
         public int user_id { get; set; }
         [StringLength(20),Required]
         public string user_name { get; set; }
-        [StringLength(50)]
-        public string real_name { get { return string.IsNullOrEmpty(_user_name) ? "" : AESEncrypt.Decrypt(_user_name); } set { _user_name = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
+        [StringLength(100)]
+        public string real_name { get {return _user_name; } set { _user_name = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
         [StringLength(50)]
         public string user_certificate_type{get;set;}
-        [StringLength(20)]
-        public string user_certificate_no { get { return string.IsNullOrEmpty(_user_certificate_no) ? "" : AESEncrypt.Decrypt(_user_certificate_no); } set { _user_certificate_no = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
-        [StringLength(20)]
-        public string user_mobile { get { return string.IsNullOrEmpty(_user_mobile) ? "" : AESEncrypt.Decrypt(_user_mobile); } set { _user_mobile = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
         [StringLength(100)]
-        public string user_email { get { return string.IsNullOrEmpty(_user_email) ? "" : AESEncrypt.Decrypt(_user_email); } set { _user_email = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
+        public string user_certificate_no { get { return _user_certificate_no; } set { _user_certificate_no = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
+        [StringLength(100)]
+        public string user_mobile { get { return _user_mobile; } set { _user_mobile = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
         [StringLength(200)]
-        public string user_password { get { return string.IsNullOrEmpty(_user_password) ? "" : AESEncrypt.Decrypt(_user_password); } set { _user_password = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
+        public string user_email { get { return _user_email; } set { _user_email = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
+        [StringLength(200)]
+        public string user_password { get { return _user_password; } set { _user_password = string.IsNullOrEmpty(value) ? "" : AESEncrypt.Encrypt(value); } }
         [StringLength(10)]
         public string user_salt { get; set; }
         public int user_state { get { return _user_state; } set { _user_state = value; } }

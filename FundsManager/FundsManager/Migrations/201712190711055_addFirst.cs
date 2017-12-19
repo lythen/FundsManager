@@ -11,7 +11,7 @@ namespace FundsManager.Migrations
                 "dbo.Dic_Apply_State",
                 c => new
                     {
-                        das_state_id = c.Int(nullable: false, identity: true),
+                        das_state_id = c.Int(nullable: false),
                         das_state_name = c.String(nullable: false, maxLength: 20),
                     })
                 .PrimaryKey(t => t.das_state_id);
@@ -48,7 +48,7 @@ namespace FundsManager.Migrations
                 "dbo.Dic_Respond_State",
                 c => new
                     {
-                        drs_state_id = c.Int(nullable: false, identity: true),
+                        drs_state_id = c.Int(nullable: false),
                         drs_state_name = c.String(nullable: false, maxLength: 20),
                     })
                 .PrimaryKey(t => t.drs_state_id);
@@ -178,11 +178,11 @@ namespace FundsManager.Migrations
                     {
                         user_id = c.Int(nullable: false, identity: true),
                         user_name = c.String(nullable: false, maxLength: 20),
-                        real_name = c.String(maxLength: 50),
+                        real_name = c.String(maxLength: 100),
                         user_certificate_type = c.String(maxLength: 50),
-                        user_certificate_no = c.String(maxLength: 20),
-                        user_mobile = c.String(maxLength: 20),
-                        user_email = c.String(maxLength: 100),
+                        user_certificate_no = c.String(maxLength: 100),
+                        user_mobile = c.String(maxLength: 100),
+                        user_email = c.String(maxLength: 200),
                         user_password = c.String(maxLength: 200),
                         user_salt = c.String(maxLength: 10),
                         user_state = c.Int(nullable: false),

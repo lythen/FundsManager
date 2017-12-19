@@ -235,9 +235,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\HandleErrorAttribute.cs" />
-    <Compile Include="Migrations\201712190348033_addFirst.cs" />
-    <Compile Include="Migrations\201712190348033_addFirst.Designer.cs">
-      <DependentUpon>201712190348033_addFirst.cs</DependentUpon>
+    <Compile Include="Migrations\201712190711055_addFirst.cs" />
+    <Compile Include="Migrations\201712190711055_addFirst.Designer.cs">
+      <DependentUpon>201712190711055_addFirst.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Dic_Apply_State.cs" />
@@ -263,8 +263,8 @@
     <Compile Include="ViewModels\UserModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201712190348033_addFirst.resx">
-      <DependentUpon>201712190348033_addFirst.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201712190711055_addFirst.resx">
+      <DependentUpon>201712190711055_addFirst.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

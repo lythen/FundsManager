@@ -20,7 +20,7 @@ namespace FundsManager.Migrations
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data.
             string psw = PasswordUnit.getPassword("63396a3725a910f5d0caa43e9a2b08ac", "6E262F901B");
-            
+
             context.User_Info.AddOrUpdate(x => x.user_name,
                 new User_Info() { real_name = "系统管理员", user_email = "lyrenlian@163.com", user_name = "sysAdmin", user_password = psw, user_mobile = "13632393905", user_state = 1, user_salt = "6E262F901B" },
                 new User_Info() { real_name = "领导1", user_email = "lyrenlian@163.com", user_name = "master", user_password = psw, user_mobile = "13632393905", user_state = 1, user_salt = "6E262F901B" },
@@ -44,14 +44,14 @@ namespace FundsManager.Migrations
                 new Dic_Log_Type() { dlt_log_name = "其他" }
                 );
             context.Dic_Apply_State.AddOrUpdate(x => x.das_state_name,
-                new Dic_Apply_State() { das_state_name = "未阅读" },
-                new Dic_Apply_State() { das_state_name = "已阅读未批复" },
-                new Dic_Apply_State() { das_state_name = "批复不通过" },
-                new Dic_Apply_State() { das_state_name = "批复通过" });
+                new Dic_Apply_State() { das_state_id = 0, das_state_name = "未阅读" },
+                new Dic_Apply_State() { das_state_id = 1, das_state_name = "已阅读未批复" },
+                new Dic_Apply_State() { das_state_id = 2, das_state_name = "批复不通过" },
+                new Dic_Apply_State() { das_state_id = 3, das_state_name = "批复通过" });
             context.Dic_Respond_State.AddOrUpdate(x => x.drs_state_name,
-                new Dic_Respond_State() { drs_state_name = "未批复" },
-                new Dic_Respond_State() { drs_state_name = "批复通过" },
-                new Dic_Respond_State() { drs_state_name = "批复不通过" });
+                new Dic_Respond_State() { drs_state_id = 0, drs_state_name = "未批复" },
+                new Dic_Respond_State() { drs_state_id = 1, drs_state_name = "批复通过" },
+                new Dic_Respond_State() { drs_state_id = 2, drs_state_name = "批复不通过" });
         }
     }
 }
