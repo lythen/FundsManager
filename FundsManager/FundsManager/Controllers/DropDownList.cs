@@ -12,7 +12,12 @@ namespace FundsManager.Controllers
         private static FundsContext db = new FundsContext();
         private static string cache_week = "cache_week";
         private static string cache_post = "cache_post";
-        private static string funds_manger = "funds_manger";
+        private static string cache_funds_manger = "funds_manger";
+        private static string cache_dept = "cache_dept";
+        private static string cache_sex = "cache_sex";
+        private static string cache_user_state = "cache_user_state";
+        private static string cache_role = "cache_role";
+        private static string cache_cardType = "cache_cardType";
         public static List<SelectListItem> SetDropDownList(List<Models.SelectOption> options)
         {
             List<SelectListItem> items = new List<SelectListItem>();
@@ -57,7 +62,7 @@ namespace FundsManager.Controllers
         }
         public static List<SelectOption> FundsManagerSelect()
         {
-            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(funds_manger);
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_funds_manger);
             if (options == null)
             {
                 options = (from user in db.User_Info
@@ -70,9 +75,68 @@ namespace FundsManager.Controllers
                                id = user.user_id.ToString(),
                                text = user.real_name
                            }).ToList();
-                if (options.Count() > 0) DataCache.SetCache(funds_manger, options);
+                if (options.Count() > 0) DataCache.SetCache(cache_funds_manger, options);
             }
             return options;
+        }
+        public static List<SelectOption> getDepartment(int id=0)
+        {
+            List<Dic_Department> depts = DBCaches<Dic_Department>.getCache(cache_dept);
+            List<SelectOption> option = (from dep in depts
+                                         where dep.dept_parent_id == id
+                                         select new SelectOption
+                                         {
+                                             id = dep.dept_id.ToString(),
+                                             text = dep.dept_name
+                                         }).ToList();
+            return option;
+        }
+        public static List<SelectOption> SexSelect()
+        {
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_sex);
+            if (options == null)
+            {
+                options = new List<SelectOption>();
+                options.Add(new SelectOption { text = "男", id = "男" });
+                options.Add(new SelectOption { text = "女", id = "女" });
+                DataCache.SetCache(cache_sex, options);
+            }
+            return options;
+        }
+        public static List<SelectOption> UserStateSelect()
+        {
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_user_state);
+            if (options == null)
+            {
+                options = new List<SelectOption>();
+                options.Add(new SelectOption { text = "正常", id = "1" });
+                options.Add(new SelectOption { text = "未启用", id = "0" });
+                options.Add(new SelectOption { text = "锁定", id = "2" });
+                DataCache.SetCache(cache_user_state, options);
+            }
+            return options;
+        }
+        public static List<SelectOption> CardTypeSelect()
+        {
+            List<Dic_CardType> depts = DBCaches<Dic_CardType>.getCache(cache_cardType);
+            List<SelectOption> option = (from ct in depts
+                                         select new SelectOption
+                                         {
+                                             id = ct.ctype_id.ToString(),
+                                             text = ct.ctype_name
+                                         }).ToList();
+            return option;
+        }
+        public static List<SelectOption> RoleSelect()
+        {
+            List<Dic_Role> depts = DBCaches<Dic_Role>.getCache(cache_role);
+            List<SelectOption> option = (from ct in depts
+                                         select new SelectOption
+                                         {
+                                             id = ct.role_id.ToString(),
+                                             text = ct.role_name
+                                         }).ToList();
+            return option;
         }
     }
 }

@@ -73,6 +73,15 @@ namespace FundsManager.Migrations
             //context.Sys_SiteInfo.AddOrUpdate(x => x.site_name,
             //    new Sys_SiteInfo() { site_name = "某某管理系统" }
             //    );
+            //context.Dic_CardType.AddOrUpdate(x => x.ctype_name,
+            //    new Dic_CardType { ctype_name = "二代居民身份证" },
+            //    new Dic_CardType { ctype_name = "护照" },
+            //    new Dic_CardType { ctype_name = "台湾身份证" },
+            //    new Dic_CardType { ctype_name = "香港身份证" },
+            //    new Dic_CardType { ctype_name = "澳门居民身份证" },
+            //    new Dic_CardType { ctype_name = "港澳居民来往内地通行证" },
+            //    new Dic_CardType { ctype_name = "台湾居民来往大陆通行证" },
+            //    new Dic_CardType { ctype_name = "其它有效证件" });
         }
 
     }

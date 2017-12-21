@@ -62,8 +62,8 @@
                     @RenderPage("_logout.cshtml")
                     <div class="widget">
                         <div class="list-group">
-                            @Html.RouteLink("用户列表", new { controller = "Student", action = "ViewList", id = "1" }, new { @class = "list-group-item studentlist" })
-                            @Html.RouteLink("添加用户", new { controller = "Student", action = "Register" }, new { @class = "list-group-item courseregister" })
+                            @Html.RouteLink("用户列表", new { controller = "UserManager", action = "Index", id = "1" }, new { @class = "list-group-item studentlist" })
+                            @Html.RouteLink("添加用户", new { controller = "UserManager", action = "Create" }, new { @class = "list-group-item courseregister" })
                         </div>
                     </div>
                 </aside>

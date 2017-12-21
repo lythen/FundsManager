@@ -28,5 +28,6 @@ namespace FundsManager.DAL
         public DbSet<Sys_SiteInfo> Sys_SiteInfo { get; set; }
         public DbSet<Funds_Apply_Recycle> Funds_Apply_Recycle { get; set; }
         public DbSet<Funds_Recycle> Funds_Recycle { get; set; }
+        public DbSet<Dic_CardType> Dic_CardType { get; set; }
     }
 }
