@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using FundsManager.DAL;
 using FundsManager.Models;
 using FundsManager.ViewModels;
+using FundsManager.Common;
 namespace FundsManager.Controllers
 {
     public class SystemSetController : Controller
@@ -115,13 +116,73 @@ namespace FundsManager.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
-
+        #region 网站设置
         public ActionResult SiteInfo()
         {
             ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
             return View(info);
         }
+        public ActionResult SiteSet()
+        {
+            ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
+            return View(info);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SiteSet([Bind(Include = "name,company,introduce,companyAddress,companyPhone,companyEmail,managerName,managerPhone,managerEmail")]ViewModels.SiteInfo info)
+        {
 
+            Sys_SiteInfo model = db.Sys_SiteInfo.First();
+            if (model.site_name != info.name)
+            {
+                db.Sys_SiteInfo.Remove(model);
+                model = info.toDBModel();
+                db.Sys_SiteInfo.Add(model);
+            }
+            else
+            {
+                model = info.toDBModel();
+                db.Entry<Sys_SiteInfo>(model).State = EntityState.Modified;
+            }
+            try
+            {
+                db.SaveChanges();
+                DBCaches<Sys_SiteInfo>.ClearCache("site-name");
+                DBCaches<Sys_SiteInfo>.ClearCache("site-info");
+            }
+            catch(Exception ex)
+            {
+                @ViewBag.msg = "修改失败。";
+            }
+            @ViewBag.msg = "修改成功。";
+            return View(info);
+        }
+        #endregion
+        #region 模块设置
+        public ActionResult Module()
+        {
+            List<ModuleInfo> models = BLL.Sys_Controller.getRoleInfo();
+            foreach(ModuleInfo model in models)
+            {
+                int[] roles = (from rvc in db.Role_vs_Controller
+                               where rvc.rvc_controller == model.name
+                               select rvc.rvc_role_id
+                               ).ToArray();
+                List<RoleInfo> rvcs = BLL.Dic_Role.getRoleInfo();
+                foreach(RoleInfo item in rvcs)
+                {
+                    if (roles.Contains(item.id)) item.hasrole = true;
+                }
+                model.roles = rvcs;
+            }
+            return View(models);
+        }
+        public ActionResult Module(List<ModuleInfo> models)
+        {
+
+            return View(models);
+        }
+        #endregion
         protected override void Dispose(bool disposing)
         {
             if (disposing)

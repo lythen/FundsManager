@@ -12,6 +12,7 @@ namespace FundsManager.Controllers
         private static FundsContext db = new FundsContext();
         private static string cache_week = "cache_week";
         private static string cache_post = "cache_post";
+        private static string funds_manger = "funds_manger";
         public static List<SelectListItem> SetDropDownList(List<Models.SelectOption> options)
         {
             List<SelectListItem> items = new List<SelectListItem>();
@@ -51,6 +52,25 @@ namespace FundsManager.Controllers
                 {
                     options.Add(new SelectOption { text = item.post_name, id = item.post_id.ToString() });
                 }
+            }
+            return options;
+        }
+        public static List<SelectOption> FundsManagerSelect()
+        {
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(funds_manger);
+            if (options == null)
+            {
+                options = (from user in db.User_Info
+                           join uvr in db.User_vs_Role
+                           on user.user_id equals uvr.uvr_user_id into T1
+                           from t1 in T1.DefaultIfEmpty()
+                           where t1.uvr_role_id == 1 || t1.uvr_role_id == 2
+                           select new SelectOption
+                           {
+                               id = user.user_id.ToString(),
+                               text = user.real_name
+                           }).ToList();
+                if (options.Count() > 0) DataCache.SetCache(funds_manger, options);
             }
             return options;
         }

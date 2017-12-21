@@ -217,7 +217,7 @@
     <Content Include="Views\RespondManager\Index.cshtml" />
     <Content Include="Views\Shared\_systemset.cshtml" />
     <Content Include="Views\Shared\_usermanager.cshtml" />
-    <Content Include="Views\Shared\_fundsLayout.cshtml" />
+    <Content Include="Views\Shared\_fundsmanager.cshtml" />
     <Content Include="Views\Shared\_respondmanager.cshtml" />
     <Content Include="Views\Shared\_error.cshtml" />
     <Content Include="Views\Shared\_login.cshtml" />
@@ -229,6 +229,7 @@
     <Content Include="Views\Shared\_applymanager.cshtml" />
     <Content Include="Views\SystemSet\SiteSet.cshtml" />
     <Content Include="Views\SystemSet\SiteInfo.cshtml" />
+    <Content Include="Views\SystemSet\Module.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -239,6 +240,8 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="BLL\Dic_Role.cs" />
+    <Compile Include="BLL\Sys_Controller.cs" />
     <Compile Include="Common\DataCache.cs" />
     <Compile Include="Common\DEncrypt\AESEncrypt.cs" />
     <Compile Include="Common\DEncrypt\DEncrypt.cs" />
@@ -293,6 +296,14 @@
     <Compile Include="Migrations\201712191258165_addeditsiteinfotable.Designer.cs">
       <DependentUpon>201712191258165_addeditsiteinfotable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712201135251_addcontrollerinfo.cs" />
+    <Compile Include="Migrations\201712201135251_addcontrollerinfo.Designer.cs">
+      <DependentUpon>201712201135251_addcontrollerinfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712201335064_addtworecycle.cs" />
+    <Compile Include="Migrations\201712201335064_addtworecycle.Designer.cs">
+      <DependentUpon>201712201335064_addtworecycle.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Dic_Apply_State.cs" />
     <Compile Include="Models\Dic_Department.cs" />
@@ -301,8 +312,10 @@
     <Compile Include="Models\Dic_Respond_State.cs" />
     <Compile Include="Models\Dic_Role.cs" />
     <Compile Include="Models\Funds.cs" />
+    <Compile Include="Models\Funds_Recycle.cs" />
     <Compile Include="Models\Funds_Apply.cs" />
     <Compile Include="Models\Funds_Apply_Child.cs" />
+    <Compile Include="Models\Funds_Apply_Recycle.cs" />
     <Compile Include="Models\Process_Original.cs" />
     <Compile Include="Models\Process_Respond.cs" />
     <Compile Include="Models\Role_vs_Controller.cs" />
@@ -314,6 +327,8 @@
     <Compile Include="Models\User_Info.cs" />
     <Compile Include="Models\User_vs_Role.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="ViewModels\FundsInfo.cs" />
     <Compile Include="ViewModels\LoginModel.cs" />
     <Compile Include="ViewModels\SystemSet.cs" />
     <Compile Include="ViewModels\UserModel.cs" />
@@ -333,6 +348,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712191258165_addeditsiteinfotable.resx">
       <DependentUpon>201712191258165_addeditsiteinfotable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712201135251_addcontrollerinfo.resx">
+      <DependentUpon>201712201135251_addcontrollerinfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712201335064_addtworecycle.resx">
+      <DependentUpon>201712201335064_addtworecycle.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

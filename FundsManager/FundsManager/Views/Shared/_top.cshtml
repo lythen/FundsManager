@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <h1>广州市跃飞教育培训有限公司</h1>
+                <h1>@FundsManager.Controllers.SiteInfo.getSiteName()</h1>
             </div>
         </div>
     </div>
@@ -35,7 +35,7 @@
                         }
                         if (((string[])Session["ControlRoles"]).Contains("FundsManager"))
                         {
-                        <li role="presentation"><a href="@Url.RouteUrl(new { controller = "FundsManager",action="Index" })" title="经费管理" target="_top">经费管理</a></li>
+                        <li role="presentation"><a href="@Url.RouteUrl(new { controller = "FundsManager",action="Create" })" title="经费管理" target="_top">经费管理</a></li>
                         }
                         if (((string[])Session["ControlRoles"]).Contains("RespondManager"))
                         {

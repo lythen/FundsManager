@@ -1,0 +1,79 @@
+﻿@model IEnumerable<FundsManager.ViewModels.ModuleInfo>
+
+@{
+    ViewBag.Title = "Module";
+}
+<style>
+    .in-lab{
+        float:left;
+        display:inline-block;
+        width:100px;
+        
+    }
+    .in-lab span,.in-lab label{
+        float:left;
+        display:inline-block;
+        width:auto;
+        padding:0px;
+        height:50px;
+        line-height:50px;
+    }
+    .table .in-lab label{padding-top:0px;}
+    .table th{text-align:center;}
+    .form-horizontal .form-group{margin-left:2px;margin-right:2px;}
+</style>
+<h2>模块设置</h2>
+
+<div class="col-md-10" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
+@using (Html.BeginForm("SystemSet", "Module", Model,FormMethod.Post,null))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+
+        <div class="form-group">
+            <table class="table">
+                <tr>
+                    <th width="20%">
+                        模块名称
+                    </th>
+                    <th width="25%">访问权限</th>
+                    <th width="40%">模块描述</th>
+                    <th width="15%">操作</th>
+                </tr>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        @Html.HiddenFor(Itemmodel=>item.hasChange)
+                        <td>
+                            @Html.EditorFor(Itemmodel => item.name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(Itemmodel => item.name, "", new { @class = "text-danger" })
+                        </td>
+                        <td>
+                            @foreach (var citem in item.roles)
+                            {
+                                var id = "rlab" + @item.id + "_" + @citem.id;
+                                <div class="in-lab"> <span> @Html.CheckBoxFor(cmodel => citem.hasrole, new { id = @id }) </span> <label class = "control-label col-md-2" for = "@id">@citem.name</label></div>
+                            }
+                        </td>
+                        <td>
+                            @Html.EditorFor(Itemmodel => item.info, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(Itemmodel => item.info, "", new { @class = "text-danger" })
+                        </td>
+                        <td style="text-align:center;">
+                            @Html.ActionLink("删除", "Delete", new { id = item.id })
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="提  交" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}

@@ -1,17 +1,18 @@
 ﻿@model FundsManager.ViewModels.SiteInfo
 
 @{
-    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "网站信息设置";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-网站信息设置";
 }
 
-<h2>SiteSet</h2>
-
+<h2>网站信息设置</h2>
+<div class="col-md-10" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
 @using (Html.BeginForm()) 
 {
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>Sys_SiteInfo</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
@@ -27,14 +28,6 @@
             <div class="col-md-10">
                 @Html.EditorFor(model => model.company, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.company, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.introduce, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.introduce, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.introduce, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -71,10 +64,10 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.manaterPhone, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.managerPhone, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.manaterPhone, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.manaterPhone, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.managerPhone, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.managerPhone, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -87,13 +80,17 @@
         </div>
 
         <div class="form-group">
+            @Html.LabelFor(model => model.introduce, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.introduce, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.introduce, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="提  交" class="btn btn-default" />
             </div>
         </div>
     </div>
 }
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>

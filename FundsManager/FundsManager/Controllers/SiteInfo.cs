@@ -36,7 +36,7 @@ namespace FundsManager.Controllers
                                 introduce = x.site_introduce,
                                 managerEmail = x.site_manager_email,
                                 managerName = x.site_manager_name,
-                                manaterPhone = x.site_manager_phone,
+                                managerPhone = x.site_manager_phone,
                                 name = x.site_name
                             }
                                ).FirstOrDefault();

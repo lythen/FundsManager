@@ -37,11 +37,11 @@ namespace FundsManager.Controllers
         {
             if (Session["ErrorPsw"] == null) Session["ErrorPsw"] = 0;
             int errTimes = (int)Session["ErrorPsw"];
-            if (errTimes >= 0)
-            {
-                ViewBag.msg = "失败次数过多，请1小时后再尝试。";
-                return View(model);
-            }
+            //if (errTimes >= 5)
+            //{
+            //    ViewBag.msg = "失败次数过多，请1小时后再尝试。";
+            //    return View(model);
+            //}
             //List<SelectOption> options = DropDownList.SysRolesSelect();
             //ViewBag.ddlRoles = DropDownList.SetDropDownList(options);
             if (Session["checkCode"] == null)

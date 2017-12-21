@@ -26,5 +26,7 @@ namespace FundsManager.DAL
         public DbSet<Role_vs_Controller> Role_vs_Controller{ get; set; }
         public DbSet<Sys_Controller> Sys_Controller { get; set; }
         public DbSet<Sys_SiteInfo> Sys_SiteInfo { get; set; }
+        public DbSet<Funds_Apply_Recycle> Funds_Apply_Recycle { get; set; }
+        public DbSet<Funds_Recycle> Funds_Recycle { get; set; }
     }
 }
