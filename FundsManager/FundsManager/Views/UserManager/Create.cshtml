@@ -5,10 +5,12 @@
 <style>
 
 </style>
+
 <h4>录入用户信息</h4>
-
-
-@using (Html.BeginForm())
+<div class="col-md-10" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
+@using (Html.BeginForm("Create", "UserManager", Model,FormMethod.Post,null))
 {
     @Html.AntiForgeryToken()
 
@@ -75,7 +77,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.officePhone, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.officePhone, new { htmlAttributes = new { @class = "form-control", @type="number"} })
+                    @Html.EditorFor(model => model.officePhone, new { htmlAttributes = new { @class = "form-control"} })
                     @Html.ValidationMessageFor(model => model.officePhone, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -104,6 +106,13 @@
                 </div>
             </div>
             <div class="form-group">
+                @Html.LabelFor(model => model.roleId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.roleId, ViewBag.Role as List<SelectListItem>, new { @class = "select form-control" })
+                    @Html.ValidationMessageFor(model => model.roleId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
                 @Html.LabelFor(model => model.state, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     @Html.DropDownListFor(model => model.state, ViewBag.State as List<SelectListItem>, new { @class = "select form-control" })
@@ -120,7 +129,7 @@
         </div>
         <div style="width:25%;float:left;min-width:200px">
             <div class="col-md-10">
-                <img id="stuphoto" class="img-thumbnail" alt="请选择小一寸或大一寸照片" style="width: 200px;" data-holder-rendered="true">
+                <img id="photo" class="img-thumbnail" alt="请选择小一寸或大一寸照片" style="width: 200px;" data-holder-rendered="true">
             </div>
             <div class="col-md-10" style="padding-top:10px;">
                 @Html.HiddenFor(model => model.picture)
@@ -143,6 +152,55 @@
 <script src="~/Scripts/jquery-3.2.1.min.js"></script>
 <script src="~/scripts/bootstrap.min.js"></script>
 <script>
+    $(function () {
+        $.getScript('../scripts/jquery.md5.js');
+        var pic = $('#picture').val();
+        if(pic){
+                $('#photo').attr('src', '../photo/' + pic);
+        }
+        $('#deptId').change(function () {
+            var formdata = new FormData();
+            formdata.append("id", this.value);
+            $.ajax({
+                url: "./GetDeptChild/",
+                type: "post",
+                data: formdata,
+                async: true,
+                processData: false, //不对form进行处理
+                contentType: false, //指定为false才能形成正确的Content-Type
+                success: function (data, textStatus) {
+                    if (data.state == 1) {
+                        var deptChild = $('#deptChild');
+                        deptChild.html('');
+                        deptChild.append($('<option value="0">---请选择---</option>'));
+                        $.each(data.data, function (i, item) {
+                            deptChild.append($('<option value="' + item.id + '">' + item.text + '</option>'));
+                        });
+                    }
+                    else if (data.state == 0) {
+                        //发生错误，重新上传
+                        alert(data.msg_text);
+                    } else {
+                        alert("发生错误");
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //发生错误，重新上传
+                    alert("发生错误");
+                }
+            });
+        });
+        $('form').submit(function () {
+            var psw = $.trim($('#password').val());
+            var psw2 = $.trim($('#password2').val());
+            var enpsw = $.md5(psw);
+            var enpsw2 = $.md5(psw2);
+            $('#password').val(enpsw);
+            $('#password2').val(enpsw2)
+            return false;
+        });
+    });
     function OpenUpFile() {
         $('#upFile').click();
     }
@@ -170,8 +228,8 @@
             contentType: false, //指定为false才能形成正确的Content-Type
             success: function (data, textStatus) {
                 if (data.state == 1) {
-                    $('#stuphoto').attr('src', '../images/temp/' + data.data);
-                    $('#photo').val(data.data);
+                    $('#photo').attr('src', '../photo/temp/' + data.data);
+                    $('#picture').val(data.data);
                 }
                 else if (data.state == 0) {
                     //发生错误，重新上传

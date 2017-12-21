@@ -122,7 +122,7 @@ namespace FundsManager.Controllers
             List<SelectOption> option = (from ct in depts
                                          select new SelectOption
                                          {
-                                             id = ct.ctype_id.ToString(),
+                                             id = ct.ctype_name,
                                              text = ct.ctype_name
                                          }).ToList();
             return option;

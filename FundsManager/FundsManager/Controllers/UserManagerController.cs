@@ -11,6 +11,9 @@ using FundsManager.Models;
 using System.IO;
 using FundsManager.Common;
 using System.Configuration;
+using FundsManager.ViewModels;
+using System.Text;
+
 namespace FundsManager.Controllers
 {
     public class UserManagerController : Controller
@@ -50,17 +53,91 @@ namespace FundsManager.Controllers
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "user_id,user_name,real_name,user_certificate_type,user_certificate_no,user_mobile,user_email,user_password,user_salt,user_state,user_login_times")] User_Info user_Info)
+        public ActionResult Create([Bind(Include = "name,realName,certificateType,certificateNo,mobile,email,password,password2,state,gender,postId,officePhone,picture,deptId,deptChild,roleId")]UserEditModel model)
         {
             setSelect();
             if (ModelState.IsValid)
             {
-                db.User_Info.Add(user_Info);
+                //db.User_Info.Add(user_Info);
+                //db.SaveChanges();
+                //return RedirectToAction("Index");
+                User_Info info = new User_Info();
+                model.toUserInfoDB(info);
+                if (db.User_Info.Where(x => x.user_certificate_type == info.user_certificate_type && x.user_certificate_no == info.user_certificate_no).Count() > 0)
+                {
+                    ViewBag.msg = "该证件号已注册。";
+                    goto next;
+                }
+                if (db.User_Info.Where(x => x.user_email == info.user_email).Count() > 0)
+                {
+                    ViewBag.msg = "该邮箱已注册。";
+                    goto next;
+                }
+                if (db.User_Info.Where(x => x.user_mobile == info.user_mobile).Count() > 0)
+                {
+                    ViewBag.msg = "该手机号已注册。";
+                    goto next;
+                }
+                if (model.password!=model.password2)
+                {
+                    ViewBag.msg = "两次输入密码不一致，请重新输入。";
+                    goto next;
+                }
+                var salt = Guid.NewGuid().ToString("N").Substring(0, 10).ToUpper();
+                info.user_password = PasswordUnit.getPassword(model.password, salt);
+                info.ToEncrypt();
+                db.User_Info.Add(info);
+                try
+                {
+                    db.SaveChanges();
+                }catch(Exception ex)
+                {
+                    ViewBag.msg = "信息录入失败，请重新录入。";
+                    ErrorUnit.WriteErrorLog(ex.ToString(), this.GetType().Name);
+                    goto next;
+                }
+                
+                User_Extend extend = new User_Extend();
+                model.toUserExtendDB(extend);
+                extend.user_id = info.user_id;
+                db.User_Extend.Add(extend);
+                string photoDir = ConfigurationManager.AppSettings["photoPath"];
+                if (!Directory.Exists(photoDir)) Directory.CreateDirectory(photoDir);
+                string photoTempDir = ConfigurationManager.AppSettings["tempPhotoPath"];
+                string file_name = string.Format("{0}{1}", photoDir, extend.user_picture).Replace("_temp", "");
+                string temp_file_name = string.Format("{0}{1}", photoDir, extend.user_picture);
+                if (System.IO.File.Exists(temp_file_name))
+                {
+                    FileInfo fi = new FileInfo(temp_file_name);
+                    fi.CopyTo(file_name, true);
+                }
+                else ViewBag.msg = "图片保存失败。";
+                if (model.roleId != null)
+                {
+                    User_vs_Role uvr = new User_vs_Role();
+                    uvr.uvr_user_id = info.user_id;
+                    uvr.uvr_role_id = (int)model.roleId;
+                    db.User_vs_Role.Add(uvr);
+                }
                 db.SaveChanges();
-                return RedirectToAction("Index");
             }
-
-            return View(user_Info);
+            else
+            {
+                StringBuilder sbmsg = new StringBuilder();
+                foreach (var value in ModelState.Values)
+                {
+                    if (value.Errors.Count() > 0)
+                    {
+                        foreach (var err in value.Errors)
+                        {
+                            sbmsg.Append(err.ErrorMessage);
+                        }
+                        ViewBag.msg = sbmsg.ToString(); ;
+                    }
+                }
+            }
+            next:
+            return View(model);
         }
 
         // GET: UserManager/Edit/5
@@ -161,10 +238,13 @@ namespace FundsManager.Controllers
             ViewBag.Role = DropDownList.SetDropDownList(options);
         }
         [HttpPost]
-        public JsonResult GetPost(string id)
+        public JsonResult GetDeptChild(string id)
         {
+            BaseJsonData json = new BaseJsonData();
             List<SelectOption> options = DropDownList.getDepartment(PageValidate.FilterParam(id));
-            return Json(options, JsonRequestBehavior.AllowGet);
+            json.data = options;
+            json.state = 1;
+            return Json(json, JsonRequestBehavior.AllowGet);
         }
         protected override void Dispose(bool disposing)
         {
