@@ -1,109 +1,259 @@
-﻿@model FundsManager.Models.User_Info
-
+﻿@model FundsManager.ViewModels.UserEditModel
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-修改用户信息";
+    List<SelectListItem> cDept = new List<SelectListItem>();
+    if (Model.deptChild != null)
+    {
+        cDept = ViewBag.DeptChild as List<SelectListItem>;
+    }
 }
+<style>
 
-<h2>Edit</h2>
+</style>
 
-@using (Html.BeginForm())
+<h4>录入用户信息</h4>
+<div class="col-md-10" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
+@using (Html.BeginForm("Edit", "UserManager", Model, FormMethod.Post, null))
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
-        <h4>User_Info</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.user_id)
+        <div style="width:70%;float:left;">
+            <div class="form-group">
+                @Html.LabelFor(model => model.name, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "form-control", @placeholder = "请输入用于登陆的用户名" } })
+                    @Html.ValidationMessageFor(model => model.name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.realName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.realName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.realName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.certificateType, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.certificateType, ViewBag.CardType as List<SelectListItem>, new { @class = "select form-control" })
+                    @Html.ValidationMessageFor(model => model.certificateType, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.certificateNo, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.certificateNo, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.certificateNo, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.password, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.password, new { htmlAttributes = new { @class = "form-control", @type = "password" } })
+                    @Html.ValidationMessageFor(model => model.password, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.password2, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.password2, new { htmlAttributes = new { @class = "form-control", @type = "password" } })
+                    @Html.ValidationMessageFor(model => model.password2, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.gender, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.gender, ViewBag.Sex as List<SelectListItem>, new { @class = "select form-control" })
+                    @Html.ValidationMessageFor(model => model.gender, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.mobile, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.mobile, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                    @Html.ValidationMessageFor(model => model.mobile, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.officePhone, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.officePhone, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.officePhone, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.email, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.email, new { htmlAttributes = new { @class = "form-control", @type = "email" } })
+                    @Html.ValidationMessageFor(model => model.email, "", new { @class = "text-danger" })
+                </div>
+            </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.user_name, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.user_name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.user_name, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.deptId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.deptId, ViewBag.Department as List<SelectListItem>, "----请选择----", new { @class = "select form-control" })
+                    @Html.ValidationMessageFor(model => model.deptId, "", new { @class = "text-danger" })
+                    @Html.DropDownListFor(model => model.deptChild, @cDept, "----请选择----", new { @class = "select form-control" })
+                    @Html.ValidationMessageFor(model => model.deptChild, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.postId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.postId, ViewBag.Post as List<SelectListItem>, new { @class = "select form-control" })
+                    @Html.ValidationMessageFor(model => model.postId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.roleId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.roleId, ViewBag.Role as List<SelectListItem>, new { @class = "select form-control" })
+                    @Html.ValidationMessageFor(model => model.roleId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.state, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.state, ViewBag.State as List<SelectListItem>, new { @class = "select form-control" })
+                    @Html.ValidationMessageFor(model => model.state, "", new { @class = "text-danger" })
+                </div>
             </div>
         </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.real_name, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div style="width:25%;float:left;min-width:200px">
             <div class="col-md-10">
-                @Html.EditorFor(model => model.real_name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.real_name, "", new { @class = "text-danger" })
+                <img id="photo" class="img-thumbnail" alt="请选择小一寸或大一寸照片" style="width: 200px;" data-holder-rendered="true">
+            </div>
+            <div class="col-md-10" style="padding-top:10px;">
+                @Html.HiddenFor(model => model.picture)
+                <input type="button" value="选择图片" onclick="OpenUpFile();" class="btn btn-primary" />
+                <input type="file" style="display:none" onchange="UpFile(this)" id="upFile" name="upFile" />
+                <p>请使用小一寸或大一寸证件照片</p>
             </div>
         </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.user_certificate_type, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.user_certificate_type, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.user_certificate_type, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.user_certificate_no, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.user_certificate_no, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.user_certificate_no, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.user_mobile, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.user_mobile, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.user_mobile, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.user_email, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.user_email, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.user_email, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.user_password, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.user_password, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.user_password, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.user_salt, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.user_salt, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.user_salt, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.user_state, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.user_state, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.user_state, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.user_login_times, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.user_login_times, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.user_login_times, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+        <div style="width:70%;float:left;min-width:200px;">
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="录   入" class="btn btn-success" />
+                    @Html.ActionLink("返回列表", "ViewList", null, new { @class = "btn btn-warning" })
+                </div>
             </div>
         </div>
     </div>
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
+<script src="~/Scripts/jquery-3.2.1.min.js"></script>
+<script src="~/scripts/bootstrap.min.js"></script>
+<script>
+    $(function () {
+        $.getScript('http://'+window.location.host + '/scripts/jquery.md5.js');
+        var pic = $('#picture').val();
+        if(pic){
+            $('#photo').attr('src', 'http://' + window.location.host + '/photo/' + pic);
+        }
+        $('#deptId').change(function () {
+            var formdata = new FormData();
+            formdata.append("id", this.value);
+            $.ajax({
+                url: "@Url.RouteUrl(new { controller = "UserManager", action = "GetDeptChild" })",
+                type: "post",
+                data: formdata,
+                async: true,
+                processData: false, //不对form进行处理
+                contentType: false, //指定为false才能形成正确的Content-Type
+                success: function (data, textStatus) {
+                    if (data.state == 1) {
+                        var deptChild = $('#deptChild');
+                        deptChild.html('');
+                        deptChild.append($('<option value="0">---请选择---</option>'));
+                        $.each(data.data, function (i, item) {
+                            deptChild.append($('<option value="' + item.id + '">' + item.text + '</option>'));
+                        });
+                    }
+                    else if (data.state == 0) {
+                        //发生错误，重新上传
+                        alert(data.msg_text);
+                    } else {
+                        alert("发生错误");
+                    }
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //发生错误，重新上传
+                    alert("发生错误");
+                }
+            });
+        });
+        $('form').submit(function () {
+            var psw = $.trim($('#password').val());
+            var psw2 = $.trim($('#password2').val());
+            if (psw) {
+                var enpsw = $.md5(psw);
+                var enpsw2 = $.md5(psw2);
+                $('#password').val(enpsw);
+                $('#password2').val(enpsw2);
+            }
+        });
+    });
+    function OpenUpFile() {
+        $('#upFile').click();
+    }
+    function UpFile(obj) {
+        if (obj.files == null) {
+            alert("没有选择文件。");
+            return;
+        }
+        if (!checkfile(obj)) return;
+        var file = obj.files[0];
+        if (file.size > 1048576) {
+            alert("请上传大小小于1M的照片。");
+            return;
+        }
+        var formdata = new FormData();
+
+        formdata.append("data", file);
+        formdata.append("name", file.name);
+        $.ajax({
+            url:"@Url.RouteUrl(new { controller = "UserManager", action = "UploadPicture" })",
+            type: "post",
+            data: formdata,
+            async: true,
+            processData: false, //不对form进行处理
+            contentType: false, //指定为false才能形成正确的Content-Type
+            success: function (data, textStatus) {
+                if (data.state == 1) {
+                    $('#photo').attr('src', 'http://' + window.location.host + '/photo/temp/' + data.data);
+                    $('#picture').val(data.data);
+                }
+                else if (data.state == 0) {
+                    //发生错误，重新上传
+                    alert(data.msg_text);
+                } else {
+                    alert("发生错误，重新上传");
+                }
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                //发生错误，重新上传
+                alert("发生错误，重新上传");
+            }
+        });
+
+    }
+    function checkfile(obj) {
+        var validExts = new Array(".jpg");
+        var fileExt = obj.files[0].name;
+        fileExt = fileExt.substring(fileExt.lastIndexOf('.'));
+        if (validExts.indexOf(fileExt) < 0) {
+            obj.files = null;
+            alert("文件选择出错, 请选择 " + validExts.toString() + "类型文件。");
+            return false;
+        }
+        else return true;
+    }
+</script>

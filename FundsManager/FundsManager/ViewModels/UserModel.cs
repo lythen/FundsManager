@@ -1,5 +1,4 @@
-﻿using FundsManager.Common.DEncrypt;
-using FundsManager.Models;
+﻿using FundsManager.Models;
 using System.ComponentModel.DataAnnotations;
 using FundsManager.Common;
 using System.ComponentModel;
@@ -52,9 +51,9 @@ namespace FundsManager.ViewModels
         public string mobile { get; set; }
         [StringLength(200), DisplayName("电子邮箱"), Required]
         public string email { get; set; }
-        [StringLength(16), DisplayName("登陆密码"), Required]
+        [StringLength(32), DisplayName("登陆密码")]
         public string password { get; set; }
-        [StringLength(16), DisplayName("确认密码"), Required]
+        [StringLength(32), DisplayName("确认密码")]
         public string password2 { get; set; }
         [DisplayName("状态")]
         public int state { get ; set ; }
@@ -64,7 +63,7 @@ namespace FundsManager.ViewModels
         public int? postId { get; set; }
         [StringLength(20), DisplayName("办公电话")]
         public string officePhone { get; set; }
-        [StringLength(20), DisplayName("相片名称")]
+        [StringLength(50), DisplayName("相片名称")]
         public string picture { get; set; }
         [DisplayName("所属部门")]
         public int? deptId { get; set; }
@@ -87,8 +86,27 @@ namespace FundsManager.ViewModels
             model.user_dept_id = deptId==null?0:(deptChild==null?(int)deptId: (int)deptChild);
             model.user_gender = PageValidate.InputText(gender, 2);
             model.user_office_phone = officePhone!=null?PageValidate.InputText(officePhone, 20):"";
-            model.user_picture = picture!=null?PageValidate.InputText(picture, 20):"";
+            model.user_picture = picture!=null?PageValidate.InputText(picture, 50):"";
             model.user_post_id = postId==null?0:(int)postId;
+        }
+        public void FromUserInfoDB(User_Info model)
+        {
+            id = model.user_id;
+            name = model.user_name;
+            realName = model.real_name;
+            certificateNo = model.user_certificate_no;
+            certificateType = model.user_certificate_type;
+            email = model.user_email;
+            times = model.user_login_times;
+            mobile = model.user_mobile;
+            state = model.user_state;
+        }
+        public void FromUserExtendDB(User_Extend model)
+        {
+            gender = model.user_gender;
+            officePhone = model.user_office_phone;
+            picture = model.user_picture;
+            postId = model.user_post_id;
         }
     }
 }

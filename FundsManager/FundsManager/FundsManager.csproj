@@ -362,6 +362,10 @@
     <Compile Include="Migrations\201712211251121_adddic.Designer.cs">
       <DependentUpon>201712211251121_adddic.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712221235543_updatepiclen.cs" />
+    <Compile Include="Migrations\201712221235543_updatepiclen.Designer.cs">
+      <DependentUpon>201712221235543_updatepiclen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\BaseJsonData.cs" />
     <Compile Include="Models\Dic_Apply_State.cs" />
@@ -417,6 +421,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712211251121_adddic.resx">
       <DependentUpon>201712211251121_adddic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712221235543_updatepiclen.resx">
+      <DependentUpon>201712221235543_updatepiclen.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

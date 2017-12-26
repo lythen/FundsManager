@@ -15,7 +15,7 @@ namespace FundsManager.Models
         public int user_post_id { get; set; }
         [StringLength(20)]
         public string user_office_phone { get; set; }
-        [StringLength(20)]
+        [StringLength(50)]
         public string user_picture { get; set; }
         public int user_dept_id { get; set; }
     }
