@@ -6,19 +6,20 @@
     {
         cDept = ViewBag.DeptChild as List<SelectListItem>;
     }
+    FundsManager.ViewModels.LoginRole role = (FundsManager.ViewModels.LoginRole)Session["LoginRole"];
 }
 <style>
 
 </style>
 
 <h4>录入用户信息</h4>
-<div class="col-md-10" style="color:red;width:100%;text-align:center;">
+<div class="col-md-10" style="color:red;width:100%;text-align:center;font-size:16px;">
     @ViewBag.msg
 </div>
 @using (Html.BeginForm("Edit", "UserManager", Model, FormMethod.Post, null))
 {
     @Html.AntiForgeryToken()
-
+    @Html.HiddenFor(model=>model.id)
     <div class="form-horizontal">
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -99,7 +100,7 @@
                 <div class="col-md-10">
                     @Html.DropDownListFor(model => model.deptId, ViewBag.Department as List<SelectListItem>, "----请选择----", new { @class = "select form-control" })
                     @Html.ValidationMessageFor(model => model.deptId, "", new { @class = "text-danger" })
-                    @Html.DropDownListFor(model => model.deptChild, @cDept, "----请选择----", new { @class = "select form-control" })
+                    @Html.DropDownListFor(model => model.deptChild, Model.deptChild, @cDept, "请选择", new Dictionary<string, object> { { "class", "select form-control" }})
                     @Html.ValidationMessageFor(model => model.deptChild, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -110,6 +111,8 @@
                     @Html.ValidationMessageFor(model => model.postId, "", new { @class = "text-danger" })
                 </div>
             </div>
+            @if (role.roleName == "系统管理员")
+            {
             <div class="form-group">
                 @Html.LabelFor(model => model.roleId, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -124,6 +127,7 @@
                     @Html.ValidationMessageFor(model => model.state, "", new { @class = "text-danger" })
                 </div>
             </div>
+            }
         </div>
         <div style="width:25%;float:left;min-width:200px">
             <div class="col-md-10">
@@ -140,7 +144,7 @@
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
                     <input type="submit" value="录   入" class="btn btn-success" />
-                    @Html.ActionLink("返回列表", "ViewList", null, new { @class = "btn btn-warning" })
+                    @Html.ActionLink("返回列表", "Index", null, new { @class = "btn btn-warning" })
                 </div>
             </div>
         </div>
@@ -156,6 +160,8 @@
         if(pic){
             $('#photo').attr('src', 'http://' + window.location.host + '/photo/' + pic);
         }
+        $('#password').val('');
+        $('#password2').val('');
         $('#deptId').change(function () {
             var formdata = new FormData();
             formdata.append("id", this.value);
@@ -215,7 +221,6 @@
             return;
         }
         var formdata = new FormData();
-
         formdata.append("data", file);
         formdata.append("name", file.name);
         $.ajax({

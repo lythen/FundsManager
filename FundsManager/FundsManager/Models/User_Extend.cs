@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
+using System;
 namespace FundsManager.Models
 {
     /// <summary>
@@ -18,5 +18,9 @@ namespace FundsManager.Models
         [StringLength(50)]
         public string user_picture { get; set; }
         public int user_dept_id { get; set; }
+        public DateTime? user_add_time { get; set; }
+        public int? user_add_user { get; set; }
+        public DateTime? user_edit_time { get; set; }
+        public int? user_edit_user { get; set; }
     }
 }

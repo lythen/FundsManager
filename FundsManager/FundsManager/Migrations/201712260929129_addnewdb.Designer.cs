@@ -7,13 +7,13 @@ namespace FundsManager.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class updatepiclen : IMigrationMetadata
+    public sealed partial class addnewdb : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(updatepiclen));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(addnewdb));
         
         string IMigrationMetadata.Id
         {
-            get { return "201712221235543_updatepiclen"; }
+            get { return "201712260929129_addnewdb"; }
         }
         
         string IMigrationMetadata.Source

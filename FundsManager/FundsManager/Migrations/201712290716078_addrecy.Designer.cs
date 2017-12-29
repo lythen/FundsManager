@@ -7,13 +7,13 @@ namespace FundsManager.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class adddic : IMigrationMetadata
+    public sealed partial class addrecy : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(adddic));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(addrecy));
         
         string IMigrationMetadata.Id
         {
-            get { return "201712211251121_adddic"; }
+            get { return "201712290716078_addrecy"; }
         }
         
         string IMigrationMetadata.Source

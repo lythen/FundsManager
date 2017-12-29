@@ -1,84 +1,217 @@
-﻿@model IEnumerable<FundsManager.Models.User_Info>
+﻿@model IEnumerable<FundsManager.ViewModels.UserListModel>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-用户列表";
+    FundsManager.ViewModels.BasePagerModel pageinfo = (FundsManager.ViewModels.BasePagerModel)ViewData["search"];
 }
+<style>
+    .table > tbody > tr > td {
+        vertical-align: middle;
+    }
 
+        .table > tbody > tr > td > img {
+            max-height: 75px;
+        }
+</style>
 <h2>用户列表</h2>
+@using (Html.BeginForm("Index", "UserManagerController", pageinfo, FormMethod.Post, new { @id = "form1" }))
+{
+    @Html.AntiForgeryToken()
+    <table class="table">
+        <tr>
+            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.roleName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.realName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.deptName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.postName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.stateTxt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.loginTimes)
+            </th>
+            <th>操作</th>
+        </tr>
 
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.user_name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.real_name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.user_certificate_type)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.user_certificate_no)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.user_mobile)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.user_email)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.user_password)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.user_salt)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.user_state)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.user_login_times)
-        </th>
-        <th></th>
-    </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <img src="http://@HttpContext.Current.Request.Url.Host:@Request.Url.Port/photo/@item.picture" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.roleName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.realName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.deptName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.postName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.stateTxt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.loginTimes)
+                </td>
+                <td>
+                    @Html.ActionLink("详细", "Edit", new { id = item.id }) |
+                    <a href="javascript:void(0);" onclick="Delete(@item.id)">删除</a>
+                </td>
+            </tr>
+        }
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.user_name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.real_name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.user_certificate_type)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.user_certificate_no)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.user_mobile)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.user_email)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.user_password)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.user_salt)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.user_state)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.user_login_times)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.user_id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.user_id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.user_id })
-        </td>
-    </tr>
+    </table>
+    @Html.HiddenFor(page => pageinfo.PageIndex, new { @id = "hid-pageindex" })
+    @Html.HiddenFor(page => pageinfo.PageSize, new { @id = "hid-pagesize" })
+    int pagerLen = 20;
+    int begini = 1;
+    int endi = 1;
+    if (pageinfo.Pages > 1)
+    {
+        if (pageinfo.Pages <= pagerLen) { endi = pageinfo.Pages; }
+        else
+        {
+            var mid = pagerLen / 2;
+            if (pageinfo.PageIndex + mid >= pageinfo.Pages)
+            {
+                endi = pageinfo.Pages;
+                mid = endi - pageinfo.PageIndex;
+                begini = pageinfo.PageIndex - (pagerLen - mid) + 1;
+            }
+            else
+            {
+                if (pageinfo.PageIndex - mid <= 0)
+                {
+                    begini = 1;
+                    mid = pagerLen - (pageinfo.PageIndex - begini);
+                }
+                else { begini = pageinfo.PageIndex - mid; }
+                endi = pageinfo.PageIndex + mid - 1;
+            }
+        }
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if (pageinfo.PageIndex == 1)
+                {
+                    <li class="disabled">
+                        <span>
+                            <span aria-hidden="true">&laquo;</span>
+                        </span>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="javascript:void(0);" onclick="Previous();" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+                @for (var i = begini; i <= endi; i++)
+                {
+                    if (i == pageinfo.PageIndex)
+                    {
+                        <li class="active"><a href="#">@i<span class="sr-only">(current)</span></a></li>
+                    }
+                    else
+                    {
+                        <li><a href="javascript:void(0);" onclick="goTo(@i);">@i</a></li>
+                    }
+
+                }
+                @if (pageinfo.PageIndex == pageinfo.Pages)
+                {
+                    <li class="disabled">
+                        <span>
+                            <span aria-hidden="true">&raquo;</span>
+                        </span>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="javascript:void(0);" aria-label="Next" onclick="Next();">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
 }
+<script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script>
+    function goTo(pageindex) {
+        $('#hid-pageindex').val(pageindex);
+        $('#indexForm').submit();
+    }
+    function Next(){
+        var pageindex=parseInt($('#hid-pageindex').val());
+        if(pageindex==(@pageinfo.Pages)){
+            alert('已是最后一页。');
+            return;
+        }
+        pageindex++;
+        goTo(pageindex);
+    }
+    function Previous() {
+        var pageindex=parseInt($('#hid-pageindex').val());
+        if(pageindex==1){
+            alert('已是第一页。');
+            return;
+        }
+        pageindex--;
+        goTo(pageindex);
+    }
+    function Delete(id){
+        if(!confirm("是否删除该用户，删除后将无法恢复。")) return;
+        var data = new Object();
+        var formdata = new FormData();
+        formdata.append("id", id);
+        $.ajax({
+            url: "@Url.RouteUrl(new { controller = "UserManager", action = "Delete" })",
+            type: "post",
+            data: formdata,
+            async: true,
+            processData: false, //不对form进行处理
+            contentType: false, //指定为false才能形成正确的Content-Type
+            success: function (data, textStatus) {
+                if (data.state == 1) {
+                    alert(data.msg_text);
+                    if(data.msg_code=="success"){
+                        window.location.reload();
+                    }
+                }
+                else if (data.state == 0) {
+                    //发生错误，重新上传
+                    alert("发生错误");
+                } else {
+                    alert("发生错误");
+                }
 
-</table>
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                //发生错误，重新上传
+                alert("发生错误");
+            }
+        });
+    }
+</script>

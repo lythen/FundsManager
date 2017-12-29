@@ -56,7 +56,7 @@ namespace FundsManager.ViewModels
         [StringLength(32), DisplayName("确认密码")]
         public string password2 { get; set; }
         [DisplayName("状态")]
-        public int state { get ; set ; }
+        public int? state { get ; set ; }
         [StringLength(2), DisplayName("性别")]
         public string gender { get; set; }
         [DisplayName("职务")]
@@ -79,14 +79,14 @@ namespace FundsManager.ViewModels
             model.user_email = PageValidate.InputText(email, 100);
             model.user_mobile = PageValidate.InputText(mobile, 20);
             model.user_name = PageValidate.InputText(name, 20);
-            model.user_state = state;
+            model.user_state = state==null?model.user_state:(int)state;
         }
         public void toUserExtendDB(User_Extend model)
         {
             model.user_dept_id = deptId==null?0:(deptChild==null?(int)deptId: (int)deptChild);
             model.user_gender = PageValidate.InputText(gender, 2);
             model.user_office_phone = officePhone!=null?PageValidate.InputText(officePhone, 20):"";
-            model.user_picture = picture!=null?PageValidate.InputText(picture, 50):"";
+            model.user_picture = picture!=null?PageValidate.InputText(picture, 50).Replace("_temp",""):"";
             model.user_post_id = postId==null?0:(int)postId;
         }
         public void FromUserInfoDB(User_Info model)
@@ -108,5 +108,20 @@ namespace FundsManager.ViewModels
             picture = model.user_picture;
             postId = model.user_post_id;
         }
+    }
+    public class UserListModel:UserModel
+    {
+        [DisplayName("真实姓名")]
+        public string realName { get; set; }
+        [DisplayName("相片名称")]
+        public string picture { get; set; }
+        [DisplayName("部门/科室")]
+        public string deptName { get; set; }
+        [DisplayName("职务")]
+        public string postName { get; set; }
+        [DisplayName("状态")]
+        public string stateTxt { get; set; }
+        [DisplayName("登陆次数")]
+        public int loginTimes { get; set; }
     }
 }

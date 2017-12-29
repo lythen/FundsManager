@@ -6,7 +6,7 @@ namespace FundsManager.Models
     /// <summary>
     /// 经费回收站
     /// </summary>
-    public class Funds_Recycle
+    public class Recycle_Funds
     {
         [Key]
         public int id { get; set; }

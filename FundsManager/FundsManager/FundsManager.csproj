@@ -255,7 +255,6 @@
     <Content Include="Views\Shared\_top.cshtml" />
     <Content Include="Views\Shared\_home.cshtml" />
     <Content Include="Views\UserManager\Create.cshtml" />
-    <Content Include="Views\UserManager\Delete.cshtml" />
     <Content Include="Views\UserManager\Details.cshtml" />
     <Content Include="Views\UserManager\Edit.cshtml" />
     <Content Include="Views\UserManager\Index.cshtml" />
@@ -330,41 +329,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\HandleErrorAttribute.cs" />
-    <Compile Include="Migrations\201712190711055_addFirst.cs" />
-    <Compile Include="Migrations\201712190711055_addFirst.Designer.cs">
-      <DependentUpon>201712190711055_addFirst.cs</DependentUpon>
+    <Compile Include="Migrations\201712260929129_addnewdb.cs" />
+    <Compile Include="Migrations\201712260929129_addnewdb.Designer.cs">
+      <DependentUpon>201712260929129_addnewdb.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201712191152399_addcontroller2.cs" />
-    <Compile Include="Migrations\201712191152399_addcontroller2.Designer.cs">
-      <DependentUpon>201712191152399_addcontroller2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712191227158_addsiteinfo.cs" />
-    <Compile Include="Migrations\201712191227158_addsiteinfo.Designer.cs">
-      <DependentUpon>201712191227158_addsiteinfo.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712191238164_addfundsyear.cs" />
-    <Compile Include="Migrations\201712191238164_addfundsyear.Designer.cs">
-      <DependentUpon>201712191238164_addfundsyear.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712191258165_addeditsiteinfotable.cs" />
-    <Compile Include="Migrations\201712191258165_addeditsiteinfotable.Designer.cs">
-      <DependentUpon>201712191258165_addeditsiteinfotable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712201135251_addcontrollerinfo.cs" />
-    <Compile Include="Migrations\201712201135251_addcontrollerinfo.Designer.cs">
-      <DependentUpon>201712201135251_addcontrollerinfo.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712201335064_addtworecycle.cs" />
-    <Compile Include="Migrations\201712201335064_addtworecycle.Designer.cs">
-      <DependentUpon>201712201335064_addtworecycle.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712211251121_adddic.cs" />
-    <Compile Include="Migrations\201712211251121_adddic.Designer.cs">
-      <DependentUpon>201712211251121_adddic.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712221235543_updatepiclen.cs" />
-    <Compile Include="Migrations\201712221235543_updatepiclen.Designer.cs">
-      <DependentUpon>201712221235543_updatepiclen.cs</DependentUpon>
+    <Compile Include="Migrations\201712290716078_addrecy.cs" />
+    <Compile Include="Migrations\201712290716078_addrecy.Designer.cs">
+      <DependentUpon>201712290716078_addrecy.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\BaseJsonData.cs" />
@@ -376,12 +347,13 @@
     <Compile Include="Models\Dic_Respond_State.cs" />
     <Compile Include="Models\Dic_Role.cs" />
     <Compile Include="Models\Funds.cs" />
-    <Compile Include="Models\Funds_Recycle.cs" />
+    <Compile Include="Models\Recycle_Funds.cs" />
     <Compile Include="Models\Funds_Apply.cs" />
     <Compile Include="Models\Funds_Apply_Child.cs" />
     <Compile Include="Models\Funds_Apply_Recycle.cs" />
     <Compile Include="Models\Process_Original.cs" />
     <Compile Include="Models\Process_Respond.cs" />
+    <Compile Include="Models\Recycle_User.cs" />
     <Compile Include="Models\Role_vs_Controller.cs" />
     <Compile Include="Models\SelectOption.cs" />
     <Compile Include="Models\Sys_Controller.cs" />
@@ -398,35 +370,13 @@
     <Compile Include="ViewModels\UserModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201712190711055_addFirst.resx">
-      <DependentUpon>201712190711055_addFirst.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201712260929129_addnewdb.resx">
+      <DependentUpon>201712260929129_addnewdb.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712191152399_addcontroller2.resx">
-      <DependentUpon>201712191152399_addcontroller2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712191227158_addsiteinfo.resx">
-      <DependentUpon>201712191227158_addsiteinfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712191238164_addfundsyear.resx">
-      <DependentUpon>201712191238164_addfundsyear.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712191258165_addeditsiteinfotable.resx">
-      <DependentUpon>201712191258165_addeditsiteinfotable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712201135251_addcontrollerinfo.resx">
-      <DependentUpon>201712201135251_addcontrollerinfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712201335064_addtworecycle.resx">
-      <DependentUpon>201712201335064_addtworecycle.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712211251121_adddic.resx">
-      <DependentUpon>201712211251121_adddic.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712221235543_updatepiclen.resx">
-      <DependentUpon>201712221235543_updatepiclen.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201712290716078_addrecy.resx">
+      <DependentUpon>201712290716078_addrecy.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

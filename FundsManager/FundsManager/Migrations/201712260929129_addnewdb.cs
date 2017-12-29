@@ -3,7 +3,7 @@ namespace FundsManager.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class addFirst : DbMigration
+    public partial class addnewdb : DbMigration
     {
         public override void Up()
         {
@@ -15,6 +15,15 @@ namespace FundsManager.Migrations
                         das_state_name = c.String(nullable: false, maxLength: 20),
                     })
                 .PrimaryKey(t => t.das_state_id);
+            
+            CreateTable(
+                "dbo.Dic_CardType",
+                c => new
+                    {
+                        ctype_id = c.Int(nullable: false, identity: true),
+                        ctype_name = c.String(nullable: false, maxLength: 50),
+                    })
+                .PrimaryKey(t => t.ctype_id);
             
             CreateTable(
                 "dbo.Dic_Department",
@@ -68,6 +77,8 @@ namespace FundsManager.Migrations
                     {
                         f_id = c.Int(nullable: false, identity: true),
                         f_name = c.String(maxLength: 100),
+                        f_in_year = c.String(maxLength: 4),
+                        f_expireDate = c.DateTime(nullable: false),
                         f_source = c.String(maxLength: 100),
                         f_amount = c.Decimal(nullable: false, precision: 18, scale: 2),
                         f_balance = c.Decimal(nullable: false, precision: 18, scale: 2),
@@ -100,6 +111,42 @@ namespace FundsManager.Migrations
                         c_state = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.c_child_number);
+            
+            CreateTable(
+                "dbo.Funds_Apply_Recycle",
+                c => new
+                    {
+                        id = c.Int(nullable: false, identity: true),
+                        apply_number = c.String(maxLength: 9),
+                        apply_user_id = c.Int(nullable: false),
+                        apply_time = c.DateTime(nullable: false),
+                        apply_funds_id = c.Int(nullable: false),
+                        apply_for = c.String(maxLength: 2000),
+                        apply_amount = c.Decimal(nullable: false, precision: 18, scale: 2),
+                        apply_state = c.Int(nullable: false),
+                        apply_delete_user = c.Int(nullable: false),
+                        apply_delete_time = c.DateTime(nullable: false),
+                    })
+                .PrimaryKey(t => t.id);
+            
+            CreateTable(
+                "dbo.Funds_Recycle",
+                c => new
+                    {
+                        id = c.Int(nullable: false, identity: true),
+                        f_id = c.Int(nullable: false),
+                        f_name = c.String(maxLength: 100),
+                        f_in_year = c.String(maxLength: 4),
+                        f_expireDate = c.DateTime(nullable: false),
+                        f_source = c.String(maxLength: 100),
+                        f_amount = c.Decimal(nullable: false, precision: 18, scale: 2),
+                        f_balance = c.Decimal(nullable: false, precision: 18, scale: 2),
+                        f_manager = c.Int(nullable: false),
+                        f_info = c.String(maxLength: 2000),
+                        f_delete_user = c.Int(nullable: false),
+                        f_delete_time = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.id);
             
             CreateTable(
                 "dbo.Process_Original",
@@ -140,7 +187,8 @@ namespace FundsManager.Migrations
                 c => new
                     {
                         id = c.Int(nullable: false, identity: true),
-                        controller_name = c.String(),
+                        controller_name = c.String(maxLength: 20),
+                        controller_info = c.String(maxLength: 1000),
                     })
                 .PrimaryKey(t => t.id);
             
@@ -160,6 +208,22 @@ namespace FundsManager.Migrations
                 .PrimaryKey(t => t.log_id);
             
             CreateTable(
+                "dbo.Sys_SiteInfo",
+                c => new
+                    {
+                        site_name = c.String(nullable: false, maxLength: 100),
+                        site_company = c.String(maxLength: 100),
+                        site_introduce = c.String(maxLength: 2000),
+                        site_company_address = c.String(maxLength: 200),
+                        site_company_phone = c.String(maxLength: 20),
+                        site_company_email = c.String(maxLength: 100),
+                        site_manager_name = c.String(maxLength: 50),
+                        site_manager_phone = c.String(maxLength: 20),
+                        site_manager_email = c.String(maxLength: 100),
+                    })
+                .PrimaryKey(t => t.site_name);
+            
+            CreateTable(
                 "dbo.User_Extend",
                 c => new
                     {
@@ -167,7 +231,7 @@ namespace FundsManager.Migrations
                         user_gender = c.String(maxLength: 2),
                         user_post_id = c.Int(nullable: false),
                         user_office_phone = c.String(maxLength: 20),
-                        user_picture = c.String(maxLength: 20),
+                        user_picture = c.String(maxLength: 50),
                         user_dept_id = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.user_id);
@@ -206,11 +270,14 @@ namespace FundsManager.Migrations
             DropTable("dbo.User_vs_Role");
             DropTable("dbo.User_Info");
             DropTable("dbo.User_Extend");
+            DropTable("dbo.Sys_SiteInfo");
             DropTable("dbo.Sys_Log");
             DropTable("dbo.Sys_Controller");
             DropTable("dbo.Role_vs_Controller");
             DropTable("dbo.Process_Respond");
             DropTable("dbo.Process_Original");
+            DropTable("dbo.Funds_Recycle");
+            DropTable("dbo.Funds_Apply_Recycle");
             DropTable("dbo.Funds_Apply_Child");
             DropTable("dbo.Funds_Apply");
             DropTable("dbo.Funds");
@@ -219,6 +286,7 @@ namespace FundsManager.Migrations
             DropTable("dbo.Dic_Post");
             DropTable("dbo.Dic_Log_Type");
             DropTable("dbo.Dic_Department");
+            DropTable("dbo.Dic_CardType");
             DropTable("dbo.Dic_Apply_State");
         }
     }
