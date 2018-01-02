@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using FundsManager.DAL;
 using FundsManager.Models;
+using FundsManager.ViewModels;
 
 namespace FundsManager.Controllers
 {
@@ -39,9 +40,16 @@ namespace FundsManager.Controllers
         // GET: FundsManager/Create
         public ActionResult Create()
         {
-            return View();
+            SetSelect();
+            return View(new FundsModel());
         }
-
+        void SetSelect()
+        {
+            List<SelectOption> options = DropDownList.UserStateSelect();
+            ViewBag.State = DropDownList.SetDropDownList(options);
+            options = DropDownList.FundsManagerSelect();
+            ViewBag.Manager = DropDownList.SetDropDownList(options);
+        }
         // POST: FundsManager/Create
         // 为了防止“过多发布”攻击，请启用要绑定到的特定属性，有关 
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。

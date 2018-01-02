@@ -23,5 +23,6 @@ namespace FundsManager.Models
         public int f_manager { get; set; }
         [StringLength(2000)]
         public string f_info { get; set; }
+        public int f_state { get; set; }
     }
 }

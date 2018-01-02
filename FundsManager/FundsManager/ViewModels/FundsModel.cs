@@ -5,15 +5,17 @@ using System.ComponentModel.DataAnnotations;
 using FundsManager.Common;
 namespace FundsManager.ViewModels
 {
-    public class FundsInfo
+    public class FundsModel
     {
+        private DateTime _expireDate = DateTime.Parse(string.Format("{0}-12-31 23:59:59.999", DateTime.Now.Year));
+        private int _state = 1;
         public int id { get; set; }
         [StringLength(100),DisplayName("经费名称")]
         public string name { get; set; }
         [StringLength(4), DisplayName("使用年度")]
         public string year { get; set; }
         [DisplayName("结算时间")]
-        public DateTime expireDate { get; set; }
+        public DateTime expireDate { get { return _expireDate; } set { _expireDate = value==null? _expireDate:value; } }
         [StringLength(100), DisplayName("经费来源")]
         public string source { get; set; }
         [DataType(DataType.Currency), DisplayName("经费总额")]
@@ -25,9 +27,11 @@ namespace FundsManager.ViewModels
         public string managerName { get; set; }
         [StringLength(2000), DisplayName("备注")]
         public string info { get; set; }
-        public Funds toDBModel()
+        [DisplayName("状态")]
+        public int state { get { return _state; }set { _state = value; } }
+        public void toDBModel(Funds model)
         {
-            Funds model = new Funds();
+            model = new Funds();
             model.f_amount = amount;
             model.f_balance = balance;
             model.f_expireDate = expireDate;
@@ -37,7 +41,6 @@ namespace FundsManager.ViewModels
             model.f_manager = manager;
             model.f_name = PageValidate.InputText(name, 100);
             model.f_source = PageValidate.InputText(source, 100);
-            return model;
         }
     }
 }

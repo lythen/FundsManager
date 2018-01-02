@@ -1,4 +1,4 @@
-﻿@model FundsManager.Models.Funds
+﻿@model FundsManager.ViewModels.FundsModel
 
 @{
     ViewBag.Title = "Create";
@@ -15,56 +15,68 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
-            @Html.LabelFor(model => model.f_name, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.name, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.f_name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.f_name, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.name, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.f_source, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.source, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.f_source, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.f_source, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.source, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.source, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.f_amount, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.amount, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.f_amount, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.f_amount, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.amount, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.amount, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.f_balance, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.balance, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.f_balance, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.f_balance, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.balance, new { htmlAttributes = new { @class = "form-control",@placeholder="若经费未使用可不输入余额。" } })
+                @Html.ValidationMessageFor(model => model.balance, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.f_manager, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.manager, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.f_manager, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.f_manager, "", new { @class = "text-danger" })
+                @Html.DropDownListFor(model => model.manager, ViewBag.Manager as List<SelectListItem>, new { @class = "select form-control" })
+                @Html.ValidationMessageFor(model => model.manager, "", new { @class = "text-danger" })
             </div>
         </div>
-
         <div class="form-group">
-            @Html.LabelFor(model => model.f_info, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.year, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.f_info, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.f_info, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.year, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.year, "", new { @class = "text-danger" })
             </div>
         </div>
-
+        <div class="form-group">
+            @Html.LabelFor(model => model.info, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model=>model.info, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.info, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.state, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.state, ViewBag.State as List<SelectListItem>, new { @class = "select form-control" })
+                @Html.ValidationMessageFor(model => model.state, "", new { @class = "text-danger" })
+            </div>
+        </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="添  加" class="btn btn-default" />
             </div>
         </div>
     </div>
