@@ -1,17 +1,18 @@
 ﻿@model FundsManager.ViewModels.FundsModel
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "创建经费";
 }
 
-<h2>添加经费</h2>
-
+<h4>添加经费</h4>
+<div class="col-md-10" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
 @using (Html.BeginForm()) 
 {
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>Funds</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
@@ -54,10 +55,10 @@
             </div>
         </div>
         <div class="form-group">
-            @Html.LabelFor(model => model.year, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.expireDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.year, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.year, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.expireDate, new { htmlAttributes = new { @class = "form-control", @type = "date" } })
+                @Html.ValidationMessageFor(model => model.expireDate, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="form-group">
@@ -76,12 +77,10 @@
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="添  加" class="btn btn-default" />
+                <input type="submit" value="添  加" class="btn btn-success" />
+                @Html.ActionLink("返回经费列表", "Index",null, new { @class = "btn btn-info" })
             </div>
         </div>
     </div>
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>

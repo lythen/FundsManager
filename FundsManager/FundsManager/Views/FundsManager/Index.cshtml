@@ -1,38 +1,40 @@
-﻿@model IEnumerable<FundsManager.Models.Funds>
+﻿@model FundsManager.ViewModels.FundsListView
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费列表";
+    List<FundsManager.ViewModels.FundsListModel> mFunds = Model.managerFunds;
+    List<FundsManager.ViewModels.FundsListModel> uFunds = Model.useFunds;
 }
 
-<h2>Index</h2>
-
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
+<h2>经费列表</h2>
+<hr />
+@if (mFunds != null)
+{
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.f_name)
+            @Html.DisplayNameFor(model => model.id)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.f_source)
+            @Html.DisplayNameFor(model => model.name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.f_amount)
+            @Html.DisplayNameFor(model => model.amount)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.f_balance)
+            @Html.DisplayNameFor(model => model.balance)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.f_manager)
+            @Html.DisplayNameFor(model => model.manager)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.f_info)
+            @Html.DisplayNameFor(model => model.info)
         </th>
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
+@foreach (var item in mFunds)
+{
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.f_name)
@@ -53,11 +55,69 @@
             @Html.DisplayFor(modelItem => item.f_info)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.f_id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.f_id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.f_id })
+            @Html.ActionLink("编辑", "Edit", new { id = item.f_id }) |
+            @Html.ActionLink("详细", "Details", new { id = item.f_id }) |
+            @Html.ActionLink("删除", "Delete", new { id = item.f_id })
         </td>
     </tr>
 }
 
 </table>
+}
+</p>
+@if (uFunds != null)
+{
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.f_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.f_source)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.f_amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.f_balance)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.f_manager)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.f_info)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in uFunds)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.f_name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.f_source)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.f_amount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.f_balance)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.f_manager)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.f_info)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.f_id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.f_id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.f_id })
+                </td>
+            </tr>
+        }
+
+    </table>
+}

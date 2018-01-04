@@ -65,15 +65,20 @@ namespace FundsManager.Controllers
             List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_funds_manger);
             if (options == null)
             {
-                options = (from user in db.User_Info
-                           join uvr in db.User_vs_Role
-                           on user.user_id equals uvr.uvr_user_id into T1
-                           from t1 in T1.DefaultIfEmpty()
-                           where t1.uvr_role_id == 1 || t1.uvr_role_id == 2
+                options = (from op in (from user in db.User_Info
+                                       join uvr in db.User_vs_Role
+                                       on user.user_id equals uvr.uvr_user_id into T1
+                                       from t1 in T1.DefaultIfEmpty()
+                                       where t1.uvr_role_id == 1 || t1.uvr_role_id == 2
+                                       select new
+                                       {
+                                           id = user.user_id,
+                                           text = user.real_name
+                                       }).ToList()
                            select new SelectOption
                            {
-                               id = user.user_id.ToString(),
-                               text = user.real_name
+                               id = op.id.ToString(),
+                               text = Common.DEncrypt.AESEncrypt.Decrypt(op.text)
                            }).ToList();
                 if (options.Count() > 0) DataCache.SetCache(cache_funds_manger, options);
             }

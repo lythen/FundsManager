@@ -55,13 +55,20 @@ namespace FundsManager.Controllers
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "f_id,f_name,f_source,f_amount,f_balance,f_manager,f_info")] Funds funds)
+        public ActionResult Create([Bind(Include = "name,expireDate,source,amount,balance,manager,info,state")] FundsModel funds)
         {
             if (ModelState.IsValid)
             {
-                db.Funds.Add(funds);
+                if (db.Funds.Where(x => x.f_name == funds.name.ToString()).Count() > 0)
+                {
+                    ViewBag.msg = "该名称已被使用";
+                    return View(funds);
+                }
+                Funds model = new Funds();
+                funds.toDBModel(model);
+                db.Funds.Add(model);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                ViewBag.msg = "经费添加成功。";
             }
 
             return View(funds);
