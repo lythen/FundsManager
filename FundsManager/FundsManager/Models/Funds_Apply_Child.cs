@@ -12,8 +12,11 @@ namespace FundsManager.Models
         public string c_apply_number { get; set; }
         [StringLength(13),Key]
         public string c_child_number { get; set; }
+        public int c_funds_id { get; set; }
         [Required,DataType(DataType.Currency)]
         public decimal c_amount { get; set; }
         public int c_state { get { return _c_state; } set { _c_state = value; } }
+        [StringLength(2000)]
+        public string c_apply_for { get; set; }
     }
 }

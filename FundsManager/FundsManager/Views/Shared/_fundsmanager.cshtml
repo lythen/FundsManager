@@ -62,10 +62,10 @@
                     @RenderPage("_logout.cshtml")
                     <div class="widget">
                         <div class="list-group">
-                            @Html.RouteLink("经费管理", new { controller = "Student", action = "ViewList", id = "1" }, new { @class = "list-group-item studentlist" })
-                            @Html.RouteLink("添加经费", new { controller = "Student", action = "Register" }, new { @class = "list-group-item courseregister" })
-                            @Html.RouteLink("支出明细", new { controller = "Student", action = "Create" }, new { @class = "list-group-item addstudent" })
-                            @Html.RouteLink("支出统计", new { controller = "Student", action = "Create" }, new { @class = "list-group-item addstudent" })
+                            @Html.RouteLink("经费管理", new { controller = "FundsManager", action = "Index" }, new { @class = "list-group-item fundsindex" })
+                            @Html.RouteLink("添加经费", new { controller = "FundsManager", action = "Create" }, new { @class = "list-group-item fundsadd" })
+                            @Html.RouteLink("支出明细", new { controller = "FundsManager", action = "Create" }, new { @class = "list-group-item fundsdetail" })
+                            @Html.RouteLink("支出统计", new { controller = "FundsManager", action = "Create" }, new { @class = "list-group-item fundsstat" })
                         </div>
                     </div>
                 </aside>

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace FundsManager.ViewModels
 {
-    public class FundsModel: FundsListModel
+    public class FundsModel: FundsBaseModel
     {
         private int _state = 1;
         [StringLength(4), DisplayName("到期时间")]
@@ -31,7 +31,7 @@ namespace FundsManager.ViewModels
             model.f_source = PageValidate.InputText(source, 100);
         }
     }
-    public class FundsListModel {
+    public class FundsBaseModel {
         private DateTime _expireDate = DateTime.Parse(string.Format("{0}-12-31 23:59:59.999", DateTime.Now.Year));
         [DisplayName("经费ID")]
         public int id { get; set; }
@@ -43,18 +43,29 @@ namespace FundsManager.ViewModels
         public DateTime expireDate { get { return _expireDate; } set { _expireDate = value == null ? _expireDate : value; } }
         [StringLength(100), DisplayName("经费来源")]
         public string source { get; set; }
-        [DisplayName("状态")]
-        public string strState { get; set; }
         [DataType(DataType.Currency), DisplayName("经费总额")]
         public decimal amount { get; set; }
         [DataType(DataType.Currency), DisplayName("经费余额")]
         public decimal? balance { get; set; }
     }
+    public class mFundsListModel: FundsBaseModel
+    {
+        [DisplayName("状态")]
+        public string strState { get; set; }
+        [DisplayName("已申请数")]
+        public int userCount { get; set; }
+        [DisplayName("申请总额")]
+        public decimal applyamount { get; set; }
+    }
+    public class uFundsListModel: FundsBaseModel
+    {
+
+    }
     public class FundsListView
     {
         //管理的经费
-        public List<FundsListModel> managerFunds { get; set; }
+        public List<mFundsListModel> managerFunds { get; set; }
         //使用的经费
-        public List<FundsListModel> useFunds { get; set; }
+        public List<uFundsListModel> useFunds { get; set; }
     }
 }

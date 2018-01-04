@@ -2,8 +2,8 @@
 
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费列表";
-    List<FundsManager.ViewModels.FundsListModel> mFunds = Model.managerFunds;
-    List<FundsManager.ViewModels.FundsListModel> uFunds = Model.useFunds;
+    List<FundsManager.ViewModels.mFundsListModel> mFunds = Model.managerFunds;
+    List<FundsManager.ViewModels.uFundsListModel> uFunds = Model.useFunds;
 }
 
 <h2>经费列表</h2>
@@ -13,22 +13,26 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.id)
+           ID
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.name)
+            经费名称
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.amount)
+            经费总额
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.balance)
+            经费余额
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.manager)
+            状态
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.info)
+            已申请数
+        </th>
+        <th>申请总额</th>
+        <th>
+            结算时间
         </th>
         <th></th>
     </tr>
@@ -37,84 +41,74 @@
 {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.f_name)
+            @Html.DisplayFor(modelItem => item.id)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.f_source)
+            @Html.DisplayFor(modelItem => item.name)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.f_amount)
+            @Html.DisplayFor(modelItem => item.amount)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.f_balance)
+            @Html.DisplayFor(modelItem => item.balance)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.f_manager)
+            @Html.DisplayFor(modelItem => item.strState)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.f_info)
+            @Html.DisplayFor(modelItem => item.userCount)
         </td>
         <td>
-            @Html.ActionLink("编辑", "Edit", new { id = item.f_id }) |
-            @Html.ActionLink("详细", "Details", new { id = item.f_id }) |
-            @Html.ActionLink("删除", "Delete", new { id = item.f_id })
+            @Html.DisplayFor(modelItem => item.applyamount)
+            
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.expireDate)
+            
+        </td>
+        <td>
+            @Html.ActionLink("编辑", "Edit", new { id = item.id }) |
+            @Html.ActionLink("详细", "Details", new { id = item.id }) |
+            @Html.ActionLink("删除", "Delete", new { id = item.id })
         </td>
     </tr>
 }
 
 </table>
 }
-</p>
+
 @if (uFunds != null)
 {
     <table class="table">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.f_name)
+                经费名称
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.f_source)
+                管理员
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.f_amount)
+                经费总额
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.f_balance)
+                结算时间
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.f_manager)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.f_info)
-            </th>
-            <th></th>
         </tr>
 
         @foreach (var item in uFunds)
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.f_name)
+                    @Html.DisplayFor(modelItem => item.name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.f_source)
+                    @Html.DisplayFor(modelItem => item.managerName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.f_amount)
+                    @Html.DisplayFor(modelItem => item.amount)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.f_balance)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.f_manager)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.f_info)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.f_id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.f_id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.f_id })
+                    @Html.DisplayFor(modelItem => item.expireDate)
                 </td>
             </tr>
         }

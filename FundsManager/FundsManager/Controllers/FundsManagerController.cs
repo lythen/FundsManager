@@ -9,7 +9,6 @@ using System.Web.Mvc;
 using FundsManager.DAL;
 using FundsManager.Models;
 using FundsManager.ViewModels;
-
 namespace FundsManager.Controllers
 {
     public class FundsManagerController : Controller
@@ -19,7 +18,58 @@ namespace FundsManager.Controllers
         // GET: FundsManager
         public ActionResult Index()
         {
-            return View(db.Funds.ToList());
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            //管理的经费
+            var mfunds = (from funds in db.Funds
+                          where funds.f_manager == user
+                          select new mFundsListModel
+                          {
+                              amount = funds.f_amount,
+                              balance = funds.f_balance,
+                              expireDate = funds.f_expireDate,
+                              id = funds.f_id,
+                              name = funds.f_name,
+                              strState = funds.f_state == 0 ? "未启用" : (funds.f_state == 1 ? "正常" : "锁定"),
+                              userCount = (from fac in db.Funds_Apply_Child
+                                           join fa in db.Funds_Apply
+                                           on fac.c_apply_number equals fa.apply_number
+                                           where fac.c_funds_id == funds.f_id && fa.apply_state == 1
+                                           select fac
+                                          ).Count(),
+                              applyamount = (
+                                from fac in db.Funds_Apply_Child
+                                join fa in db.Funds_Apply
+                                on fac.c_apply_number equals fa.apply_number
+                                where fac.c_funds_id == funds.f_id && fa.apply_state == 1
+                                select new {
+                                  amount=fac.c_amount
+                              }
+                                ).Sum(x=>(x.amount as decimal?)==null?0: x.amount)
+                          }
+                          ).ToList();
+            //使用的经费
+            var ufunds = (from funds in db.Funds
+                          join fac in db.Funds_Apply_Child
+                          on funds.f_id equals fac.c_funds_id
+                          join apply in db.Funds_Apply
+                          on fac.c_apply_number equals apply.apply_number
+                          join u in db.User_Info
+                          on funds.f_manager equals u.user_id into T1
+                          from t1 in T1.DefaultIfEmpty()
+                          where apply.apply_user_id == user && apply.apply_state == 1
+                          select new uFundsListModel
+                          {
+                              amount = fac.c_amount,
+                              expireDate = funds.f_expireDate,
+                              managerName = t1.user_name,
+                              name = funds.f_name
+                          }
+                          ).ToList();
+            FundsListView list = new FundsListView();
+            list.managerFunds = mfunds;
+            list.useFunds = ufunds;
+            return View(list);
         }
 
         // GET: FundsManager/Details/5
