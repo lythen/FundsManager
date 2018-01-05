@@ -37,15 +37,13 @@ namespace FundsManager.Controllers
                                            where fac.c_funds_id == funds.f_id && fa.apply_state == 1
                                            select fac
                                           ).Count(),
-                              applyamount = (
+                              applyamount =  (
                                 from fac in db.Funds_Apply_Child
                                 join fa in db.Funds_Apply
                                 on fac.c_apply_number equals fa.apply_number
                                 where fac.c_funds_id == funds.f_id && fa.apply_state == 1
-                                select new {
-                                  amount=fac.c_amount
-                              }
-                                ).Sum(x=>(x.amount as decimal?)==null?0: x.amount)
+                                select fac.c_amount
+                                ).DefaultIfEmpty(0).Sum()
                           }
                           ).ToList();
             //使用的经费
