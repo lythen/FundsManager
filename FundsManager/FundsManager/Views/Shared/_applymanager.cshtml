@@ -62,8 +62,9 @@
                     @RenderPage("_logout.cshtml")
                     <div class="widget">
                         <div class="list-group">
-                            @Html.RouteLink("申请列表", new { controller = "Student", action = "ViewList", id = "1" }, new { @class = "list-group-item studentlist" })
-                            @Html.RouteLink("新的申请", new { controller = "Student", action = "NewApply" }, new { @class = "list-group-item NewApply" })
+                            @Html.RouteLink("待批复列表", new { controller = "ApplyManager", action = "Index"}, new { @class = "list-group-item waiting" })
+                            @Html.RouteLink("我的经费", new { controller = "ApplyManager", action = "MyFunds" }, new { @class = "list-group-item myfunds" })
+                            @Html.RouteLink("新的申请", new { controller = "ApplyManager", action = "Create" }, new { @class = "list-group-item newapply" })
                         </div>
                     </div>
                 </aside>

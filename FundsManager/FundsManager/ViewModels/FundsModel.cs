@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace FundsManager.ViewModels
 {
-    public class FundsModel: FundsBaseModel
+    public class FundsModel : FundsBaseModel
     {
         private int _state = 1;
         [StringLength(4), DisplayName("到期时间")]
@@ -17,21 +17,24 @@ namespace FundsManager.ViewModels
         [StringLength(2000), DisplayName("备注")]
         public string info { get; set; }
         [DisplayName("状态")]
-        public int state { get { return _state; }set { _state = value; } }
+        public int state { get { return _state; } set { _state = value; } }
         public void toDBModel(Funds model)
         {
             model.f_amount = amount;
-            model.f_balance = balance==null?amount:(decimal)balance;
+            model.f_balance = balance == null ? amount : (decimal)balance;
             model.f_expireDate = expireDate;
-            model.f_id = id;
+            if (model.f_id == 0)
+                model.f_id = id;
             model.f_info = PageValidate.InputText(info, 2000);
             model.f_in_year = expireDate.Year.ToString();
             model.f_manager = manager;
             model.f_name = PageValidate.InputText(name, 100);
             model.f_source = PageValidate.InputText(source, 100);
+            model.f_state = state;
         }
     }
-    public class FundsBaseModel {
+    public class FundsBaseModel
+    {
         private DateTime _expireDate = DateTime.Parse(string.Format("{0}-12-31 23:59:59.999", DateTime.Now.Year));
         [DisplayName("经费ID")]
         public int id { get; set; }
@@ -48,7 +51,7 @@ namespace FundsManager.ViewModels
         [DataType(DataType.Currency), DisplayName("经费余额")]
         public decimal? balance { get; set; }
     }
-    public class mFundsListModel: FundsBaseModel
+    public class mFundsListModel : FundsBaseModel
     {
         [DisplayName("状态")]
         public string strState { get; set; }
@@ -57,7 +60,7 @@ namespace FundsManager.ViewModels
         [DisplayName("申请总额")]
         public decimal applyamount { get; set; }
     }
-    public class uFundsListModel: FundsBaseModel
+    public class uFundsListModel : FundsBaseModel
     {
 
     }

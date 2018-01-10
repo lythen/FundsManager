@@ -1,63 +1,52 @@
-﻿@model IEnumerable<FundsManager.Models.Funds_Apply>
+﻿@model IEnumerable<FundsManager.ViewModels.ApplyListModel>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title  = FundsManager.Controllers.SiteInfo.getSiteName() + "待批复经费列表";
 }
 
-<h2>Index</h2>
+<hr />
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.apply_user_id)
+            @Html.DisplayNameFor(model=>model.number)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.apply_time)
+            @Html.DisplayNameFor(model => model.time)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.apply_funds_id)
+            @Html.DisplayNameFor(model => model.amount)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.apply_for)
+            @Html.DisplayNameFor(model => model.strState)
         </th>
-        <th>
-            @Html.DisplayNameFor(model => model.apply_amount)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.apply_state)
-        </th>
-        <th></th>
+        <th>操作</th>
     </tr>
-
-@foreach (var item in Model) {
+@if (Model != null && Model.Count() > 0)
+{
+foreach (var item in Model)
+{
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.apply_user_id)
+            @Html.DisplayFor(modelItem => item.number)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.apply_time)
+            @Html.DisplayFor(modelItem => item.time)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.apply_funds_id)
+            @Html.DisplayFor(modelItem => item.amount)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.apply_for)
+            @Html.DisplayFor(modelItem => item.strState)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.apply_amount)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.apply_state)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.apply_number }) |
-            @Html.ActionLink("Details", "Details", new { id=item.apply_number }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.apply_number })
+            @Html.ActionLink("详细", "Details", new { id = item.number }) |
+            @Html.ActionLink("撤消", "Delete", new { id = item.number })
         </td>
     </tr>
 }
-
+}else
+{
+    <tr><td colspan="5" align="center">当前没有待批复的申请</td></tr>
+}
 </table>

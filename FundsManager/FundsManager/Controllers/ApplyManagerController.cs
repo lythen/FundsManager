@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using FundsManager.DAL;
 using FundsManager.Models;
+using FundsManager.ViewModels;
 
 namespace FundsManager.Controllers
 {
@@ -18,7 +19,22 @@ namespace FundsManager.Controllers
         // GET: ApplyManager
         public ActionResult Index()
         {
-            return View(db.Funds_Apply.ToList());
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            var waitList = (from apply in db.Funds_Apply
+                            join das in db.Dic_Apply_State
+                            on apply.apply_state equals das.das_state_id
+                            where apply.apply_user_id == user && apply.apply_state!=1
+                            select new ApplyListModel
+                            {
+                                amount = apply.apply_amount,
+                                number = apply.apply_number,
+                                state = apply.apply_state,
+                                time = apply.apply_time,
+                                strState= das.das_state_name
+                            }
+                            ).ToList();
+            return View(waitList);
         }
 
         // GET: ApplyManager/Details/5
@@ -115,7 +131,25 @@ namespace FundsManager.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
-
+        public ActionResult MyFunds()
+        {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            var waitList = (from apply in db.Funds_Apply
+                            join das in db.Dic_Apply_State
+                            on apply.apply_state equals das.das_state_id
+                            where apply.apply_user_id == user && apply.apply_state==1
+                            select new ApplyListModel
+                            {
+                                amount = apply.apply_amount,
+                                number = apply.apply_number,
+                                state = apply.apply_state,
+                                time = apply.apply_time,
+                                strState = das.das_state_name
+                            }
+                            ).ToList();
+            return View(waitList);
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)

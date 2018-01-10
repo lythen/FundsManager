@@ -6,10 +6,12 @@
     List<FundsManager.ViewModels.uFundsListModel> uFunds = Model.useFunds;
 }
 
-<h2>经费列表</h2>
-<hr />
+<div class="col-md-10 err" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
 @if (mFunds != null)
 {
+    <h4>管理的经费列表</h4>
 <table class="table">
     <tr>
         <th>
@@ -67,9 +69,8 @@
             
         </td>
         <td>
-            @Html.ActionLink("编辑", "Edit", new { id = item.id }) |
-            @Html.ActionLink("详细", "Details", new { id = item.id }) |
-            @Html.ActionLink("删除", "Delete", new { id = item.id })
+            @Html.ActionLink("详细", "Edit", new { id = item.id }) |
+            <a href="javascript:void(0);" onclick="DelFunds(@item.id)">删除</a>
         </td>
     </tr>
 }
@@ -77,8 +78,11 @@
 </table>
 }
 
-@if (uFunds != null)
+@if (uFunds != null && uFunds.Count() > 0)
 {
+    <hr />
+    <h4>使用的经费列表</h4>
+
     <table class="table">
         <tr>
             <th>
@@ -115,3 +119,20 @@
 
     </table>
 }
+<script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script>
+    function DelFunds(id) {
+        if (!confirm("是否删除该经费？删除后将无法恢复。")) return;
+        $.post("@Url.RouteUrl(new { controller = "FundsManager", action = "Delete" })", { fid: id }, function (data) {
+            if (data.state == 1) {
+                alert('删除成功。');
+                window.location.reload();
+            }else
+            {
+                $('.err').text(data.msg_text);
+            }
+        }).fail(function (err) {
+            alert(err.status+':'+err.statusText);
+        });
+    }
+</script>

@@ -9,6 +9,10 @@ using System.Web.Mvc;
 using FundsManager.DAL;
 using FundsManager.Models;
 using FundsManager.ViewModels;
+using System.Data.Entity.Validation;
+using System.Text;
+using FundsManager.Common;
+
 namespace FundsManager.Controllers
 {
     public class FundsManagerController : Controller
@@ -37,7 +41,7 @@ namespace FundsManager.Controllers
                                            where fac.c_funds_id == funds.f_id && fa.apply_state == 1
                                            select fac
                                           ).Count(),
-                              applyamount =  (
+                              applyamount = (
                                 from fac in db.Funds_Apply_Child
                                 join fa in db.Funds_Apply
                                 on fac.c_apply_number equals fa.apply_number
@@ -129,11 +133,29 @@ namespace FundsManager.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Funds funds = db.Funds.Find(id);
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            SetSelect();
+            FundsModel funds = (from f in db.Funds
+                                where f.f_id == (int)id
+                                select new FundsModel
+                                {
+                                    amount = f.f_amount,
+                                    id = f.f_id,
+                                    balance = f.f_balance,
+                                    expireDate = f.f_expireDate,
+                                    info = f.f_info,
+                                    manager = f.f_manager,
+                                    name = f.f_name,
+                                    source = f.f_source,
+                                    state = f.f_state,
+                                    year = f.f_in_year
+                                }).FirstOrDefault();
             if (funds == null)
             {
-                return HttpNotFound();
+                return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有找到该经费。" });
             }
+            if (user != funds.manager) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有对该经费的管理权限。" });
             return View(funds);
         }
 
@@ -142,41 +164,144 @@ namespace FundsManager.Controllers
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "f_id,f_name,f_source,f_amount,f_balance,f_manager,f_info")] Funds funds)
+        public ActionResult Edit([Bind(Include = "id,name,expireDate,source,amount,balance,manager,info,state")] FundsModel funds)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
             if (ModelState.IsValid)
             {
-                db.Entry(funds).State = EntityState.Modified;
+                SetSelect();
+                Funds model = db.Funds.Find(funds.id);
+                if (funds == null)
+                {
+                    ViewBag.msg = "没有找到该经费。";
+                    return View(funds);
+                }
+                if (user != model.f_manager)
+                {
+                    ViewBag.msg = "您不是该经费的管理员，没有更改权限。";
+                    return View(funds);
+                }
+                if (model.f_name != funds.name)
+                    if (db.Funds.Where(x => x.f_name == funds.name.ToString() && x.f_id != funds.id).Count() > 0)
+                    {
+                        ViewBag.msg = "该名称已被使用";
+                        return View(funds);
+                    }
+                funds.toDBModel(model);
+
+                db.Entry(model).State = EntityState.Modified;
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (DbEntityValidationException ex)
+                {
+                    StringBuilder errors = new StringBuilder();
+                    IEnumerable<DbEntityValidationResult> validationResult = ex.EntityValidationErrors;
+                    foreach (DbEntityValidationResult result in validationResult)
+                    {
+                        ICollection<DbValidationError> validationError = result.ValidationErrors;
+                        foreach (DbValidationError err in validationError)
+                        {
+                            errors.Append(err.PropertyName + ":" + err.ErrorMessage + "\r\n");
+                        }
+                    }
+                    ErrorUnit.WriteErrorLog(errors.ToString(), this.GetType().Name);
+                    ViewBag.msg = " 经费信息更新失败。";
+                    return View(funds);
+                }
+                ViewBag.msg = "经费信息修改成功。";
+                Sys_Log log = new Sys_Log()
+                {
+                    log_content = "修改经费信息" + model.f_name,
+                    log_ip = Common.IpHelper.GetIP(),
+                    log_target = funds.id.ToString(),
+                    log_time = DateTime.Now,
+                    log_type = 7,
+                    log_user_id = user,
+                    log_device = ""
+                };
+                db.Sys_Log.Add(log);
                 db.SaveChanges();
-                return RedirectToAction("Index");
             }
             return View(funds);
         }
-
-        // GET: FundsManager/Delete/5
-        public ActionResult Delete(int? id)
+        [HttpPost]
+        public JsonResult Delete(string fid)
         {
-            if (id == null)
+            int id = PageValidate.FilterParam(fid);
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (id == 0)
+            {
+                json.msg_text = "参数传递失败，请重试。";
+                json.msg_code = "paramErr";
+                return Json(json, JsonRequestBehavior.AllowGet);
             }
             Funds funds = db.Funds.Find(id);
             if (funds == null)
             {
-                return HttpNotFound();
+                json.msg_text = "没有找到该经费，该经费可能已被删除。";
+                json.msg_code = "noThis";
+                return Json(json, JsonRequestBehavior.AllowGet);
             }
-            return View(funds);
-        }
-
-        // POST: FundsManager/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Funds funds = db.Funds.Find(id);
+            var used = (from apply in db.Funds_Apply
+                        join ac in db.Funds_Apply_Child
+                        on apply.apply_number equals ac.c_apply_number
+                        where ac.c_funds_id == funds.f_id && ac.c_state == 1
+                        select 1).Count();
+            if (used > 0)
+            {
+                json.msg_text = "该经费已在使用中，无法删除。";
+                json.msg_code = "inUsed";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            //db.Funds.Remove(funds);
+            Recycle_Funds rf = new Recycle_Funds();
+            rf.f_amount = funds.f_amount;
+            rf.f_balance = funds.f_balance;
+            rf.f_delete_time = DateTime.Now;
+            rf.f_delete_user = user;
+            rf.f_expireDate = funds.f_expireDate;
+            rf.f_id = funds.f_id;
+            rf.f_info = funds.f_info;
+            rf.f_in_year = funds.f_in_year;
+            rf.f_manager = funds.f_manager;
+            rf.f_name = funds.f_name;
+            rf.f_source = funds.f_source;
+            rf.f_state = funds.f_state;
+            db.Funds_Recycle.Add(rf);
+            try
+            {
+                db.SaveChanges();
+            }catch(Exception e)
+            {
+                json.msg_text = "删除失败，请重新操作。";
+                json.msg_code = "recyErr";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
             db.Funds.Remove(funds);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception)
+            {
+                json.msg_text = "删除失败，请重新操作。";
+                json.msg_code = "delErr";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            json.msg_text = "删除成功。";
+            json.msg_code = "success";
+            json.state = 1;
+            return Json(json, JsonRequestBehavior.AllowGet);
         }
 
         protected override void Dispose(bool disposing)

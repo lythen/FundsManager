@@ -26,6 +26,7 @@ namespace FundsManager.Models
         [StringLength(2000)]
         public string f_info { get; set; }
         public int f_delete_user { get; set; }
-        public int f_delete_time { get; set; }
+        public DateTime f_delete_time { get; set; }
+        public int f_state { get; set; }
     }
 }
