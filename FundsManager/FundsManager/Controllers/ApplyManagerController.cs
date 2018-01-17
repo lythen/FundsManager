@@ -68,20 +68,82 @@ namespace FundsManager.Controllers
         // 为了防止“过多发布”攻击，请启用要绑定到的特定属性，有关 
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(ApplyEditModel funds_Apply)
+        public JsonResult Create(ApplyEditModel funds_Apply)
         {
-            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_code = "nologin";
+                goto next;
+            }
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
             SetSelect();
             if (ModelState.IsValid)
             {
+                Funds_Apply apply = new Funds_Apply();
+                apply.apply_amount = funds_Apply.amount;
+                apply.apply_state = 1;
+                apply.apply_time = DateTime.Now;
+                apply.apply_user_id = user;
+                var maxfa = db.Funds_Apply.OrderByDescending(x => x.apply_number).FirstOrDefault();
+                //apply_number:年份+10001自增
+                if (maxfa == null) apply.apply_number = DateTime.Now.Year.ToString() + "10001";
+                else apply.apply_number = DateTime.Now.Year.ToString() + (int.Parse(maxfa.apply_number.Substring(5)) + 1);
+                try
+                {
+                    db.Funds_Apply.Add(apply);
+                }catch(Exception e)
+                {
+                    json.msg_code = "error";
+                    json.msg_text = "申请单提交失败。";
+                    goto next;
+                }
+                //子申请单号由申请单号+3位序号如 201710001-001
+                int i=1;
+                foreach (ApplyChildModel citem in funds_Apply.capply)
+                {
+                    Funds_Apply_Child capply = new Funds_Apply_Child();
+                    capply.c_apply_number = apply.apply_number;
+                    capply.c_child_number = GetIntStr(i);
+                    capply.c_amount = citem.amount;
+                    capply.c_apply_for = citem.applyFor;
+                    capply.c_funds_id = citem.Fid;
+                    capply.c_state = 1;
+                    db.Funds_Apply_Child.Add(capply);
+                    i++;
+                }
+                try
+                {
+                    db.Funds_Apply.Add(apply);
+                }
+                catch (Exception e)
+                {
+                    var list = db.Funds_Apply_Child.Where(x => x.c_apply_number == apply.apply_number);
+                    if (list.Count() > 0) db.Funds_Apply_Child.RemoveRange(list);
+                    db.Funds_Apply.Remove(apply);
+                    try
+                    {
+                        db.SaveChanges();
+                    }
+                    catch { }
+                    json.msg_code = "error";
+                    json.msg_text = "申请单提交失败。";
+                    goto next;
+                }
                 //db.Funds_Apply.Add(funds_Apply);
                 //db.SaveChanges();
-                return RedirectToAction("Index");
+                json.state = 1;
+                json.msg_code = "success";
+                json.msg_text = "申请单提交成功！";
             }
-
-            return View(funds_Apply);
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
+        string GetIntStr(int num)
+        {
+            if (num < 10) return "00" + num;
+            if (num < 100) return "0" + num;
+            return num.ToString();
         }
         void SetSelect()
         {
@@ -162,6 +224,32 @@ namespace FundsManager.Controllers
                             }
                             ).ToList();
             return View(waitList);
+        }
+        public ActionResult ApplyNext(string number)
+        {
+            if (number == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Funds_Apply funds_Apply = db.Funds_Apply.Where(x=>x.apply_state==1&&x.apply_number==number).FirstOrDefault();
+            if (funds_Apply == null)
+            {
+                return HttpNotFound();
+            }
+            var cmList = (from child in db.Funds_Apply_Child
+                          join funds in db.Funds
+                          on child.c_funds_id equals funds.f_id
+                          join user in db.User_Info
+                          on funds.f_manager equals user.user_id
+                          where child.c_apply_number == number && child.c_state == 1
+                          select new ApplyFundsManager
+                          {
+                              Cnumber = child.c_child_number,
+                              strManager = user.real_name
+                          }
+                          ).ToList();
+            if (cmList.Count() > 0) ViewBag.number = number;
+            return View(cmList);
         }
         protected override void Dispose(bool disposing)
         {

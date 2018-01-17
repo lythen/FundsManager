@@ -24,8 +24,6 @@ namespace FundsManager.ViewModels
     {
         [DisplayName("状态")]
         public string strState { get; set; }
-        [DisplayName("管理员")]
-        public string strManager { get; set; }
     }
     public class ApplyChildModel
     {
@@ -47,6 +45,13 @@ namespace FundsManager.ViewModels
     {
         [DisplayName("状态")]
          public string strState { get; set; }
+    }
+    public class ApplyFundsManager
+    {
+        [StringLength(13), DisplayName("子编号")]
+        public string Cnumber { get; set; }
+        [DisplayName("管理员")]
+        public string strManager { get; set; }
     }
     public class ApplyEditModel: ApplyModel
     {

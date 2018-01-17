@@ -1,0 +1,33 @@
+﻿@model IEnumerable<FundsManager.ViewModels.ApplyFundsManager>
+
+@{
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费申请结果";
+}
+
+<h4>经费申请结果</h4>
+<hr />
+<div>
+    <div id="div-res"></div>
+    @if (Model != null && Model.Count() > 0)
+    {
+        <ul>
+            @foreach(var item in Model)
+            {
+            <li>
+                <div>子订单号：@item.Cnumber</div> <div>申请管理员： @item.strManager</div>
+            </li>
+            }
+        </ul>
+    }
+    <div>
+        @Html.ActionLink("返回", "MyFunds",null,new { @class="btn btn-danger"})
+    </div>
+</div>
+<script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script>
+    $(function () {
+        var res = '@ViewBag.number';
+        if (res) $('#div-res').val('订单提交成功，当前订单号为：' + res);
+        else $('#div-res').val('订单提交失败，请重新申请。');
+    });
+</script>
