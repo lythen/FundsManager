@@ -29,6 +29,7 @@ namespace FundsManager.ViewModels
     }
     public class ApplyChildModel
     {
+        private int _apply_state = 0;
         [StringLength(9), DisplayName("申请编号")]
         public string Fnumber { get; set; }
         [StringLength(13), DisplayName("子编号")]
@@ -38,13 +39,17 @@ namespace FundsManager.ViewModels
         [Required, DataType(DataType.Currency), DisplayName("金额")]
         public decimal amount { get; set; }
         [DisplayName("状态")]
-        public int state { get; set; }
+        public int state { get { return _apply_state; } set { _apply_state = value; } }
         [StringLength(2000),DisplayName("备注")]
-        public string c_apply_for { get; set; }
+        public string applyFor { get; set; }
     }
     public class ApplyChildListModel: ApplyChildModel
     {
         [DisplayName("状态")]
          public string strState { get; set; }
+    }
+    public class ApplyEditModel: ApplyModel
+    {
+        public List<ApplyChildModel> capply { get; set; }
     }
 }

@@ -18,6 +18,7 @@ namespace FundsManager.Controllers
         private static string cache_user_state = "cache_user_state";
         private static string cache_role = "cache_role";
         private static string cache_cardType = "cache_cardType";
+        private static string cache_funds = "cache_funds";
         public static List<SelectListItem> SetDropDownList(List<Models.SelectOption> options)
         {
             List<SelectListItem> items = new List<SelectListItem>();
@@ -140,6 +141,18 @@ namespace FundsManager.Controllers
                                          {
                                              id = ct.role_id.ToString(),
                                              text = ct.role_name
+                                         }).ToList();
+            return option;
+        }
+        public static List<SelectOption> FundsSelect()
+        {
+            List<Funds> funds = DBCaches<Funds>.getCache(cache_dept);
+            List<SelectOption> option = (from fund in funds
+                                         where fund.f_state==1
+                                         select new SelectOption
+                                         {
+                                             id = fund.f_id.ToString(),
+                                             text = fund.f_name
                                          }).ToList();
             return option;
         }

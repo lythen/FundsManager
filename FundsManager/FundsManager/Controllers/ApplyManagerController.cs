@@ -55,7 +55,13 @@ namespace FundsManager.Controllers
         // GET: ApplyManager/Create
         public ActionResult Create()
         {
-            return View();
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            SetSelect();
+            ApplyEditModel model = new ApplyEditModel();
+            List<ApplyChildModel> list = new List<ApplyChildModel>();
+            list.Add(new ApplyChildModel());
+            model.capply = list;
+            return View(model);
         }
 
         // POST: ApplyManager/Create
@@ -63,18 +69,25 @@ namespace FundsManager.Controllers
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "apply_number,apply_user_id,apply_time,apply_funds_id,apply_for,apply_amount,apply_state")] Funds_Apply funds_Apply)
+        public ActionResult Create(ApplyEditModel funds_Apply)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            SetSelect();
             if (ModelState.IsValid)
             {
-                db.Funds_Apply.Add(funds_Apply);
-                db.SaveChanges();
+                //db.Funds_Apply.Add(funds_Apply);
+                //db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
             return View(funds_Apply);
         }
-
+        void SetSelect()
+        {
+            List<SelectOption> options = DropDownList.FundsSelect();
+            ViewBag.Funds = DropDownList.SetDropDownList(options);
+        }
         // GET: ApplyManager/Edit/5
         public ActionResult Edit(string id)
         {
