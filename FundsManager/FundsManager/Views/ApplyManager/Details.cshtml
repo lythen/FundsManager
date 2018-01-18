@@ -1,66 +1,44 @@
-﻿@model FundsManager.Models.Funds_Apply
+﻿@model IEnumerable<FundsManager.ViewModels.ApplyFundsManager>
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费详细";
 }
+<style>
+    .form-group {
+    }
 
-<h2>Details</h2>
+    .col-md-10 {
+        margin-top: 15px;
+        font-size: 15px;
+    }
+</style>
 
+<h4>经费详细</h4>
+<hr />
 <div>
-    <h4>Funds_Apply</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.apply_user_id)
-        </dt>
+    <div class="form-group">
+        <div class="col-md-10 alert">
+            <div id="div-res">经费申请单号：@ViewBag.number</div>
+        </div>
+    </div>
+    @if (Model != null && Model.Count() > 0)
+    {
+        foreach (var item in Model)
+        {
+            <div class="form-group">
+                <div class="col-md-10 form-res">
 
-        <dd>
-            @Html.DisplayFor(model => model.apply_user_id)
-        </dd>
+                    <div>子申请单号：@item.Cnumber</div>
+                    <div>经费管理员： @item.strManager</div>
+                    <div>申请单状态： @item.strState</div>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.apply_time)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.apply_time)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.apply_funds_id)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.apply_funds_id)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.apply_for)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.apply_for)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.apply_amount)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.apply_amount)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.apply_state)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.apply_state)
-        </dd>
-
-    </dl>
+                </div>
+            </div>
+        }
+    }
+    <div class="form-group">
+        <div class="col-md-10">
+            @Html.ActionLink("返    回", "Index", null, new { @class = "btn btn-warning" })
+        </div>
+    </div>
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.apply_number }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>

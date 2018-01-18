@@ -3,9 +3,13 @@
 @{
     ViewBag.Title  = FundsManager.Controllers.SiteInfo.getSiteName() + "待批复经费列表";
 }
-
-<hr />
-
+<style>
+    #msg{display:none;}
+</style>
+<h4>待批复经费列表</h4>
+<div class="col-md-10" id="msg">
+    @ViewBag.msg
+</div>
 <table class="table">
     <tr>
         <th>
@@ -15,11 +19,16 @@
             @Html.DisplayNameFor(model => model.time)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.amount)
+            子申请单号
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.strState)
+            金额
         </th>
+        <th>
+            状态
+        </th>
+        <th>子操作</th>
+
         <th>操作</th>
     </tr>
 @if (Model != null && Model.Count() > 0)
@@ -34,14 +43,52 @@ foreach (var item in Model)
             @Html.DisplayFor(modelItem => item.time)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.amount)
+            @if (item.childState != null)
+            {
+            foreach (var citem in item.childState)
+            {
+                <div>
+                    @citem.childState.Split(',')[0]
+                </div>
+            }
+            }
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.strState)
+            @if (item.childState != null)
+            {
+                foreach (var citem in item.childState)
+                {
+                    <div>
+                        @citem.childState.Split(',')[2]
+                    </div>
+                }
+            }
         </td>
         <td>
-            @Html.ActionLink("详细", "Details", new { id = item.number }) |
-            @Html.ActionLink("撤消", "Delete", new { id = item.number })
+@if (item.childState != null)
+{
+    foreach (var citem in item.childState)
+    {
+                <div>
+                    @citem.childState.Split(',')[1]
+                </div>
+    }
+}
+        </td>
+        <td>
+            @if (item.childState != null)
+            {
+                foreach (var citem in item.childState)
+                {
+                    <div>
+                        <a href="javascript:void(0);" onclick="DelCApply('@citem.childState.Split(',')[0]')">撤销</a>
+                    </div>
+                }
+            }
+            
+        </td>
+        <td>
+            @Html.ActionLink("详细", "Details", new { id = item.number })
         </td>
     </tr>
 }
@@ -50,3 +97,20 @@ foreach (var item in Model)
     <tr><td colspan="5" align="center">当前没有待批复的申请</td></tr>
 }
 </table>
+<script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script>
+    function DelCApply(cnumber) {
+        var obj = new Object();
+        obj.cnumber = cnumber;
+        $.post("@Url.RouteUrl(new {controller= "ApplyManager", action= "Delete" })", obj, function (data) {
+            if (data.state == '1') {
+                location.reload();
+            } else {
+                if (data.msg_code == 'nologin') location.href = '@Url.RouteUrl(new { action = "LogOut", controller = "Login"})';
+                $('#msg').removeClass();
+                $('#msg').addClass('alert alert alert-danger');
+                $('#msg').text(data.msg_text);
+            }
+        });
+    }
+</script>

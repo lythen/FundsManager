@@ -1,51 +1,82 @@
-﻿@model IEnumerable<FundsManager.ViewModels.ApplyChildListModel>
+﻿@model IEnumerable<FundsManager.ViewModels.ApplyListModel>
 
 @{
-    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "MyFunds";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "我的经费列表";
 }
 
-<h2>MyFunds</h2>
+<hr />
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.apply_user_id)
+            @Html.DisplayNameFor(model => model.number)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.apply_time)
+            @Html.DisplayNameFor(model => model.time)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.apply_amount)
+            子申请单号
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.apply_state)
+            金额
         </th>
-        <th></th>
+        <th>
+            状态
+        </th>
+        <th>操作</th>
     </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.apply_user_id)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.apply_time)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.apply_amount)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.apply_state)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.apply_number }) |
-            @Html.ActionLink("Details", "Details", new { id=item.apply_number }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.apply_number })
-        </td>
-    </tr>
-}
-
+    @if (Model != null && Model.Count() > 0)
+    {
+        foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.number)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.time)
+                </td>
+                <td>
+                    @if (item.childState != null)
+                    {
+                        foreach (var citem in item.childState)
+                        {
+                            <div>
+                                @citem.childState.Split(',')[0]
+                            </div>
+                        }
+                    }
+                </td>
+                <td>
+                    @if (item.childState != null)
+                    {
+                        foreach (var citem in item.childState)
+                        {
+                            <div>
+                                @citem.childState.Split(',')[2]
+                            </div>
+                        }
+                    }
+                </td>
+                <td>
+                    @if (item.childState != null)
+                    {
+                        foreach (var citem in item.childState)
+                        {
+                            <div>
+                                @citem.childState.Split(',')[1]
+                            </div>
+                        }
+                    }
+                </td>
+                <td>
+                    @Html.ActionLink("详细", "Details", new { id = item.number })
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr><td colspan="5" align="center">当前没有已批复的申请</td></tr>
+    }
 </table>

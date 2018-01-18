@@ -23,7 +23,11 @@ namespace FundsManager.ViewModels
     public class ApplyListModel: ApplyModel
     {
         [DisplayName("状态")]
-        public string strState { get; set; }
+        public IQueryable<ChildState> childState { get; set; }
+    }
+    public class ChildState
+    {
+        public string childState { get; set; }
     }
     public class ApplyChildModel
     {
@@ -52,6 +56,8 @@ namespace FundsManager.ViewModels
         public string Cnumber { get; set; }
         [DisplayName("管理员")]
         public string strManager { get; set; }
+        [DisplayName("申请单状态")]
+        public string strState { get; set; }
     }
     public class ApplyEditModel: ApplyModel
     {

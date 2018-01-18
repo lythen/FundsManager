@@ -3,31 +3,56 @@
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费申请结果";
 }
+<style>
+    .form-group {
+    }
+
+    .col-md-10 {
+        margin-top: 15px;
+        font-size:15px;
+    }
+</style>
 
 <h4>经费申请结果</h4>
 <hr />
 <div>
-    <div id="div-res"></div>
+    <div class="form-group">
+        <div class="col-md-10 alert">
+            <div id="div-res"></div>
+        </div>
+    </div>
     @if (Model != null && Model.Count() > 0)
     {
-        <ul>
-            @foreach(var item in Model)
-            {
-            <li>
-                <div>子订单号：@item.Cnumber</div> <div>申请管理员： @item.strManager</div>
-            </li>
-            }
-        </ul>
+        foreach (var item in Model)
+        {
+            <div class="form-group">
+                <div class="col-md-10 form-res">
+
+                    <div>子申请单号：@item.Cnumber</div>
+                    <div>经费管理员： @item.strManager</div>
+                    <div>申请单状态： @item.strState</div>
+
+                </div>
+            </div>
+        }
     }
-    <div>
-        @Html.ActionLink("返回", "MyFunds",null,new { @class="btn btn-danger"})
+    <div class="form-group">
+        <div class="col-md-10">
+            @Html.ActionLink("返    回", "Index", null, new { @class = "btn btn-warning" })
+        </div>
     </div>
 </div>
 <script src="~/scripts/jquery-3.2.1.min.js"></script>
 <script>
     $(function () {
         var res = '@ViewBag.number';
-        if (res) $('#div-res').val('订单提交成功，当前订单号为：' + res);
-        else $('#div-res').val('订单提交失败，请重新申请。');
+        if (res) {
+            $('#div-res').text('订单提交成功，当前订单号为：' + res);
+            $('.alert').addClass('alert-success');
+        }
+        else {
+            $('#div-res').val('订单提交失败，请重新申请。');
+            $('.alert').addClass('alert-danger');
+        }
     });
 </script>

@@ -20,9 +20,9 @@ namespace FundsManager.Controllers
         public ActionResult Index()
         {
             LoginModel model = new LoginModel();
-            if (Request.Cookies["username"] != null)
+            if (Request.Cookies["name"] != null)
             {
-                model.userName = Server.UrlDecode(Request.Cookies["username"].Value);
+                model.userName = Server.UrlDecode(Request.Cookies["name"].Value);
                 model.isRemember = true;
             }
             return View(model);
@@ -141,11 +141,11 @@ namespace FundsManager.Controllers
             HttpCookie cookie;
             if (model.isRemember)
             {
-                cookie = new HttpCookie("username", Server.UrlEncode(model.userName));
+                cookie = new HttpCookie("name", Server.UrlEncode(model.userName));
                 cookie.Expires = DateTime.Now.AddHours(1);
                 Response.AppendCookie(cookie);
             }
-            else if (Request.Cookies["username"] != null) Response.Cookies.Remove("username");
+            else if (Request.Cookies["name"] != null) Response.Cookies.Remove("name");
 
             cookie = new HttpCookie("realname", Server.UrlEncode(user.real_name));
             cookie.Expires = DateTime.Now.AddHours(1);
