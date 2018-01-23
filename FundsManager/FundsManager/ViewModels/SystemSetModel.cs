@@ -51,29 +51,18 @@ namespace FundsManager.ViewModels
         [StringLength(1000)]
         public string info { get; set; }
         public int hasChange = 0;
-        public List<RoleInfo> roles = new List<RoleInfo>();
-        public Sys_Controller toDBModel()
-        {
-            Sys_Controller model = new Sys_Controller();
-            model.id = id;
-            model.controller_name = name;
-            model.controller_info = info;
-            return model;
-        }
+        public RoleInfo[] roles { get; set; }
     }
-    public sealed class RoleInfo
+    public class EditModules
+    {
+        public List<ModuleInfo> modules { get; set; }
+    }
+    public class RoleInfo
     {
         public int id { get; set; }
         [StringLength(20)]
         public string name { get; set; }
         public bool hasrole { get; set; }
-        public Dic_Role toDBModel()
-        {
-            Dic_Role model = new Dic_Role();
-            model.role_id = id;
-            model.role_name = name;
-            return model;
-        }
     }
     public class DepartMentModel
     {

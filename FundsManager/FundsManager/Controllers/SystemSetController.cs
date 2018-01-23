@@ -62,27 +62,61 @@ namespace FundsManager.Controllers
         [wxAuthorize(Roles = "系统管理员")]
         public ActionResult ContrlModule()
         {
-            List<ModuleInfo> models = BLL.Sys_Controller.getRoleInfo();
+            List<ModuleInfo> models =DBCaches2.getModuleInfo();
             foreach(ModuleInfo model in models)
             {
                 int[] roles = (from rvc in db.Role_vs_Controller
                                where rvc.rvc_controller == model.name
                                select rvc.rvc_role_id
                                ).ToArray();
-                List<RoleInfo> rvcs = BLL.Dic_Role.getRoleInfo();
+               RoleInfo[] rvcs = DBCaches2.getRoleInfo();
                 foreach(RoleInfo item in rvcs)
                 {
                     if (roles.Contains(item.id)) item.hasrole = true;
+                    else item.hasrole = false;
                 }
                 model.roles = rvcs;
             }
             return View(models);
         }
         [HttpPost,wxAuthorize(Roles ="系统管理员")]
-        public JsonResult ContrlModule(List<ModuleInfo> models)
+        public JsonResult ContrlModule(EditModules models)
         {
             BaseJsonData json = new BaseJsonData();
-
+            if (ModelState.IsValid)
+            {
+                string ctrl_name;
+                foreach(ModuleInfo info in models.modules)
+                {
+                    ctrl_name = info.name;
+                    var no1 = db.Role_vs_Controller.Where(x => x.rvc_role_id != 1&& x.rvc_controller== ctrl_name);
+                    if (no1.Count() > 0)
+                    {
+                        db.Role_vs_Controller.RemoveRange(no1);
+                        db.SaveChanges();
+                    }
+                    if (info.roles != null && info.roles.Length > 0)
+                    {
+                        foreach(RoleInfo rinfo in info.roles)
+                        {
+                            Role_vs_Controller rvc = new Role_vs_Controller();
+                            rvc.rvc_role_id = rinfo.id;
+                            rvc.rvc_controller = ctrl_name;
+                            if (db.Role_vs_Controller.Find(rvc.rvc_role_id,rvc.rvc_controller) == null) db.Role_vs_Controller.Add(rvc);
+                        }
+                    }
+                }
+                db.SaveChanges();
+                json.state = 1;
+                json.msg_code = "success";
+                json.msg_text = "数据更新成功。";
+                DBCaches2.ClearCache("dic-module");
+            }
+            else
+            {
+                json.msg_code = "error";
+                json.msg_text = "数据接收错误。";
+            }
             return Json(json, JsonRequestBehavior.AllowGet);
         }
         #endregion

@@ -26,6 +26,9 @@
             <a href="@Url.RouteUrl(new { controller = "Login", action = "Logout" })" title="注销当前登陆" target="_top" onclick="return confirm('是否退出当前登陆?');">
                 <i class="fa fa-comments"></i> 退出登陆
             </a>
+            <a href="@Url.RouteUrl(new { controller = "UserManager", action = "Edit" })" title="查看或编辑个人信息" target="_top">
+                <i class="fa fa-comments"></i> 个人信息
+            </a>
         </p>
     </div>
 </div>

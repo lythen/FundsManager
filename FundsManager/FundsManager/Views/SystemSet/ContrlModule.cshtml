@@ -45,7 +45,8 @@
 
                 @foreach (var item in Model)
                 {
-                    <tr>
+                    <tr class="tr-c">
+                        @Html.HiddenFor(Itemmodel=>item.id)
                         @Html.HiddenFor(Itemmodel=>item.hasChange)
                         <td>
                             @Html.EditorFor(Itemmodel => item.name, new { htmlAttributes = new { @class = "form-control",Readonly="Readonly" } })
@@ -55,7 +56,7 @@
                             @foreach (var citem in item.roles)
                             {
                                 var id = "rlab" + @item.id + "_" + @citem.id;
-                                <div class="in-lab"> <span> @Html.CheckBoxFor(cmodel => citem.hasrole, new { id = @id }) </span> <label class = "control-label col-md-2" for = "@id">@citem.name</label></div>
+                                <div class="in-lab"> <span> @Html.CheckBoxFor(cmodel => citem.hasrole, new {Value= @citem.id, id = @id, onchange = "SetChange(this);" }) </span> <label class = "control-label col-md-2" for = "@id">@citem.name</label></div>
                             }
                         </td>
                         <td>
@@ -72,7 +73,7 @@
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="提  交" class="btn btn-default" />
+                <input type="button" value="保存更改" class="btn btn-default" onclick="Edit()" />
             </div>
         </div>
     </div>
@@ -93,13 +94,44 @@
             alert(err.status+':'+err.statusText);
         });
     }
+    function SetChange(obj) {
+        $(obj).parent().parent().parent().parent().find('#item_hasChange').val(1);
+    }
     function Edit() {
         if (!confirm("是否确认当前修改？。")) return;
+        var list = new Array();
+        var trs = $('.tr-c');
+        var len = trs.length;
+        var hasChange;
+        var minfo, roles,boxes,rinfo;
+        for (var i = 0; i < len; i++) {
+            var tr = $(trs[i]);
+            hasChange = tr.find('#item_hasChange').val();
+            if (hasChange == "1") {
+                minfo = new Object();
+                minfo.id = parseInt(tr.find('#item_id').val());
+                minfo.info = tr.find('#item_info').val();
+                minfo.name = tr.find('#item_name').val();
+                roles = new Array();
+                boxes = tr.find('input[type="checkbox"]:checked');
+                if (boxes.length > 0) {
+                    for (var j = 0; j < boxes.length; j++) {
+                        rinfo=new Object();
+                        rinfo.id = parseInt(boxes[j].value);
+                        rinfo.hasrole = true;
+                        roles.push(rinfo);
+                    }
+                    minfo.roles = roles;
+                }
+                list.push(minfo);
+            }
+        }
         var data = new Object();
-        $.post("@Url.RouteUrl(new { controller = "SystemSet", action = "ContrlModule" })", { pid: id }, function (data) {
+        data.modules = list;
+        $.post("@Url.RouteUrl(new { controller = "SystemSet", action = "ContrlModule" })", data, function (data) {
             if (data.state == 1) {
-                alert('删除成功。');
-                window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "Department" })";
+                alert('更新成功。');
+                window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "ContrlModule" })";
             }else
             {
                 $('.err').text(data.msg_text);

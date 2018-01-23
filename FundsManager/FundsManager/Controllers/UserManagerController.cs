@@ -77,7 +77,7 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                id = PageValidate.FilterParam(User.Identity.Name);
             }
             User_Info user_Info = db.User_Info.Find(id);
             if (user_Info == null)
@@ -202,8 +202,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             LoginRole role = (LoginRole)Session["LoginRole"];
-            if(role.roleName!="系统管理员"&&User.Identity.Name!=id.ToString())
-                return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限!" });
+            if (role.roleName != "系统管理员") id = PageValidate.FilterParam(User.Identity.Name);
             setSelect();
             if (id == null)
             {
