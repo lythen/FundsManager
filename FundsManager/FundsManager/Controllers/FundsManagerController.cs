@@ -303,7 +303,39 @@ namespace FundsManager.Controllers
             json.state = 1;
             return Json(json, JsonRequestBehavior.AllowGet);
         }
-
+        #region 批复流程管理
+        public ActionResult Process()
+        {
+            var list = (from pro in db.Process_Info
+                        select new ProcessModel
+                        {
+                            id = pro.process_id,
+                            name = pro.process_name,
+                            time = pro.process_create_time,
+                            user = pro.process_user_id,
+                            funds = pro.process_funds
+                        }).ToList();
+            return View(list);
+        }
+        public ActionResult ProcessAdd()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult ProcessAdd(ProcessModel model)
+        {
+            return View();
+        }
+        public ActionResult ProcessEdit(int? id)
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult ProcessEdit(ProcessModel model)
+        {
+            return View();
+        }
+        #endregion
         protected override void Dispose(bool disposing)
         {
             if (disposing)

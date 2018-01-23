@@ -293,6 +293,11 @@
     <Content Include="Views\SystemSet\Post.cshtml" />
     <Content Include="Views\SystemSet\Department.cshtml" />
     <Content Include="Views\SystemSet\Role.cshtml" />
+    <Content Include="Views\FundsManager\Process.cshtml" />
+    <Content Include="Views\FundsManager\ProcessAdd.cshtml" />
+    <Content Include="Views\FundsManager\ProcessEdit.cshtml" />
+    <Content Include="Views\FundsManager\Detail.cshtml" />
+    <Content Include="Views\FundsManager\Statistics.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -358,7 +363,20 @@
     <Compile Include="Migrations\201801080727568_updatetime.Designer.cs">
       <DependentUpon>201801080727568_updatetime.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801231525192_editprocess.cs" />
+    <Compile Include="Migrations\201801231525192_editprocess.Designer.cs">
+      <DependentUpon>201801231525192_editprocess.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231528560_editprocess2.cs" />
+    <Compile Include="Migrations\201801231528560_editprocess2.Designer.cs">
+      <DependentUpon>201801231528560_editprocess2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231530454_editprocess3.cs" />
+    <Compile Include="Migrations\201801231530454_editprocess3.Designer.cs">
+      <DependentUpon>201801231530454_editprocess3.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Process_Info.cs" />
     <Compile Include="ViewModels\ApplyModel.cs" />
     <Compile Include="Models\Dic_Apply_State.cs" />
     <Compile Include="Models\Dic_CardType.cs" />
@@ -372,7 +390,7 @@
     <Compile Include="Models\Funds_Apply.cs" />
     <Compile Include="Models\Funds_Apply_Child.cs" />
     <Compile Include="Models\Funds_Apply_Recycle.cs" />
-    <Compile Include="Models\Process_Original.cs" />
+    <Compile Include="Models\Process_List.cs" />
     <Compile Include="Models\Process_Respond.cs" />
     <Compile Include="Models\Recycle_User.cs" />
     <Compile Include="Models\Role_vs_Controller.cs" />
@@ -407,6 +425,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801080727568_updatetime.resx">
       <DependentUpon>201801080727568_updatetime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231525192_editprocess.resx">
+      <DependentUpon>201801231525192_editprocess.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231528560_editprocess2.resx">
+      <DependentUpon>201801231528560_editprocess2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231530454_editprocess3.resx">
+      <DependentUpon>201801231530454_editprocess3.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

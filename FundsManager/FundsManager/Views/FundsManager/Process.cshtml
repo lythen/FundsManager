@@ -1,0 +1,88 @@
+﻿@model IEnumerable<FundsManager.ViewModels.ProcessModel>
+@{
+    ViewBag.Title = "批复流程管理";
+}
+
+<style>
+    .form-control {
+        width: 200px;
+        display: inline-block;
+    }
+</style>
+<h4>批复流程管理</h4>
+<p>
+    @Html.ActionLink("新建流程", "ProcessAdd",null,new { @class="btn btn-info"})
+</p>
+<div class="col-md-10" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>
+                            流程ID
+                        </th>
+                        <th>
+                            流程名称
+                        </th>
+                        <th>
+                            创建人
+                        </th>
+                        <th>
+                            创建时间
+                        </th>
+                        <th>
+                            操作
+                        </th>
+                    </tr>
+                    @if (Model != null && Model.Count() > 0)
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.id</td>
+                                <td>@item.name</td>
+                                <td>@item.user</td>
+                                <td>@item.time</td>
+                                <td><a href="javascript:void(0);" onclick="ShowProcesses(@item.id)">详细</a>|<a href="javascript:void(0);" onclick="DelProcesses(@item.id)">删除</a></td>
+                            </tr>
+                        }
+
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">当前没有数据</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+}
+<script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script>
+    function DelProcesses(id) {
+        if (!confirm("是否删除该职务？删除后将无法恢复。")) return;
+        $.post("@Url.RouteUrl(new { controller = "FundsManager", action = "DeleteProcess" })", { pid: id }, function (data) {
+            if (data.state == 1) {
+                alert('删除成功。');
+                window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "Post" })";
+            }else
+            {
+                $('.err').text(data.msg_text);
+            }
+        }).fail(function (err) {
+            alert(err.status+':'+err.statusText);
+        });
+    }
+    function ShowProcesses(id){
+
+    }
+</script>
+

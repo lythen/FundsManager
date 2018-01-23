@@ -17,7 +17,7 @@ namespace FundsManager.DAL
         public DbSet<Funds> Funds { get; set; }
         public DbSet<Funds_Apply> Funds_Apply { get; set; }
         public DbSet<Funds_Apply_Child> Funds_Apply_Child { get; set; }
-        public DbSet<Process_Original> Process_Original { get; set; }
+        public DbSet<Process_List> Process_List { get; set; }
         public DbSet<Process_Respond> Process_Respond { get; set; }
         public DbSet<Sys_Log> Sys_Log { get; set; }
         public DbSet<User_Extend> User_Extend { get; set; }
@@ -30,6 +30,7 @@ namespace FundsManager.DAL
         public DbSet<Recycle_Funds> Funds_Recycle { get; set; }
         public DbSet<Dic_CardType> Dic_CardType { get; set; }
         public DbSet<Recycle_User> Recycle_User { get; set; }
+        public DbSet<Process_Info> Process_Info { get; set; }
 
     }
 }

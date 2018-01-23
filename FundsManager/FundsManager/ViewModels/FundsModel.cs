@@ -71,4 +71,29 @@ namespace FundsManager.ViewModels
         //使用的经费
         public List<uFundsListModel> useFunds { get; set; }
     }
+    public class ProcessModel
+    {
+        private int _funds = 0;
+        private DateTime _time = DateTime.Now;
+        [DisplayName("流程ID")]
+        public int id { get; set; }
+        [StringLength(50),DisplayName("流程名称")]
+        public string name { get; set; }
+        [DisplayName("创建人")]
+        public int user { get; set; }
+        [DisplayName("创建时间")]
+        public DateTime time { get { return _time; } set { _time = value; } }
+        [DisplayName("默认使用")]
+        public int funds { get { return _funds; } set { _funds = value; } }
+        [DisplayName("详细流程")]
+        public List<ProcessDetail> processList { get; set; }
+    }
+    public class ProcessDetail
+    {
+        public int id { get; set; }
+        [DisplayName("批复领导")]
+        public int user { get; set; }
+        [DisplayName("批复序号")]
+        public int sort { get; set; }
+    }
 }
