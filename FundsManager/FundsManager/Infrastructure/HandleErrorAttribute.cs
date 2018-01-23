@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FundsManager.Common;
+using System;
 using System.Diagnostics;
 using System.Web.Mvc;
 
@@ -24,6 +25,7 @@ namespace FundsManager.Infrastructure
                 if (filterContext.Exception != null)
                 {
                     Trace.TraceError(filterContext.Exception.ToString());
+                    ErrorUnit.WriteErrorLog(filterContext.Exception.ToString(), filterContext.ParentActionViewContext.ToString());
                 }
                 filterContext.ExceptionHandled = true;
             }

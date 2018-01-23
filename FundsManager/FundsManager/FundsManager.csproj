@@ -270,10 +270,7 @@
     <Content Include="Views\FundsManager\Delete.cshtml" />
     <Content Include="Views\FundsManager\Edit.cshtml" />
     <Content Include="Views\FundsManager\Index.cshtml" />
-    <Content Include="Views\RespondManager\Create.cshtml" />
-    <Content Include="Views\RespondManager\Delete.cshtml" />
     <Content Include="Views\RespondManager\Details.cshtml" />
-    <Content Include="Views\RespondManager\Edit.cshtml" />
     <Content Include="Views\RespondManager\Index.cshtml" />
     <Content Include="Views\Shared\_systemset.cshtml" />
     <Content Include="Views\Shared\_usermanager.cshtml" />
@@ -289,9 +286,12 @@
     <Content Include="Views\Shared\_applymanager.cshtml" />
     <Content Include="Views\SystemSet\SiteSet.cshtml" />
     <Content Include="Views\SystemSet\SiteInfo.cshtml" />
-    <Content Include="Views\SystemSet\Module.cshtml" />
+    <Content Include="Views\SystemSet\ContrlModule.cshtml" />
     <Content Include="Views\ApplyManager\MyFunds.cshtml" />
     <Content Include="Views\ApplyManager\ApplyNext.cshtml" />
+    <Content Include="Views\SystemSet\Post.cshtml" />
+    <Content Include="Views\SystemSet\Department.cshtml" />
+    <Content Include="Views\SystemSet\Role.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -322,6 +322,7 @@
     <Compile Include="Common\WeeK.cs" />
     <Compile Include="Controllers\ApplyManagerController.cs" />
     <Compile Include="Controllers\DBCaches.cs" />
+    <Compile Include="Controllers\DBCaches2.cs" />
     <Compile Include="Controllers\DropDownList.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\FundsManagerController.cs" />
@@ -388,7 +389,8 @@
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\FundsModel.cs" />
     <Compile Include="ViewModels\LoginModel.cs" />
-    <Compile Include="ViewModels\SystemSet.cs" />
+    <Compile Include="ViewModels\ResponseModel.cs" />
+    <Compile Include="ViewModels\SystemSetModel.cs" />
     <Compile Include="ViewModels\UserModel.cs" />
   </ItemGroup>
   <ItemGroup>

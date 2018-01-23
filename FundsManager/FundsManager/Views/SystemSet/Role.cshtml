@@ -1,0 +1,84 @@
+﻿@model FundsManager.Models.Dic_Role
+@{
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-角色设置";
+    List<FundsManager.Models.Dic_Role> list = ViewData["RoleList"] as List<FundsManager.Models.Dic_Role>;
+}
+<style>
+    .form-control{width:200px;display:inline-block;}
+</style>
+<h4>职务表</h4>
+
+<div class="col-md-10" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.role_name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.role_name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.role_name, "", new { @class = "text-danger" })
+                <input type="submit" value="添加角色" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                <table class="table table-bordered">
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                职务名称
+                            </th>
+                            <th>
+                                操作
+                            </th>
+                        </tr>
+                    @if (list != null && list.Count() > 0)
+                    {
+                        foreach (var item in list)
+                        {
+                        <tr>
+                            <td>@item.role_id</td>
+                            <td>@item.role_name</td>
+                            <td><a href="javascript:void(0);" onclick="DelFunds(@item.role_id)">删除</a></td>
+                        </tr>
+                            }
+
+                        }
+                        else
+                        {
+                        <tr>
+                            <td colspan="2">当前没有数据</td>
+                        </tr>
+                        }
+                </table>
+            </div>
+        </div>
+    </div>
+}
+<script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script>
+    function DelFunds(id) {
+        if (!confirm("是否删除该职务？删除后将无法恢复。")) return;
+        $.post("@Url.RouteUrl(new { controller = "SystemSet", action = "DeleteRole" })", { rid: id }, function (data) {
+            if (data.state == 1) {
+                alert('删除成功。');
+                window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "Role" })";
+            }else
+            {
+                $('.err').text(data.msg_text);
+            }
+        }).fail(function (err) {
+            alert(err.status+':'+err.statusText);
+        });
+    }
+</script>

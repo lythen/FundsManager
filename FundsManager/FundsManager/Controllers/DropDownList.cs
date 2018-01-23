@@ -4,6 +4,7 @@ using FundsManager.DAL;
 using FundsManager.Models;
 using System.Linq;
 using FundsManager.Common;
+using FundsManager.ViewModels;
 
 namespace FundsManager.Controllers
 {
@@ -13,7 +14,7 @@ namespace FundsManager.Controllers
         private static string cache_week = "cache_week";
         private static string cache_post = "cache_post";
         private static string cache_funds_manger = "funds_manger";
-        private static string cache_dept = "cache_dept";
+        private static string cache_dept = "cache_depts";
         private static string cache_sex = "cache_sex";
         private static string cache_user_state = "cache_user_state";
         private static string cache_role = "cache_role";
@@ -85,15 +86,15 @@ namespace FundsManager.Controllers
             }
             return options;
         }
-        public static List<SelectOption> getDepartment(int id=0)
+        public static List<SelectOption> getDepartment(int? id=null)
         {
-            List<Dic_Department> depts = DBCaches<Dic_Department>.getCache(cache_dept);
+            List<DepartMentModel> depts = DBCaches2.getDeptCache();
             List<SelectOption> option = (from dep in depts
-                                         where dep.dept_parent_id == id
+                                         where dep.parentId == (id==null? dep.parentId:(int)id)
                                          select new SelectOption
                                          {
-                                             id = dep.dept_id.ToString(),
-                                             text = dep.dept_name
+                                             id = dep.deptId.ToString(),
+                                             text = dep.deptName
                                          }).ToList();
             return option;
         }

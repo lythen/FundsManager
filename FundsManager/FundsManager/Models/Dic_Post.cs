@@ -1,12 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace FundsManager.Models
 {
     public class Dic_Post
     {
-        [Key]
+        [Key, DisplayName("职务ID")]
         public int post_id { get; set; }
-        [StringLength(20), Required]
+        [StringLength(20), Required,DisplayName("职务名称")]
         public string post_name { get; set; }
     }
 }

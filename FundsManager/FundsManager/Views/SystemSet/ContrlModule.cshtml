@@ -48,7 +48,7 @@
                     <tr>
                         @Html.HiddenFor(Itemmodel=>item.hasChange)
                         <td>
-                            @Html.EditorFor(Itemmodel => item.name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.EditorFor(Itemmodel => item.name, new { htmlAttributes = new { @class = "form-control",Readonly="Readonly" } })
                             @Html.ValidationMessageFor(Itemmodel => item.name, "", new { @class = "text-danger" })
                         </td>
                         <td>
@@ -63,7 +63,7 @@
                             @Html.ValidationMessageFor(Itemmodel => item.info, "", new { @class = "text-danger" })
                         </td>
                         <td style="text-align:center;">
-                            @Html.ActionLink("删除", "Delete", new { id = item.id })
+                            <a href="javascript:void(0);" onclick="DelFunds(@item.id)">删除</a>
                         </td>
                     </tr>
                 }
@@ -77,3 +77,35 @@
         </div>
     </div>
 }
+<script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script>
+    function DelFunds(id) {
+        if (!confirm("是否删除该部门/科室？删除后将无法恢复。")) return;
+        $.post("@Url.RouteUrl(new { controller = "SystemSet", action = "DeleteDept" })", { pid: id }, function (data) {
+            if (data.state == 1) {
+                alert('删除成功。');
+                window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "Department" })";
+            }else
+            {
+                $('.err').text(data.msg_text);
+            }
+        }).fail(function (err) {
+            alert(err.status+':'+err.statusText);
+        });
+    }
+    function Edit() {
+        if (!confirm("是否确认当前修改？。")) return;
+        var data = new Object();
+        $.post("@Url.RouteUrl(new { controller = "SystemSet", action = "ContrlModule" })", { pid: id }, function (data) {
+            if (data.state == 1) {
+                alert('删除成功。');
+                window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "Department" })";
+            }else
+            {
+                $('.err').text(data.msg_text);
+            }
+        }).fail(function (err) {
+            alert(err.status+':'+err.statusText);
+        });
+    }
+</script>

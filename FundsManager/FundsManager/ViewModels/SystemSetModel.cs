@@ -5,7 +5,7 @@ using FundsManager.Common;
 using System.Collections.Generic;
 namespace FundsManager.ViewModels
 {
-    public class SystemSet
+    public class SystemSetModel
     {
     }
     public class SiteInfo
@@ -74,5 +74,17 @@ namespace FundsManager.ViewModels
             model.role_name = name;
             return model;
         }
+    }
+    public class DepartMentModel
+    {
+        private int parent_id = 0;
+        [DisplayName("部门ID")]
+        public int? deptId { get; set; }
+        [DisplayName("部门名称")]
+        public string deptName { get; set; }
+        [DisplayName("上级部门ID")]
+        public int parentId { get { return parent_id; } set { parent_id = value; } }
+        [DisplayName("上级部门名称")]
+        public string parentName { get; set; }
     }
 }
