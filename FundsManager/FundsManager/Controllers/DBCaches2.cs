@@ -14,6 +14,8 @@ namespace FundsManager.Controllers
         private static string cache_depts = "cache_depts";
         private static string dic_module = "dic-module";
         private static string cache_role = "cache_role";
+        private static string cache_process_list = "cache_process_list";
+        private static string cache_process_detail = "cache_process_detail";
         public static List<DepartMentModel> getDeptCache()
         {
             List<DepartMentModel> list = (List<DepartMentModel>)DataCache.GetCache(cache_depts);
@@ -73,6 +75,47 @@ namespace FundsManager.Controllers
                         }).ToArray();
             return list;
 
+        }
+        public static List<ProcessModel> getListProcessModel()
+        {
+            object roles = DataCache.GetCache(cache_process_list);
+            if (roles == null)
+            {
+                var list = (from pro in db.Process_Info
+                            join u in db.User_Info on pro.process_user_id equals u.user_id
+                            select new ProcessModel
+                            {
+                                id = pro.process_id,
+                                name = pro.process_name,
+                                time = pro.process_create_time,
+                                user = u.real_name,
+                                funds = pro.process_funds,
+                                uid=pro.process_user_id
+                            }).ToList();
+                if (list.Count() > 0) DataCache.SetCache(cache_process_list, list, DateTime.Now.AddYears(1), System.Web.Caching.Cache.NoSlidingExpiration);
+                return list;
+            }
+            else return (List<ProcessModel>)roles;
+        }
+        public static List<ProcessDetail> getProcessDetail()
+        {
+            object roles = DataCache.GetCache(cache_process_detail);
+            if (roles == null)
+            {
+                var list = (from pl in db.Process_List
+                             join u2 in db.User_Info on pl.po_user_id equals u2.user_id
+                             select new ProcessDetail
+                             {
+                                 id = pl.po_id,
+                                 sort = pl.po_sort,
+                                 strUser = u2.real_name,
+                                 user = pl.po_user_id,
+                                 pid=pl.po_process_id
+                             }).ToList();
+                if (list.Count() > 0) DataCache.SetCache(cache_process_detail, list, DateTime.Now.AddYears(1), System.Web.Caching.Cache.NoSlidingExpiration);
+                return list;
+            }
+            else return (List<ProcessDetail>)roles;
         }
         public static void ClearCache(string cache_name)
         {
