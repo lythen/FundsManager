@@ -1,7 +1,132 @@
-﻿
+﻿@model FundsManager.ViewModels.ProcessModel
 @{
-    ViewBag.Title = "ProcessEdit";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-流程修改";
 }
+<style>
+    .form-control {
+        width: 200px;
+        display: inline-block;
+    }
 
-<h2>ProcessEdit</h2>
+    .out-form {
+        width: 100%;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 15px 10px 0px 0px;
+        margin-top: 15px;
+    }
 
+    .funds-all {
+        width: auto;
+        min-width: 250px;
+        display: inline-block;
+        height: 36px;
+    }
+
+    #msg {
+        display: none;
+    }
+</style>
+<h4>流程修改</h4>
+<div class="col-md-10" id="msg">
+    @ViewBag.msg
+</div>
+<div class="form-horizontal">
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.name, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "form-control funds-all" } })
+            @Html.ValidationMessageFor(model => model.name, "", new { @class = "text-danger" })
+            <input type="button" onclick="addChild();" class="btn btn-info" value="添加流程" />
+        </div>
+    </div>
+    @foreach (var item in Model.processList)
+    {
+        <div class="out-form">
+
+            <div class="form-group">
+                @Html.LabelFor(model => item.sort, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => item.sort, new { htmlAttributes = new { @class = "form-control txt-funds", @type = "number" } })
+                    @Html.ValidationMessageFor(model => item.sort, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => item.user, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => item.user, item.user, ViewBag.Users as List<SelectListItem>,"", new Dictionary<string, object> { { "class", "select form-control" } })
+                    @Html.ValidationMessageFor(model => item.user, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    }
+    <div class="form-group btn-div" style="padding-top:15px;">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="button" id="fat-btn" onclick="Add(this);" data-loading-text="加载中..." class="btn btn-primary" autocomplete="off">
+                提 交
+            </button>
+            @Html.ActionLink("返 回", "Process", null, new { @class = "btn btn-warning" })
+        </div>
+    </div>
+</div>
+
+<script src="~/scripts/jquery-3.2.1.slim.js"></script>
+<script>
+    function addChild() {
+        var sort = $('.out-form').length + 1;
+        var div = $('.out-form').get(0);
+        if (div == null) {
+            alert('添加出错');
+        }
+        var str = div.outerHTML;
+        var newdiv = $(str);
+        newdiv.find('#item_sort').val(sort);
+        newdiv.insertBefore($('.btn-div'));
+    }
+    function Add(obj) {
+        var formdata = new Object();
+        formdata.name = $('#name').val();
+        var divs = $('.out-form');
+        var list = new Array();
+        var len = divs.length;
+        if (len == 0) {
+            alert('没有任何流程。');
+            return;
+        }
+        for (var i = 0; i < len; i++) {
+            var child = new Object();
+            child.sort = $(divs[i]).find('#item_sort').val();
+            if (!child.sort || child.sort == 0) {
+                alert('批复序号不能为空！');
+                return false;
+            }
+            child.user = $(divs[i]).find('#item_user').val();
+            if (!child.user || child.user == 0) {
+                alert('请选择批复领导！');
+                return false;
+            }
+            list.push(child);
+        }
+        formdata.processList = list;
+        $.post("@Url.RouteUrl(new {controller= "FundsManager", action= "ProcessEdit" })", formdata, function (data, status) {
+            if (data.state == '1') {
+                alert('修改成功。');
+                location.href ='@Url.RouteUrl(new { action = "Process", controller = "FundsManager" })';
+            } else {
+                if (data.msg_code == 'nologin') location.href = '@Url.RouteUrl(new { action = "LogOut", controller = "Login"})';
+                $('#msg').removeClass();
+                $('#msg').addClass('col-md-offset-2 col-md-10 alert alert alert-danger');
+                $('#msg').text(data.msg_text);
+            }
+            $('#msg').slideDown("slow");
+            //setTimeout(function () {
+            //    $('#msg').slideToggle("slow");
+            //}, 5000);
+        });
+    }
+</script>

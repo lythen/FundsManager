@@ -12,6 +12,7 @@ using FundsManager.ViewModels;
 using System.Data.Entity.Validation;
 using System.Text;
 using FundsManager.Common;
+using FundsManager.Common.DEncrypt;
 
 namespace FundsManager.Controllers
 {
@@ -306,34 +307,220 @@ namespace FundsManager.Controllers
         #region 批复流程管理
         public ActionResult Process()
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
             var list = (from pro in db.Process_Info
+                        join u in db.User_Info on pro.process_user_id equals u.user_id
                         select new ProcessModel
                         {
                             id = pro.process_id,
                             name = pro.process_name,
                             time = pro.process_create_time,
-                            user = pro.process_user_id,
+                            user = u.real_name,
+                            isSelf = pro.process_user_id== user,
                             funds = pro.process_funds
                         }).ToList();
             return View(list);
         }
         public ActionResult ProcessAdd()
         {
-            return View();
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            List<SelectOption> options = DropDownList.FundsManagerSelect();
+            ViewBag.Users = DropDownList.SetDropDownList(options);
+            ProcessModel model = new ProcessModel();
+            model.processList = new List<ProcessDetail>();
+            model.processList.Add(new ProcessDetail() { sort=1 });
+            return View(model);
         }
         [HttpPost]
-        public ActionResult ProcessAdd(ProcessModel model)
+        public JsonResult ProcessAdd(ProcessModel model)
         {
-            return View();
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                goto next;
+            }
+            if (model.processList == null || model.processList.Count() == 0)
+            {
+                json.msg_code = "noList";
+                json.msg_text = "不包含任何流程。";
+                goto next;
+            }
+            string proName= PageValidate.InputText(model.name, 50);
+            if (db.Process_Info.Where(x => x.process_name == proName).Count() > 0)
+            {
+                json.msg_code = "nameExists";
+                json.msg_text = "该名称已存在。";
+                goto next;
+            }
+            
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            Process_Info info = new Process_Info();
+            info.process_create_time = DateTime.Now;
+            info.process_name = PageValidate.InputText(model.name, 50);
+            info.process_user_id = user;
+            db.Process_Info.Add(info);
+            try
+            {
+                db.SaveChanges();
+            }
+            catch
+            {
+                json.msg_code = "infoError";
+                json.msg_text = "流程信息添加失败。";
+                goto next;
+            }
+            int i = 1;
+            foreach(ProcessDetail item in model.processList.OrderBy(x => x.sort))
+            {
+                Process_List list = new Process_List();
+                list.po_process_id = info.process_id;
+                list.po_sort = i;
+                list.po_user_id = item.user;
+                i++;
+                db.Process_List.Add(list);
+            }
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception e) {
+                ErrorUnit.WriteErrorLog(e.ToString(), "WriteProcessList");
+                json.msg_code = "infoError";
+                json.msg_text = "流程列表添加失败。";
+                goto next;
+            }
+            json.msg_code = "success";
+            json.state = 1;
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
         }
         public ActionResult ProcessEdit(int? id)
         {
-            return View();
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            List<SelectOption> options = DropDownList.FundsManagerSelect();
+            ViewBag.Users = DropDownList.SetDropDownList(options);
+            ProcessModel model = getProcessModel((int)id);
+            if (model == null||model.uid!=user)
+            {
+                ViewBag.mag = "该流程不存在或者您非该流程创建者。";
+                model = new ProcessModel();
+                model.processList = new List<ProcessDetail>();
+                model.processList.Add(new ProcessDetail() { sort = 1 });
+            }
+            return View(model);
         }
         [HttpPost]
         public ActionResult ProcessEdit(ProcessModel model)
         {
             return View();
+        }
+        public JsonResult getProcessModel(string pid)
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                goto next;
+            }
+            int id = PageValidate.FilterParam(pid);
+            ProcessModel model = getProcessModel(id);
+            if (model == null)
+            {
+                json.msg_text = "该流程不存在或已被删除。";
+                json.msg_code = "notExists";
+                goto next;
+            }
+            foreach(var item in model.processList)
+            {
+                item.strUser = AESEncrypt.Decrypt(item.strUser);
+            }
+            json.state = 1;
+            json.data = model;
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
+        ProcessModel getProcessModel(int id)
+        {
+            var model = (from pro in db.Process_Info
+                         join u in db.User_Info on pro.process_user_id equals u.user_id
+                         where pro.process_id == id
+                         select new ProcessModel
+                         {
+                             name = pro.process_name,
+                             uid=pro.process_user_id,
+                             processList = (from pl in db.Process_List
+                                            join u2 in db.User_Info on pl.po_user_id equals u2.user_id
+                                            where pl.po_process_id == pro.process_id
+                                            select new ProcessDetail
+                                            {
+                                                id = pl.po_id,
+                                                sort = pl.po_sort,
+                                                strUser = u2.real_name,
+                                                user=pl.po_user_id
+                                            }
+                                  ).ToList()
+                         }).FirstOrDefault();
+            return model;
+        }
+        #endregion
+        #region 统计
+        public void setSearchSelect()
+        {
+
+        }
+        public ActionResult Statistics()
+        {
+            FundsSearchModel info = new FundsSearchModel();
+            return View(info);
+        }
+        [HttpPost]
+        public ActionResult Statistics(FundsSearchModel info)
+        {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+
+            setSearchSelect();
+            FundsStatistics model = new FundsStatistics();
+            switch (info.statorDetail)
+            {
+                case 0:model.stats = getStatistics(info);break;
+                case 1:model.details = getStatisticsDetail(info);break;
+            }
+            ViewData["StatData"] = model;
+            return View(info);
+        }
+        List<FundsStatDetail> getStatisticsDetail(FundsSearchModel info)
+        {
+            var query = (from capply in db.Funds_Apply_Child
+                         join apply in db.Funds_Apply on capply.c_apply_number equals apply.apply_number
+                         join user in db.User_Info on apply.apply_user_id equals user.user_id
+                         join funds in db.Funds on capply.c_funds_id equals funds.f_id
+                         select new FundsStatDetail
+                         {
+                             applyAmount = capply.c_amount,
+                             applyTime = apply.apply_time,
+                             fname = funds.f_name,
+                             uname = user.user_name
+                         });
+            info.Amount = query.Count();
+            return query.Skip(info.PageSize * (info.PageIndex - 1)).Take(info.PageSize).ToList();
+        }
+        List<FundsStat> getStatistics(FundsSearchModel info)
+        {
+            var query = (from funds in db.Funds
+                         where funds.f_in_year==info.year.ToString()
+                         select new FundsStat
+                         {
+                              amount=funds.f_amount,
+                               name=funds.f_name
+                         }
+                       ).ToList();
+            return null;
         }
         #endregion
         protected override void Dispose(bool disposing)

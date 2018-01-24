@@ -1,6 +1,7 @@
 ﻿using FundsManager.Common;
 using System;
 using System.Diagnostics;
+using System.Text;
 using System.Web.Mvc;
 
 namespace FundsManager.Infrastructure
@@ -25,7 +26,12 @@ namespace FundsManager.Infrastructure
                 if (filterContext.Exception != null)
                 {
                     Trace.TraceError(filterContext.Exception.ToString());
-                    ErrorUnit.WriteErrorLog(filterContext.Exception.ToString(), filterContext.ParentActionViewContext.ToString());
+                    StringBuilder sb = new StringBuilder();
+                    foreach(var item in filterContext.RouteData.Values)
+                    {
+                        sb.Append(item.Key).Append(": ").Append(item.Value).Append("\r\n");
+                    }
+                    ErrorUnit.WriteErrorLog(filterContext.Exception.ToString(), sb.ToString());
                 }
                 filterContext.ExceptionHandled = true;
             }

@@ -74,19 +74,22 @@ namespace FundsManager.ViewModels
     public class ProcessModel
     {
         private int _funds = 0;
+        private bool _is_self = false;
         private DateTime _time = DateTime.Now;
         [DisplayName("流程ID")]
-        public int id { get; set; }
+        public int? id { get; set; }
         [StringLength(50),DisplayName("流程名称")]
         public string name { get; set; }
         [DisplayName("创建人")]
-        public int user { get; set; }
+        public string user { get; set; }
+        public int? uid { get; set; }
         [DisplayName("创建时间")]
         public DateTime time { get { return _time; } set { _time = value; } }
         [DisplayName("默认使用")]
         public int funds { get { return _funds; } set { _funds = value; } }
         [DisplayName("详细流程")]
         public List<ProcessDetail> processList { get; set; }
+       public bool isSelf { get { return _is_self; }set { _is_self = value; } }
     }
     public class ProcessDetail
     {
@@ -95,5 +98,56 @@ namespace FundsManager.ViewModels
         public int user { get; set; }
         [DisplayName("批复序号")]
         public int sort { get; set; }
+        [DisplayName("批复领导")]
+        public string strUser { get; set; }
+    }
+    public class FundsSearchModel : BasePagerModel
+    {
+        [DisplayName("年份")]
+        public int year { get; set; }
+        [DisplayName("经费")]
+        public int? fund { get; set; }
+        [DisplayName("统计或详细")]
+        public int statorDetail { get; set; }
+    }
+    /// <summary>
+    /// 经费统计
+    /// </summary>
+    public class FundsStatistics
+    {
+        /// <summary>
+        /// 统计
+        /// </summary>
+        public List<FundsStatDetail> details { get; set; }
+        /// <summary>
+        /// 明细
+        /// </summary>
+        public List<FundsStat> stats { get; set; }
+    }
+    public class FundsStatDetail
+    {
+        [DisplayName("经费名称")]
+        public string fname { get; set; }
+        [DisplayName("申请人")]
+        public string uname { get; set; }
+        [DisplayName("申请金额")]
+        public decimal applyAmount { get; set; }
+        [DisplayName("申请时间")]
+        public DateTime applyTime { get; set; }
+    }
+    public class FundsStat
+    {
+        [DisplayName("经费名称")]
+        public string name { get; set; }
+        [DisplayName("经费总额（元）")]
+        public decimal amount { get; set; }
+        [DisplayName("经费已用（元）")]
+        public decimal hasUsed { get; set; }
+        [DisplayName("经费余额（元）")]
+        public decimal havntUsed { get; set; }
+        [DisplayName("申请数量（笔）")]
+        public int applyNum { get; set; }
+        [DisplayName("最大申请（元）")]
+        public decimal maxUsed { get; set; }
     }
 }
