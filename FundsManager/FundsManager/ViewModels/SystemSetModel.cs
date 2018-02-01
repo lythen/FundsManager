@@ -28,9 +28,8 @@ namespace FundsManager.ViewModels
         public string managerPhone { get; set; }
         [StringLength(100), DisplayName("管理员邮箱")]
         public string managerEmail { get; set; }
-        public Sys_SiteInfo toDBModel()
+        public Sys_SiteInfo toDBModel(Sys_SiteInfo model)
         {
-            Sys_SiteInfo model = new Sys_SiteInfo();
             model.site_name = PageValidate.InputText(name, 100);
             model.site_company = PageValidate.InputText(company, 100);
             model.site_company_address = PageValidate.InputText(companyAddress, 1200);

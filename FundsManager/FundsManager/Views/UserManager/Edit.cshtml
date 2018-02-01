@@ -154,11 +154,20 @@
 <script src="~/Scripts/jquery-3.2.1.min.js"></script>
 <script src="~/scripts/bootstrap.min.js"></script>
 <script>
+    function getRootPath() {
+        var strFullPath = window.document.location.href;
+        var strPath = window.document.location.pathname;
+        var pos = strFullPath.indexOf(strPath);
+        var prePath = strFullPath.substring(0, pos);
+        var postPath = strPath.substring(0, strPath.substr(1).indexOf('/') + 1);
+        return (prePath + postPath);
+    }
     $(function () {
-        $.getScript('http://'+window.location.host + '/scripts/jquery.md5.js');
+        $.getScript(getRootPath() + '/scripts/jquery.md5.js');
         var pic = $('#picture').val();
         if(pic){
-            $('#photo').attr('src', 'http://' + window.location.host + '/photo/' + pic);
+            $('#photo').attr('src', getRootPath() + '/photo/' + pic.replace('_temp', ''));
+            $('#picture').val(pic.replace('_temp', ''))
         }
         $('#password').val('');
         $('#password2').val('');
@@ -232,7 +241,7 @@
             contentType: false, //指定为false才能形成正确的Content-Type
             success: function (data, textStatus) {
                 if (data.state == 1) {
-                    $('#photo').attr('src', 'http://' + window.location.host + '/photo/temp/' + data.data);
+                    $('#photo').attr('src', getRootPath() + '/photo/temp/' + data.data);
                     $('#picture').val(data.data);
                 }
                 else if (data.state == 0) {

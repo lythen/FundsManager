@@ -28,7 +28,7 @@ namespace FundsManager.Controllers
                                 }).FirstOrDefault();
                 var loginInfo = (from l in db.Sys_Log
                                  where l.log_user_id == id
-                                 orderby l.log_time ascending
+                                 orderby l.log_time descending
                                  select l
                                  ).FirstOrDefault();
                 if (loginInfo != null)

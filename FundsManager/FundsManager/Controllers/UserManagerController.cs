@@ -202,11 +202,8 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             LoginRole role = (LoginRole)Session["LoginRole"];
             if (role.roleName != "系统管理员") id = PageValidate.FilterParam(User.Identity.Name);
+            if (id == null) id = PageValidate.FilterParam(User.Identity.Name);
             setSelect();
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
             UserEditModel model = new UserEditModel();
             User_Info info = db.User_Info.Find(id);
             if (info == null)
@@ -341,7 +338,9 @@ namespace FundsManager.Controllers
                 try
                 {
                     db.SaveChanges();
-                }catch(DbEntityValidationException ex)
+                    ViewBag.msg = " 更新成功。";
+                }
+                catch(DbEntityValidationException ex)
                 {
                     StringBuilder errors = new StringBuilder();
                     IEnumerable<DbEntityValidationResult> validationResult = ex.EntityValidationErrors;
@@ -358,7 +357,6 @@ namespace FundsManager.Controllers
                 }
             }
             next:
-            ViewBag.msg = " 更新成功。";
             return View(model);
         }
 

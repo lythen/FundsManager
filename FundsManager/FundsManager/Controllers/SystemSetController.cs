@@ -32,16 +32,16 @@ namespace FundsManager.Controllers
         public ActionResult SiteSet([Bind(Include = "name,company,introduce,companyAddress,companyPhone,companyEmail,managerName,managerPhone,managerEmail")]ViewModels.SiteInfo info)
         {
 
-            Sys_SiteInfo model = db.Sys_SiteInfo.First();
+            Sys_SiteInfo model = db.Sys_SiteInfo.FirstOrDefault();
             if (model.site_name != info.name)
             {
                 db.Sys_SiteInfo.Remove(model);
-                model = info.toDBModel();
+                info.toDBModel(model);
                 db.Sys_SiteInfo.Add(model);
             }
             else
             {
-                model = info.toDBModel();
+                info.toDBModel(model);
                 db.Entry<Sys_SiteInfo>(model).State = EntityState.Modified;
             }
             try
