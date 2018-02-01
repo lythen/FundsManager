@@ -48,6 +48,7 @@
                 <div class="col-md-10">
                     @Html.EditorFor(model => item.sort, new { htmlAttributes = new { @class = "form-control txt-funds", @type = "number"} })
                     @Html.ValidationMessageFor(model => item.sort, "", new { @class = "text-danger" })
+                    <input type="button" class="btn btn-danger" value="删除此项" onclick="RemoveThis(this)" />
                 </div>
             </div>
             <div class="form-group">
@@ -121,6 +122,29 @@
             //setTimeout(function () {
             //    $('#msg').slideToggle("slow");
             //}, 5000);
+        });
+    }
+    function RemoveThis(obj) {
+        if ($('.out-form').length == 1) {
+            alert('只有一个流程时，无法删除。');
+            return;
+        }
+        var old = $(obj).parent().parent().parent();
+        var val;
+        try {
+            val = parseInt(old.find('#item_sort').val());
+        } catch (err) {
+            return;
+        }
+        old.remove();
+        if (val == 0) return;
+        var divs = $('.out-form');
+        $.each(divs, function (i, item) {
+            var s = $(item).find('#item_sort');
+            if (s.val()) {
+                var w = parseInt(s.val());
+                if (w > val) s.val((w - 1));
+            }
         });
     }
 </script>

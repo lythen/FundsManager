@@ -100,6 +100,7 @@ namespace FundsManager.ViewModels
         public int sort { get; set; }
         [DisplayName("批复领导")]
         public string strUser { get; set; }
+        public int? pid { get; set; }
     }
     public class FundsSearchModel : BasePagerModel
     {

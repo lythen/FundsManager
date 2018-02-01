@@ -309,17 +309,15 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            var list = (from pro in db.Process_Info
-                        join u in db.User_Info on pro.process_user_id equals u.user_id
-                        select new ProcessModel
-                        {
-                            id = pro.process_id,
-                            name = pro.process_name,
-                            time = pro.process_create_time,
-                            user = u.real_name,
-                            isSelf = pro.process_user_id== user,
-                            funds = pro.process_funds
-                        }).ToList();
+            var list = DBCaches2.getListProcessModel();
+            if (list.Count() > 0)
+            {
+                foreach(var item in list)
+                {
+                    if (item.uid == user) item.isSelf = true;
+                    else item.isSelf = false;
+                }
+            }
             return View(list);
         }
         public ActionResult ProcessAdd()
@@ -394,7 +392,9 @@ namespace FundsManager.Controllers
             }
             json.msg_code = "success";
             json.state = 1;
-            next:
+            DBCaches2.ClearCache("cache_process_list");
+            DBCaches2.ClearCache("cache_process_detail");
+        next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
         public ActionResult ProcessEdit(int? id)
@@ -414,9 +414,77 @@ namespace FundsManager.Controllers
             return View(model);
         }
         [HttpPost]
-        public ActionResult ProcessEdit(ProcessModel model)
+        public JsonResult ProcessEdit(ProcessModel model)
         {
-            return View();
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                goto next;
+            }
+            if (model.processList == null || model.processList.Count() == 0)
+            {
+                json.msg_code = "noList";
+                json.msg_text = "不包含任何流程。";
+                goto next;
+            }
+            string proName = PageValidate.InputText(model.name, 50);
+            if (db.Process_Info.Where(x => x.process_name == proName&&x.process_id!=model.id).Count() > 0)
+            {
+                json.msg_code = "nameExists";
+                json.msg_text = "该名称已存在。";
+                goto next;
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            Process_Info info = db.Process_Info.Find(model.id);
+            if (user != info.process_user_id)
+            {
+                json.msg_code = "nopower";
+                json.msg_text = "无法修改他人的流程。";
+                goto next;
+            }
+            info.process_name = PageValidate.InputText(model.name, 50);
+            db.Entry<Process_Info>(info).State = EntityState.Modified;
+            var oldList = db.Process_List.Where(pl => pl.po_process_id == info.process_id);
+            if (oldList.Count() > 0) db.Process_List.RemoveRange(oldList);
+            try
+            {
+                db.SaveChanges();
+            }
+            catch
+            {
+                json.msg_code = "infoError";
+                json.msg_text = "流程信息修改失败。";
+                goto next;
+            }
+            int i = 1;
+            foreach (ProcessDetail item in model.processList.OrderBy(x => x.sort))
+            {
+                Process_List list = new Process_List();
+                list.po_process_id = info.process_id;
+                list.po_sort = i;
+                list.po_user_id = item.user;
+                i++;
+                db.Process_List.Add(list);
+            }
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                ErrorUnit.WriteErrorLog(e.ToString(), "WriteProcessList");
+                json.msg_code = "infoError";
+                json.msg_text = "流程列表添加失败。";
+                goto next;
+            }
+            json.msg_code = "success";
+            json.state = 1;
+            DBCaches2.ClearCache("cache_process_list");
+            DBCaches2.ClearCache("cache_process_detail");
+        next:
+            return Json(json, JsonRequestBehavior.AllowGet);
         }
         public JsonResult getProcessModel(string pid)
         {
@@ -446,23 +514,15 @@ namespace FundsManager.Controllers
         }
         ProcessModel getProcessModel(int id)
         {
-            var model = (from pro in db.Process_Info
-                         join u in db.User_Info on pro.process_user_id equals u.user_id
-                         where pro.process_id == id
+            var model = (from pro in DBCaches2.getListProcessModel()
+                         where pro.uid == id
                          select new ProcessModel
                          {
-                             name = pro.process_name,
-                             uid=pro.process_user_id,
-                             processList = (from pl in db.Process_List
-                                            join u2 in db.User_Info on pl.po_user_id equals u2.user_id
-                                            where pl.po_process_id == pro.process_id
-                                            select new ProcessDetail
-                                            {
-                                                id = pl.po_id,
-                                                sort = pl.po_sort,
-                                                strUser = u2.real_name,
-                                                user=pl.po_user_id
-                                            }
+                             name = pro.name,
+                             uid=pro.uid,
+                             processList = (from pl in DBCaches2.getProcessDetail()
+                                            where pl.pid == pro.id
+                                            select pl
                                   ).ToList()
                          }).FirstOrDefault();
             return model;
