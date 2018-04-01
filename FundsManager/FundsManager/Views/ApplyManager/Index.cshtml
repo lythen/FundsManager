@@ -1,12 +1,13 @@
 ﻿@model IEnumerable<FundsManager.ViewModels.ApplyListModel>
 
 @{
-    ViewBag.Title  = FundsManager.Controllers.SiteInfo.getSiteName() + "待批复经费列表";
+    ViewBag.Title  = FundsManager.Controllers.SiteInfo.getSiteName() + "我的经费列表";
 }
 <style>
     #msg{display:none;}
+    .table .table tbody tr td, .table .table tbody tr th, .table .table tfoot tr td, .table .table tfoot tr th, .table .table thead tr td, .table .table thead tr th{border-top:none;}
 </style>
-<h4>待批复经费列表</h4>
+<h4>我的经费列表</h4>
 <div class="col-md-10" id="msg">
     @ViewBag.msg
 </div>
@@ -18,16 +19,18 @@
         <th>
             @Html.DisplayNameFor(model => model.time)
         </th>
-        <th>
+        <th>订单状态</th>
+        <th class="th-no">
             子申请单号
         </th>
-        <th>
+        <th class="th-co">经费代码</th>
+        <th class="th-am">
             金额
         </th>
-        <th>
+        <th class="th-st">
             状态
         </th>
-        <th>子操作</th>
+        <th class="th-do">子操作</th>
 
         <th>操作</th>
     </tr>
@@ -43,49 +46,35 @@ foreach (var item in Model)
             @Html.DisplayFor(modelItem => item.time)
         </td>
         <td>
-            @if (item.childState != null)
-            {
-            foreach (var citem in item.childState)
-            {
-                <div>
-                    @citem.childState.Split(',')[0]
-                </div>
-            }
-            }
+            @item.strState
         </td>
-        <td>
-            @if (item.childState != null)
-            {
-                foreach (var citem in item.childState)
+        <td colspan="5">
+            <table class="table">
+                @if (item.child != null && item.child.Count() > 0)
                 {
-                    <div>
-                        @citem.childState.Split(',')[2]
-                    </div>
+                    foreach (var citem in item.child)
+                    {
+                        <tr>
+                            <td class="td-no">
+                                @citem.Cnumber
+                            </td>
+                            <td class="td-co">
+                                @citem.fundsCode
+                            </td>
+                            <td class="td-am">
+                                @citem.amount
+                            </td>
+                            <td class="td-st">
+                                @citem.strState
+                            </td>
+                            <td class="td-do">
+                                <a href="javascript:void(0);" onclick="DelCApply('@citem.Cnumber')">撤销</a>
+                            </td>
+                        </tr>
+                    }
                 }
-            }
-        </td>
-        <td>
-@if (item.childState != null)
-{
-    foreach (var citem in item.childState)
-    {
-                <div>
-                    @citem.childState.Split(',')[1]
-                </div>
-    }
-}
-        </td>
-        <td>
-            @if (item.childState != null)
-            {
-                foreach (var citem in item.childState)
-                {
-                    <div>
-                        <a href="javascript:void(0);" onclick="DelCApply('@citem.childState.Split(',')[0]')">撤销</a>
-                    </div>
-                }
-            }
-            
+            </table>
+           
         </td>
         <td>
             @Html.ActionLink("详细", "Details", new { id = item.number })
@@ -113,4 +102,16 @@ foreach (var item in Model)
             }
         });
     }
+    $(function () {
+        var w = $('.th-no').width();
+        $('.td-no').width(w);
+        var w = $('.th-co').width();
+        $('.td-co').width(w);
+        var w = $('.th-am').width();
+        $('.td-am').width(w);
+        var w = $('.th-st').width();
+        $('.td-st').width(w);
+        var w = $('.th-do').width();
+        $('.td-do').width(w);
+    });
 </script>

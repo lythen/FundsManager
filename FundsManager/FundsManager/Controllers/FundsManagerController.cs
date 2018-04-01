@@ -30,6 +30,7 @@ namespace FundsManager.Controllers
                           where funds.f_manager == user
                           select new mFundsListModel
                           {
+                              code=funds.f_code,
                               amount = funds.f_amount,
                               balance = funds.f_balance,
                               expireDate = funds.f_expireDate,
@@ -63,6 +64,7 @@ namespace FundsManager.Controllers
                           where apply.apply_user_id == user && apply.apply_state == 1
                           select new uFundsListModel
                           {
+                              code=funds.f_code,
                               amount = fac.c_amount,
                               expireDate = funds.f_expireDate,
                               managerName = t1.user_name,
@@ -93,6 +95,7 @@ namespace FundsManager.Controllers
         // GET: FundsManager/Create
         public ActionResult Create()
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             SetSelect();
             return View(new FundsModel());
         }
@@ -100,25 +103,47 @@ namespace FundsManager.Controllers
         {
             List<SelectOption> options = DropDownList.UserStateSelect();
             ViewBag.State = DropDownList.SetDropDownList(options);
-            options = DropDownList.FundsManagerSelect();
-            ViewBag.Manager = DropDownList.SetDropDownList(options);
+            //options = DropDownList.FundsManagerSelect();
+            //ViewBag.Manager = DropDownList.SetDropDownList(options);
+            options = DropDownList.ProcessSelect();
+            ViewBag.Process = DropDownList.SetDropDownList(options);
+
         }
         // POST: FundsManager/Create
         // 为了防止“过多发布”攻击，请启用要绑定到的特定属性，有关 
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "name,expireDate,source,amount,balance,manager,info,state")] FundsModel funds)
+        public ActionResult Create([Bind(Include = "code,name,expireDate,source,amount,balance,processId,info,state")] FundsModel funds)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            SetSelect();
             if (ModelState.IsValid)
             {
-                if (db.Funds.Where(x => x.f_name == funds.name.ToString()).Count() > 0)
+                if (db.Funds.Where(x => x.f_code == funds.code).Count() > 0)
+                {
+                    ViewBag.msg = "该代码已被使用";
+                    return View(funds);
+                }
+                if (db.Funds.Where(x => x.f_name == funds.name).Count() > 0)
                 {
                     ViewBag.msg = "该名称已被使用";
                     return View(funds);
                 }
+                if (funds.processId == null || funds.processId == 0)
+                {
+                    ViewBag.msg = "未选择批复流程。";
+                    return View(funds);
+                }
+                if (funds.amount == 0)
+                {
+                    ViewBag.msg = "请设置经费总额。";
+                    return View(funds);
+                }
                 Funds model = new Funds();
                 funds.toDBModel(model);
+                model.f_manager = user;
                 db.Funds.Add(model);
                 db.SaveChanges();
                 ViewBag.msg = "经费添加成功。";
@@ -130,6 +155,7 @@ namespace FundsManager.Controllers
         // GET: FundsManager/Edit/5
         public ActionResult Edit(int? id)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -165,13 +191,13 @@ namespace FundsManager.Controllers
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "id,name,expireDate,source,amount,balance,manager,info,state")] FundsModel funds)
+        public ActionResult Edit([Bind(Include = "id,code,name,expireDate,source,amount,balance,info,state")] FundsModel funds)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            SetSelect();
             if (ModelState.IsValid)
             {
-                SetSelect();
                 Funds model = db.Funds.Find(funds.id);
                 if (funds == null)
                 {
@@ -184,13 +210,45 @@ namespace FundsManager.Controllers
                     return View(funds);
                 }
                 if (model.f_name != funds.name)
-                    if (db.Funds.Where(x => x.f_name == funds.name.ToString() && x.f_id != funds.id).Count() > 0)
+                    if (db.Funds.Where(x => x.f_name == funds.name && x.f_id != funds.id).Count() > 0)
                     {
                         ViewBag.msg = "该名称已被使用";
                         return View(funds);
                     }
+                if (model.f_code != funds.code)
+                {
+                    if (db.Funds.Where(x => x.f_code == funds.code && x.f_id != funds.id).Count() > 0)
+                    {
+                        ViewBag.msg = "该代码已被使用";
+                        return View(funds);
+                    }
+                }
+                if (funds.amount == 0)
+                {
+                    ViewBag.msg = "请输入经费总额。";
+                    return View(funds);
+                }
+                if (funds.balance == null || funds.balance == 0)
+                {
+                    //自动设置余额
+                    decimal usedfunds = (from fs in db.Funds
+                                  join fac in db.Funds_Apply_Child
+                                  on fs.f_id equals fac.c_funds_id
+                                  join apply in db.Funds_Apply
+                                  on fac.c_apply_number equals apply.apply_number
+                                  join u in db.User_Info
+                                  on fs.f_manager equals u.user_id into T1
+                                  from t1 in T1.DefaultIfEmpty()
+                                  where fs.f_id == funds.id && apply.apply_user_id == user && apply.apply_state == 1
+                                  select fac.c_get).DefaultIfEmpty(0).Sum();
+                    if (usedfunds > 0) funds.balance = funds.amount - usedfunds;
+                    if (funds.balance < 0)
+                    {
+                        ViewBag.msg = "出错：当前设置的经费总额小于已使用的经费总额。";
+                        return View(funds);
+                    }
+                }
                 funds.toDBModel(model);
-
                 db.Entry(model).State = EntityState.Modified;
                 try
                 {
@@ -529,13 +587,23 @@ namespace FundsManager.Controllers
         }
         #endregion
         #region 统计
-        public void setSearchSelect()
+        public void setSearchSelect(int user)
         {
-
+            List<SelectOption> options = DropDownList.FundsYearsSelect();
+            ViewBag.Year = DropDownList.SetDropDownList(options);
+            options = DropDownList.FundsSelect(user);
+            ViewBag.Funds = DropDownList.SetDropDownList(options);
+            options = DropDownList.StatOrDetailSelect();
+            ViewBag.StatorDetail=DropDownList.SetDropDownList(options);
         }
         public ActionResult Statistics()
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            setSearchSelect(user);
             FundsSearchModel info = new FundsSearchModel();
+            FundsStatistics model = new FundsStatistics();
+            ViewData["StatData"] = model;
             return View(info);
         }
         [HttpPost]
@@ -544,43 +612,71 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
 
-            setSearchSelect();
+            setSearchSelect(user);
             FundsStatistics model = new FundsStatistics();
             switch (info.statorDetail)
             {
-                case 0:model.stats = getStatistics(info);break;
-                case 1:model.details = getStatisticsDetail(info);break;
+                case 0:model.stats = getStatistics(info,user);break;
+                case 1:model.details = getStatisticsDetail(info,user);break;
             }
             ViewData["StatData"] = model;
             return View(info);
         }
-        List<FundsStatDetail> getStatisticsDetail(FundsSearchModel info)
+        List<FundsStatDetail> getStatisticsDetail(FundsSearchModel info,int id)
         {
+            if (info.fund == null || info.fund == 0)
+            {
+                ViewBag.msg = "请选择经费。";
+                return null;
+            }
             var query = (from capply in db.Funds_Apply_Child
                          join apply in db.Funds_Apply on capply.c_apply_number equals apply.apply_number
                          join user in db.User_Info on apply.apply_user_id equals user.user_id
                          join funds in db.Funds on capply.c_funds_id equals funds.f_id
+                         where funds.f_manager == id && funds.f_id==info.fund && apply.apply_state==1
                          select new FundsStatDetail
                          {
                              applyAmount = capply.c_amount,
                              applyTime = apply.apply_time,
                              fname = funds.f_name,
-                             uname = user.user_name
+                             uname = user.real_name
                          });
             info.Amount = query.Count();
-            return query.Skip(info.PageSize * (info.PageIndex - 1)).Take(info.PageSize).ToList();
+            var list= query.OrderBy(x=>x.applyAmount).Skip(info.PageSize * (info.PageIndex - 1)).Take(info.PageSize).ToList();
+            foreach(var item in list)
+            {
+                item.uname = AESEncrypt.Decrypt(item.uname);
+            }
+            return list;
         }
-        List<FundsStat> getStatistics(FundsSearchModel info)
+        List<FundsStat> getStatistics(FundsSearchModel info, int id)
         {
             var query = (from funds in db.Funds
-                         where funds.f_in_year==info.year.ToString()
+                         where funds.f_manager== id && funds.f_in_year==info.year.ToString() && funds.f_id==((info.fund==null||info.fund==0)?funds.f_id:info.fund)
                          select new FundsStat
                          {
                               amount=funds.f_amount,
-                               name=funds.f_name
+                               name=funds.f_name,
+                               havntUsed=funds.f_balance,
+                               id=funds.f_id
                          }
                        ).ToList();
-            return null;
+            foreach(var item in query)
+            {
+                int count = (from a in db.Funds_Apply_Child
+                             join fa in db.Funds_Apply on a.c_apply_number equals fa.apply_number
+                             where a.c_funds_id == item.id && fa.apply_state == 1
+                             select a
+                           ).Count();
+                item.applyNum = count;
+                decimal used = (from a in db.Funds_Apply_Child
+                                join fa in db.Funds_Apply on a.c_apply_number equals fa.apply_number
+                                where a.c_funds_id == item.id && fa.apply_state==1
+                                select a.c_amount
+                           ).DefaultIfEmpty(0).Sum();
+                item.hasUsed = used;
+            }
+            return query;
         }
         #endregion
         protected override void Dispose(bool disposing)

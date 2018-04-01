@@ -8,16 +8,17 @@ namespace FundsManager.Models
     /// </summary>
     public class Process_Respond
     {
-        private DateTime _pr_time = DateTime.Now;
+        private int _pr_state = 0;
         [Key]
         public int pr_id { get; set; }
-        [StringLength(9)]
+        [StringLength(20)]
         public string pr_apply_number { get; set; }
         public int pr_user_id { get; set; }
         public int pr_number { get; set; }
-        public DateTime pr_time { get { return _pr_time; } set { _pr_time = value; } }
+        public DateTime? pr_time { get; set; }
         [StringLength(2000)]
         public string pr_content { get; set; }
-        public int pr_state { get; set; }
+        public int pr_state { get { return _pr_state; } set { _pr_state = value; } }
+        public int? next { get; set; }
     }
 }

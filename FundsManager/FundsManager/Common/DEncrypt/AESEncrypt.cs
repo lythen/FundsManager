@@ -71,23 +71,27 @@ namespace FundsManager.Common.DEncrypt
         /// <returns></returns>
         public static string Decrypt(string text, string password, string iv)
         {
-            RijndaelManaged rijndaelCipher = new RijndaelManaged();
-            rijndaelCipher.Mode = CipherMode.CBC;
-            rijndaelCipher.Padding = PaddingMode.PKCS7;
-            rijndaelCipher.KeySize = 128;
-            rijndaelCipher.BlockSize = 128;
-            byte[] encryptedData = Convert.FromBase64String(text);
-            byte[] pwdBytes = System.Text.Encoding.UTF8.GetBytes(password);
-            byte[] keyBytes = new byte[16];
-            int len = pwdBytes.Length;
-            if (len > keyBytes.Length) len = keyBytes.Length;
-            System.Array.Copy(pwdBytes, keyBytes, len);
-            rijndaelCipher.Key = keyBytes;
-            byte[] ivBytes = System.Text.Encoding.UTF8.GetBytes(iv);
-            rijndaelCipher.IV = ivBytes;
-            ICryptoTransform transform = rijndaelCipher.CreateDecryptor();
-            byte[] plainText = transform.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
-            return Encoding.UTF8.GetString(plainText);
+            try
+            {
+                RijndaelManaged rijndaelCipher = new RijndaelManaged();
+                rijndaelCipher.Mode = CipherMode.CBC;
+                rijndaelCipher.Padding = PaddingMode.PKCS7;
+                rijndaelCipher.KeySize = 128;
+                rijndaelCipher.BlockSize = 128;
+                byte[] encryptedData = Convert.FromBase64String(text);
+                byte[] pwdBytes = System.Text.Encoding.UTF8.GetBytes(password);
+                byte[] keyBytes = new byte[16];
+                int len = pwdBytes.Length;
+                if (len > keyBytes.Length) len = keyBytes.Length;
+                System.Array.Copy(pwdBytes, keyBytes, len);
+                rijndaelCipher.Key = keyBytes;
+                byte[] ivBytes = System.Text.Encoding.UTF8.GetBytes(iv);
+                rijndaelCipher.IV = ivBytes;
+                ICryptoTransform transform = rijndaelCipher.CreateDecryptor();
+                byte[] plainText = transform.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+                return Encoding.UTF8.GetString(plainText);
+            }
+            catch { return text; }
         }
     }
 }

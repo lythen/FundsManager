@@ -48,7 +48,8 @@
         {
             <tr>
                 <td>
-                    <img src="http://@HttpContext.Current.Request.Url.Host:@Request.Url.Port/photo/@item.picture" />
+                    @*<img src="http://@HttpContext.Current.Request.Url.Host:@Request.Url.Port/photo/@item.picture" />*@
+                    <img src="./photo/@item.picture" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.name)

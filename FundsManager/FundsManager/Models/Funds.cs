@@ -9,6 +9,8 @@ namespace FundsManager.Models
     {
         [Key]
         public int f_id { get; set; }
+        [StringLength(20)]
+        public string f_code { get; set; }
         [StringLength(100)]
         public string f_name { get; set; }
         [StringLength(4)]
@@ -24,5 +26,6 @@ namespace FundsManager.Models
         [StringLength(2000)]
         public string f_info { get; set; }
         public int f_state { get; set; }
+        public int? f_process { get; set; }
     }
 }

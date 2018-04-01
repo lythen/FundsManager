@@ -62,8 +62,11 @@
                     @RenderPage("_logout.cshtml")
                     <div class="widget">
                         <div class="list-group">
-                            @Html.RouteLink("待批复列表", new { controller = "ApplyManager", action = "Index"}, new { @class = "list-group-item waiting" })
-                            @Html.RouteLink("我的经费", new { controller = "ApplyManager", action = "MyFunds" }, new { @class = "list-group-item myfunds" })
+                            @if (((string[])Session["ControlRoles"]).Contains("RespondManager"))
+                            {
+                            @Html.RouteLink("待批复申请", new { controller = "ApplyManager", action = "Index"}, new { @class = "list-group-item waiting" })
+                            }
+                            @Html.RouteLink("我的申请", new { controller = "ApplyManager", action = "MyFunds" }, new { @class = "list-group-item myfunds" })
                             @Html.RouteLink("新的申请", new { controller = "ApplyManager", action = "Create" }, new { @class = "list-group-item newapply" })
                         </div>
                     </div>

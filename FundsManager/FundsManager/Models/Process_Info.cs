@@ -8,7 +8,7 @@ using System.Web;
 namespace FundsManager.Models
 {
     /// <summary>
-    /// 批复流程
+    /// 批复流程 -废弃，不用！
     /// </summary>
     public class Process_Info
     {

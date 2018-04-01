@@ -29,9 +29,16 @@
                 <div class="col-md-10 form-res">
 
                     <div>子申请单号：@item.Cnumber</div>
-                    <div>经费管理员： @item.strManager</div>
                     <div>申请单状态： @item.strState</div>
+                    @if(item.processList!=null){
+                        foreach(var citem in item.processList)
+                        {
+                            <div>@citem.number<span>. </span>@citem.user (
+                            @citem.strState <span>批复时间：</span>@citem.strTime
 
+                    )</div>
+                        }
+                    }
                 </div>
             </div>
         }

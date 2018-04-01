@@ -1,0 +1,68 @@
+﻿@model IEnumerable<FundsManager.ViewModels.ResponseDetail>
+
+@{
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "已批复列表";
+}
+
+<h2>已批复列表</h2>
+<div class="col-md-10 err" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.apply_number)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.capply_number)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.fundsCode)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.strAddDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.applyUser)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.content)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.strState)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.id)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.apply_number)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.capply_number)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.fundsCode)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.strAddDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.applyUser)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.content)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.strState)
+        </td>
+    </tr>
+}
+
+</table>

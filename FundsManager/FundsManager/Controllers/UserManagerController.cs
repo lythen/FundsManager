@@ -60,7 +60,8 @@ namespace FundsManager.Controllers
                             times = user.user_login_times,
                             deptName=t4.dept_name==null?"":t4.dept_name,
                             postName=t5.post_name==null?"":t5.post_name,
-                             picture=t3.user_picture==null?"default.jpg":t3.user_picture
+                             picture=t3.user_picture==null?"default.jpg":t3.user_picture,
+                             loginTimes=user.user_login_times
                         }).Skip((pager.PageIndex-1)*pager.PageSize).Take(pager.PageSize).ToList();
             foreach(var item in list)
             {
@@ -228,6 +229,9 @@ namespace FundsManager.Controllers
                     ViewBag.DeptChild = DropDownList.SetDropDownList(options);
                 }
             }
+            model.roleId = (from svr in db.User_vs_Role
+                            where svr.uvr_user_id == id
+                            select svr.uvr_role_id).DefaultIfEmpty(0).FirstOrDefault();
             next:
             return View(model);
         }

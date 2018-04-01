@@ -8,7 +8,6 @@ namespace FundsManager.DAL
         public FundsContext() : base("FundsDBContext")
         {
         }
-        public DbSet<Dic_Apply_State> Dic_Apply_State { get; set; }
         public DbSet<Dic_Department> Dic_Department { get; set; }
         public DbSet<Dic_Log_Type> Dic_Log_Type { get; set; }
         public DbSet<Dic_Post> Dic_Post { get; set; }
@@ -26,7 +25,7 @@ namespace FundsManager.DAL
         public DbSet<Role_vs_Controller> Role_vs_Controller{ get; set; }
         public DbSet<Sys_Controller> Sys_Controller { get; set; }
         public DbSet<Sys_SiteInfo> Sys_SiteInfo { get; set; }
-        public DbSet<Funds_Apply_Recycle> Funds_Apply_Recycle { get; set; }
+        public DbSet<Recycle_Funds_Apply> Funds_Apply_Recycle { get; set; }
         public DbSet<Recycle_Funds> Funds_Recycle { get; set; }
         public DbSet<Dic_CardType> Dic_CardType { get; set; }
         public DbSet<Recycle_User> Recycle_User { get; set; }

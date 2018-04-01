@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace FundsManager.Models
 {
     /// <summary>
-    /// 批复流程列表
+    /// 批复流程列表 -废弃，不用！
     /// </summary>
     public class Process_List
     {

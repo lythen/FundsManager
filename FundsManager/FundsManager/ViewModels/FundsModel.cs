@@ -13,7 +13,7 @@ namespace FundsManager.ViewModels
         [StringLength(4), DisplayName("到期时间")]
         public string year { get; set; }
         [DisplayName("经费管理员")]
-        public int manager { get; set; }
+        public int? manager { get; set; }
         [StringLength(2000), DisplayName("备注")]
         public string info { get; set; }
         [DisplayName("状态")]
@@ -22,15 +22,16 @@ namespace FundsManager.ViewModels
         {
             model.f_amount = amount;
             model.f_balance = balance == null ? amount : (decimal)balance;
-            model.f_expireDate = expireDate;
+            model.f_expireDate = (DateTime)expireDate;
             if (model.f_id == 0)
                 model.f_id = id;
             model.f_info = PageValidate.InputText(info, 2000);
-            model.f_in_year = expireDate.Year.ToString();
-            model.f_manager = manager;
+            model.f_in_year = ((DateTime)expireDate).Year.ToString();
             model.f_name = PageValidate.InputText(name, 100);
             model.f_source = PageValidate.InputText(source, 100);
             model.f_state = state;
+            model.f_process = processId;
+            model.f_code = code;
         }
     }
     public class FundsBaseModel
@@ -38,18 +39,22 @@ namespace FundsManager.ViewModels
         private DateTime _expireDate = DateTime.Parse(string.Format("{0}-12-31 23:59:59.999", DateTime.Now.Year));
         [DisplayName("经费ID")]
         public int id { get; set; }
+        [StringLength(20), DisplayName("经费代码"),Required]
+        public string code { get; set; }
         [StringLength(100), DisplayName("经费名称")]
         public string name { get; set; }
         [DisplayName("经费管理员")]
         public string managerName { get; set; }
         [DisplayName("结算时间")]
-        public DateTime expireDate { get { return _expireDate; } set { _expireDate = value == null ? _expireDate : value; } }
+        public DateTime? expireDate { get { return _expireDate; } set { _expireDate = value == null ? _expireDate : (DateTime)value; } }
         [StringLength(100), DisplayName("经费来源")]
         public string source { get; set; }
         [DataType(DataType.Currency), DisplayName("经费总额")]
         public decimal amount { get; set; }
         [DataType(DataType.Currency), DisplayName("经费余额")]
         public decimal? balance { get; set; }
+        [DisplayName("批复流程")]
+        public int? processId { get; set; }
     }
     public class mFundsListModel : FundsBaseModel
     {
@@ -138,6 +143,7 @@ namespace FundsManager.ViewModels
     }
     public class FundsStat
     {
+        public int id { get; set; }
         [DisplayName("经费名称")]
         public string name { get; set; }
         [DisplayName("经费总额（元）")]

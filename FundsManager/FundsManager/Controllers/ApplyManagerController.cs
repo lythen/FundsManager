@@ -25,6 +25,7 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
             var waitList = (from apply in db.Funds_Apply
+                            join s in db.Dic_Respond_State on apply.apply_state equals s.drs_state_id
                             where apply.apply_user_id == user && apply.apply_state != 3
                             select new ApplyListModel
                             {
@@ -32,11 +33,20 @@ namespace FundsManager.Controllers
                                 number = apply.apply_number,
                                 state = apply.apply_state,
                                 time = apply.apply_time,
-                                childState = (from child in db.Funds_Apply_Child
-                                              join das in db.Dic_Apply_State on apply.apply_state equals das.das_state_id
-                                              where child.c_apply_number==apply.apply_number
-                                              select new ChildState { childState=child.c_child_number + "," + das.das_state_name + "," + child.c_amount }
-                                              )
+                                strState = s.drs_state_name,
+                                child = (from child in db.Funds_Apply_Child
+                                         join das in db.Dic_Respond_State on apply.apply_state equals das.drs_state_id
+                                         join f in db.Funds on child.c_funds_id equals f.f_id
+                                         where child.c_apply_number == apply.apply_number
+                                         select new ApplyChildModel
+                                         {
+                                             Cnumber = child.c_child_number,
+                                             fundsCode = f.f_code,
+                                             amount = child.c_amount,
+                                             strState = das.drs_state_name,
+                                             factGet = child.c_get
+                                         }
+                                              ).ToList()
                             }
                             ).ToList();
             return View(waitList);
@@ -45,11 +55,12 @@ namespace FundsManager.Controllers
         // GET: ApplyManager/Details/5
         public ActionResult Details(string id)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Funds_Apply funds_Apply = db.Funds_Apply.Where(x => x.apply_state == 1 && x.apply_number == id).FirstOrDefault();
+            Funds_Apply funds_Apply = db.Funds_Apply.Where(x => x.apply_number == id).FirstOrDefault();
             if (funds_Apply == null)
             {
                 return HttpNotFound();
@@ -57,31 +68,47 @@ namespace FundsManager.Controllers
             var cmList = (from child in db.Funds_Apply_Child
                           join funds in db.Funds
                           on child.c_funds_id equals funds.f_id
-                          join user in db.User_Info
-                          on funds.f_manager equals user.user_id into T1
-                          from t1 in T1
-                          join das in db.Dic_Apply_State on child.c_state equals das.das_state_id
+                          join das in db.Dic_Respond_State on child.c_state equals das.drs_state_id
                           where child.c_apply_number == id
                           select new ApplyFundsManager
                           {
                               Cnumber = child.c_child_number,
-                              strManager = t1.real_name,
-                              strState = das.das_state_name
+                              strState = das.drs_state_name
                           }
                           ).ToList();
             if (cmList.Count() > 0) ViewBag.number = id;
             foreach (ApplyFundsManager item in cmList)
             {
-                item.strManager = AESEncrypt.Decrypt(item.strManager);
+                var plist = (from p in db.Process_Respond
+                             join s in db.Dic_Respond_State
+                             on p.pr_state equals s.drs_state_id into T1
+                             from t1 in T1.DefaultIfEmpty()
+                             join u in db.User_Info
+                             on p.pr_user_id equals u.user_id into T2
+                             from t2 in T2.DefaultIfEmpty()
+                             where p.pr_apply_number == item.Cnumber
+                             select new ListResponseModel
+                             {
+                                 capply_number = p.pr_apply_number,
+                                 content = p.pr_content,
+                                 id = p.pr_id,
+                                 number = p.pr_number,
+                                 strState = t1.drs_state_name,
+                                 state = p.pr_state,
+                                 time = p.pr_time,
+                                 user = t2.user_name
+                             }
+                             ).ToList();
+                item.processList = plist;
             }
             return View(cmList);
         }
-
         // GET: ApplyManager/Create
         public ActionResult Create()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
-            SetSelect();
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            SetSelect(0);
             ApplyEditModel model = new ApplyEditModel();
             List<ApplyChildModel> list = new List<ApplyChildModel>();
             list.Add(new ApplyChildModel());
@@ -102,11 +129,9 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
-            SetSelect();
+            SetSelect(0);
             if (ModelState.IsValid)
             {
-
-
                 Funds_Apply apply = new Funds_Apply();
                 apply.apply_amount = funds_Apply.amount;
                 apply.apply_state = 0;
@@ -131,34 +156,94 @@ namespace FundsManager.Controllers
                 int i = 1;
                 foreach (ApplyChildModel citem in funds_Apply.capply)
                 {
+                    var funds = (from fs in db.Funds
+                                 where fs.f_id == citem.Fid
+                                 select fs).FirstOrDefault();
+                    if (funds.f_amount == 0)
+                    {
+                        json.msg_code = "error";
+                        json.msg_text = string.Format("申请单提交失败,id为{0}的经费没有设置总额。", citem.Fid);
+                        goto next;
+                    }
+                    if (funds.f_balance < citem.amount)
+                    {
+                        json.msg_code = "error";
+                        json.msg_text = string.Format("申请单提交失败,id为{0}的经费不足。", citem.Fid);
+                        goto next;
+                    }
                     Funds_Apply_Child capply = new Funds_Apply_Child();
                     capply.c_apply_number = apply.apply_number;
                     capply.c_child_number = string.Format("{0}-{1}", apply.apply_number, GetIntStr(i));
                     capply.c_amount = citem.amount;
+                    capply.c_get = citem.amount;
+                    capply.c_get_info = "";
                     capply.c_apply_for = citem.applyFor;
                     capply.c_funds_id = citem.Fid;
                     capply.c_state = 0;
                     db.Funds_Apply_Child.Add(capply);
-                    i++;
-                }
-                try
-                {
-                    db.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    var list = db.Funds_Apply_Child.Where(x => x.c_apply_number == apply.apply_number);
-                    if (list.Count() > 0) db.Funds_Apply_Child.RemoveRange(list);
-                    db.Funds_Apply.Remove(apply);
                     try
                     {
                         db.SaveChanges();
                     }
-                    catch { }
-                    json.msg_code = "error";
-                    json.msg_text = "申请单提交失败。";
-                    goto next;
+                    catch (Exception e)
+                    {
+                        var list = db.Funds_Apply_Child.Where(x => x.c_apply_number == apply.apply_number);
+                        if (list.Count() > 0) db.Funds_Apply_Child.RemoveRange(list);
+                        db.Funds_Apply.Remove(apply);
+
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch { }
+                        json.msg_code = "error";
+                        json.msg_text = "申请单提交失败。";
+                        goto next;
+                    }
+                    Process_Respond pr = new Process_Respond();
+                    pr.pr_apply_number = capply.c_child_number;
+                    pr.pr_user_id = funds_Apply.next;
+                    pr.pr_number = 1;
+                    db.Process_Respond.Add(pr);
+                    //写入批复流程
+                    //var plist = (from pl in db.Process_List
+                    //             where pl.po_process_id == funds.f_process
+                    //             select new
+                    //             {
+                    //                 pr_apply_number = capply.c_child_number,
+                    //                 pr_user_id = pl.po_user_id,
+                    //                 pr_number = pl.po_sort
+                    //             }).ToList();
+                    //foreach(var item in plist)
+                    //{
+                    //    Process_Respond pr = new Process_Respond();
+                    //    pr.pr_apply_number = item.pr_apply_number;
+                    //    pr.pr_user_id = item.pr_user_id;
+                    //    pr.pr_number = item.pr_number;
+                    //    db.Process_Respond.Add(pr);
+                    //}
+                    try
+                    {
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+
+                        var list = db.Funds_Apply_Child.Where(x => x.c_apply_number == apply.apply_number);
+                        if (list.Count() > 0) db.Funds_Apply_Child.RemoveRange(list);
+                        db.Funds_Apply.Remove(apply);
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (Exception et) { }
+                        json.msg_code = "error";
+                        json.msg_text = "申请单批复流程生成失败。";
+                        goto next;
+                    }
+                    i++;
                 }
+
                 //db.Funds_Apply.Add(funds_Apply);
                 //db.SaveChanges();
                 json.state = 1;
@@ -174,23 +259,49 @@ namespace FundsManager.Controllers
             if (num < 100) return "0" + num;
             return num.ToString();
         }
-        void SetSelect()
+        void SetSelect(int user)
         {
-            List<SelectOption> options = DropDownList.FundsSelect();
+
+            List<SelectOption> options = DropDownList.FundsSelect(user);
             ViewBag.Funds = DropDownList.SetDropDownList(options);
+            ViewData["ViewUsers"] = DropDownList.RespondUserSelect();
         }
         // GET: ApplyManager/Edit/5
         public ActionResult Edit(string id)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Funds_Apply funds_Apply = db.Funds_Apply.Find(id);
-            if (funds_Apply == null)
-            {
-                return HttpNotFound();
-            }
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            var waitList = (from apply in db.Funds_Apply
+                            join das in db.Dic_Respond_State
+                            on apply.apply_state equals das.drs_state_id
+                            where apply.apply_user_id == user// && apply.apply_state == 3
+                            select new ApplyListModel
+                            {
+                                amount = apply.apply_amount,
+                                number = apply.apply_number,
+                                state = apply.apply_state,
+                                strState = das.drs_state_name,
+                                time = apply.apply_time,
+                                child = (from c in db.Funds_Apply_Child
+                                         join das in db.Dic_Respond_State on c.c_state equals das.drs_state_id
+                                         join f in db.Funds on c.c_funds_id equals f.f_id
+                                         where c.c_apply_number == apply.apply_number
+                                         select new ApplyChildModel
+                                         {
+                                             Cnumber = c.c_child_number,
+                                             fundsCode = f.f_code,
+                                             amount = c.c_amount,
+                                             strState = das.drs_state_name,
+                                             factGet = c.c_get
+                                         }
+                                              ).ToList()
+                            }
+                            ).ToList();
             return View(funds_Apply);
         }
 
@@ -201,6 +312,7 @@ namespace FundsManager.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "apply_number,apply_user_id,apply_time,apply_funds_id,apply_for,apply_amount,apply_state")] Funds_Apply funds_Apply)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             if (ModelState.IsValid)
             {
                 db.Entry(funds_Apply).State = EntityState.Modified;
@@ -232,7 +344,7 @@ namespace FundsManager.Controllers
                 json.msg_text = "申请单不存在或被删除。";
                 goto next;
             }
-            if (child.c_state == 3)
+            if (child.c_state == 1)
             {
                 json.msg_code = "forbidden";
                 json.msg_text = "已批复同意的子申请单不允许删除。";
@@ -245,7 +357,7 @@ namespace FundsManager.Controllers
                 //只有一条子申请单情况，直接把父申请单也删除
                 var f = db.Funds_Apply.Find(number);
                 if (f != null)
-                    if (f.apply_state == 3)
+                    if (f.apply_state == 1)
                     {
                         json.msg_code = "forbidden";
                         json.msg_text = "已批复同意的申请单不允许删除。";
@@ -286,31 +398,41 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
             var waitList = (from apply in db.Funds_Apply
-                            join das in db.Dic_Apply_State
-                            on apply.apply_state equals das.das_state_id
-                            where apply.apply_user_id == user && apply.apply_state == 3
+                            join das in db.Dic_Respond_State
+                            on apply.apply_state equals das.drs_state_id
+                            where apply.apply_user_id == user// && apply.apply_state == 3
                             select new ApplyListModel
                             {
                                 amount = apply.apply_amount,
                                 number = apply.apply_number,
                                 state = apply.apply_state,
+                                strState = das.drs_state_name,
                                 time = apply.apply_time,
-                                childState = (from child in db.Funds_Apply_Child
-                                              join das in db.Dic_Apply_State on apply.apply_state equals das.das_state_id
-                                              where child.c_apply_number == apply.apply_number
-                                              select new ChildState { childState = child.c_child_number + "," + das.das_state_name+","+child.c_amount }
-                                              )
+                                child = (from c in db.Funds_Apply_Child
+                                         join das in db.Dic_Respond_State on c.c_state equals das.drs_state_id
+                                         join f in db.Funds on c.c_funds_id equals f.f_id
+                                         where c.c_apply_number == apply.apply_number
+                                         select new ApplyChildModel
+                                         {
+                                             Cnumber = c.c_child_number,
+                                             fundsCode = f.f_code,
+                                             amount = c.c_amount,
+                                             strState = das.drs_state_name,
+                                             factGet = c.c_get
+                                         }
+                                              ).ToList()
                             }
                             ).ToList();
             return View(waitList);
         }
         public ActionResult ApplyNext(string number)
         {
+
             if (number == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Funds_Apply funds_Apply = db.Funds_Apply.Where(x => x.apply_state == 1 && x.apply_number == number).FirstOrDefault();
+            Funds_Apply funds_Apply = db.Funds_Apply.Where(x => x.apply_number == number).FirstOrDefault();
             if (funds_Apply == null)
             {
                 return HttpNotFound();
@@ -318,22 +440,38 @@ namespace FundsManager.Controllers
             var cmList = (from child in db.Funds_Apply_Child
                           join funds in db.Funds
                           on child.c_funds_id equals funds.f_id
-                          join user in db.User_Info 
-                          on funds.f_manager equals user.user_id into T1
-                          from t1 in T1
-                          join das in db.Dic_Apply_State on child.c_state equals das.das_state_id
+                          join das in db.Dic_Respond_State on child.c_state equals das.drs_state_id
                           where child.c_apply_number == number
                           select new ApplyFundsManager
                           {
                               Cnumber = child.c_child_number,
-                              strManager = t1.real_name,
-                              strState=das.das_state_name
+                              strState = das.drs_state_name
                           }
                           ).ToList();
             if (cmList.Count() > 0) ViewBag.number = number;
-            foreach(ApplyFundsManager item in cmList)
+            foreach (ApplyFundsManager item in cmList)
             {
-                item.strManager = AESEncrypt.Decrypt(item.strManager);
+                var plist = (from p in db.Process_Respond
+                             join s in db.Dic_Respond_State
+                             on p.pr_state equals s.drs_state_id into T1
+                             from t1 in T1.DefaultIfEmpty()
+                             join u in db.User_Info
+                             on p.pr_user_id equals u.user_id into T2
+                             from t2 in T2.DefaultIfEmpty()
+                             where p.pr_apply_number == item.Cnumber
+                             select new ListResponseModel
+                             {
+                                 capply_number = p.pr_apply_number,
+                                 content = p.pr_content,
+                                 id = p.pr_id,
+                                 number = p.pr_number,
+                                 strState = t1.drs_state_name,
+                                 state = p.pr_state,
+                                 time = p.pr_time,
+                                 user = t2.user_name
+                             }
+                             ).ToList();
+                item.processList = plist;
             }
             return View(cmList);
         }

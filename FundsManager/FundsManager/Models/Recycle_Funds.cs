@@ -28,5 +28,6 @@ namespace FundsManager.Models
         public int f_delete_user { get; set; }
         public DateTime f_delete_time { get; set; }
         public int f_state { get; set; }
+        public int? f_process { get; set; }
     }
 }

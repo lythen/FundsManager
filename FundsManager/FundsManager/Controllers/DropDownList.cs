@@ -14,12 +14,15 @@ namespace FundsManager.Controllers
         private static string cache_week = "cache_week";
         private static string cache_post = "cache_post";
         private static string cache_funds_manger = "funds_manger";
-        private static string cache_dept = "cache_depts";
         private static string cache_sex = "cache_sex";
         private static string cache_user_state = "cache_user_state";
         private static string cache_role = "cache_role";
         private static string cache_cardType = "cache_cardType";
-        private static string cache_funds = "cache_funds";
+        private static string cache_funds = "cache_funds_";
+        private static string cache_process = "cache_process";
+        private static string cache_fundsYear = "cache_fundsYear";
+        private static string cache_stat_detail = "cache_stat_detail";
+        private static string cache_response_user = "cache_response_user_";
         public static List<SelectListItem> SetDropDownList(List<Models.SelectOption> options)
         {
             List<SelectListItem> items = new List<SelectListItem>();
@@ -86,11 +89,11 @@ namespace FundsManager.Controllers
             }
             return options;
         }
-        public static List<SelectOption> getDepartment(int? id=null)
+        public static List<SelectOption> getDepartment(int? id = null)
         {
             List<DepartMentModel> depts = DBCaches2.getDeptCache();
             List<SelectOption> option = (from dep in depts
-                                         where dep.parentId == (id==null? dep.parentId:(int)id)
+                                         where dep.parentId == (id == null ? dep.parentId : (int)id)
                                          select new SelectOption
                                          {
                                              id = dep.deptId.ToString(),
@@ -145,17 +148,95 @@ namespace FundsManager.Controllers
                                          }).ToList();
             return option;
         }
-        public static List<SelectOption> FundsSelect()
+        public static List<SelectOption> FundsSelect(int user)
         {
-            List<Funds> funds = DBCaches<Funds>.getCache(cache_dept);
+            string key = cache_funds+user;
+            List<Funds> funds = DBCaches<Funds>.getCache(cache_funds);
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(key);
+            if (options == null)
+            {
+                options = (from fund in funds
+                                             where fund.f_state == 1 && fund.f_manager == (user == 0 ? fund.f_manager : user)
+                                             select new SelectOption
+                                             {
+                                                 id = fund.f_id.ToString(),
+                                                 text = string.Format("{0}({1})", fund.f_name, fund.f_balance)
+                                             }).ToList();
+                if (options.Count() > 0) DataCache.SetCache(key, options);
+            }
+            return options;
+        }
+        public static List<SelectOption> ProcessSelect()
+        {
+            List<Process_Info> funds = DBCaches<Process_Info>.getCache(cache_process);
             List<SelectOption> option = (from fund in funds
-                                         where fund.f_state==1
                                          select new SelectOption
                                          {
-                                             id = fund.f_id.ToString(),
-                                             text = fund.f_name
+                                             id = fund.process_id.ToString(),
+                                             text = fund.process_name
                                          }).ToList();
             return option;
+        }
+        public static List<SelectOption> FundsYearsSelect()
+        {
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_fundsYear);
+            if (options == null)
+            {
+                var glist = (from op in db.Funds
+                             group op by op.f_in_year into p
+                             select p).ToList();
+                options = new List<SelectOption>();
+                foreach (var item in glist)
+                {
+                    SelectOption so = new SelectOption();
+                    so.id = item.Key;
+                    so.text = item.Key;
+                    options.Add(so);
+                }
+                if (options.Count() > 0) DataCache.SetCache(cache_funds_manger, options);
+            }
+            return options;
+        }
+        public static List<SelectOption> StatOrDetailSelect()
+        {
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_stat_detail);
+            if (options == null)
+            {
+                options = new List<SelectOption>();
+                SelectOption so = new SelectOption();
+                so.id = "0";
+                so.text = "统计";
+                options.Add(so);
+                so = new SelectOption();
+                so.id = "1";
+                so.text = "详细";
+                options.Add(so);
+                if (options.Count() > 0) DataCache.SetCache(cache_funds_manger, options);
+            }
+            return options;
+        }
+        public static List<SelectOption> RespondUserSelect()
+        {
+            string key = cache_user_state + "0";
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(key);
+            if (options == null)
+            {
+                options = (from op in (from user in db.User_Info
+                                       join uvr in db.User_vs_Role on user.user_id equals uvr.uvr_user_id
+                                       where user.user_state == 1 && uvr.uvr_role_id <=2
+                                       select new
+                                       {
+                                           id = user.user_id,
+                                           text = user.real_name
+                                       }).ToList()
+                           select new SelectOption
+                           {
+                               id = op.id.ToString(),
+                               text = Common.DEncrypt.AESEncrypt.Decrypt(op.text)
+                           }).ToList();
+                if (options.Count() > 0) DataCache.SetCache(key, options);
+            }
+            return options;
         }
     }
 }

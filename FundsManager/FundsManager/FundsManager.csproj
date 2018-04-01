@@ -16,7 +16,7 @@
     <RootNamespace>FundsManager</RootNamespace>
     <AssemblyName>FundsManager</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -171,6 +171,7 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="ApplicationInsights.config" />
+    <None Include="Properties\PublishProfiles\166funds.pubxml" />
     <None Include="Properties\PublishProfiles\fds166.pubxml" />
     <None Include="Scripts\jquery-1.10.2-vsdoc.js" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -271,7 +272,6 @@
     <Content Include="Views\FundsManager\Delete.cshtml" />
     <Content Include="Views\FundsManager\Edit.cshtml" />
     <Content Include="Views\FundsManager\Index.cshtml" />
-    <Content Include="Views\RespondManager\Details.cshtml" />
     <Content Include="Views\RespondManager\Index.cshtml" />
     <Content Include="Views\Shared\_systemset.cshtml" />
     <Content Include="Views\Shared\_usermanager.cshtml" />
@@ -282,7 +282,6 @@
     <Content Include="Views\ApplyManager\Create.cshtml" />
     <Content Include="Views\ApplyManager\Delete.cshtml" />
     <Content Include="Views\ApplyManager\Details.cshtml" />
-    <Content Include="Views\ApplyManager\Edit.cshtml" />
     <Content Include="Views\ApplyManager\Index.cshtml" />
     <Content Include="Views\Shared\_applymanager.cshtml" />
     <Content Include="Views\SystemSet\SiteSet.cshtml" />
@@ -298,6 +297,8 @@
     <Content Include="Views\FundsManager\ProcessEdit.cshtml" />
     <Content Include="Views\FundsManager\Detail.cshtml" />
     <Content Include="Views\FundsManager\Statistics.cshtml" />
+    <Content Include="Views\RespondManager\Responded.cshtml" />
+    <Content Include="Views\ApplyManager\Edit.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -375,10 +376,42 @@
     <Compile Include="Migrations\201801231530454_editprocess3.Designer.cs">
       <DependentUpon>201801231530454_editprocess3.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803050751427_addprocessid.cs" />
+    <Compile Include="Migrations\201803050751427_addprocessid.Designer.cs">
+      <DependentUpon>201803050751427_addprocessid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803050913429_addprocessid1.cs" />
+    <Compile Include="Migrations\201803050913429_addprocessid1.Designer.cs">
+      <DependentUpon>201803050913429_addprocessid1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803050920056_updatepan.cs" />
+    <Compile Include="Migrations\201803050920056_updatepan.Designer.cs">
+      <DependentUpon>201803050920056_updatepan.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803190924104_addnew.cs" />
+    <Compile Include="Migrations\201803190924104_addnew.Designer.cs">
+      <DependentUpon>201803190924104_addnew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803190931020_addnew2.cs" />
+    <Compile Include="Migrations\201803190931020_addnew2.Designer.cs">
+      <DependentUpon>201803190931020_addnew2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803190943297_addnew1.cs" />
+    <Compile Include="Migrations\201803190943297_addnew1.Designer.cs">
+      <DependentUpon>201803190943297_addnew1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803260813157_del.cs" />
+    <Compile Include="Migrations\201803260813157_del.Designer.cs">
+      <DependentUpon>201803260813157_del.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803260820323_uptime.cs" />
+    <Compile Include="Migrations\201803260820323_uptime.Designer.cs">
+      <DependentUpon>201803260820323_uptime.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Process_Info.cs" />
+    <Compile Include="Models\Recycle_Apply_Child.cs" />
     <Compile Include="ViewModels\ApplyModel.cs" />
-    <Compile Include="Models\Dic_Apply_State.cs" />
     <Compile Include="Models\Dic_CardType.cs" />
     <Compile Include="Models\Dic_Department.cs" />
     <Compile Include="Models\Dic_Log_Type.cs" />
@@ -389,7 +422,7 @@
     <Compile Include="Models\Recycle_Funds.cs" />
     <Compile Include="Models\Funds_Apply.cs" />
     <Compile Include="Models\Funds_Apply_Child.cs" />
-    <Compile Include="Models\Funds_Apply_Recycle.cs" />
+    <Compile Include="Models\Recycle_Funds_Apply.cs" />
     <Compile Include="Models\Process_List.cs" />
     <Compile Include="Models\Process_Respond.cs" />
     <Compile Include="Models\Recycle_User.cs" />
@@ -434,6 +467,30 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801231530454_editprocess3.resx">
       <DependentUpon>201801231530454_editprocess3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803050751427_addprocessid.resx">
+      <DependentUpon>201803050751427_addprocessid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803050913429_addprocessid1.resx">
+      <DependentUpon>201803050913429_addprocessid1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803050920056_updatepan.resx">
+      <DependentUpon>201803050920056_updatepan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803190924104_addnew.resx">
+      <DependentUpon>201803190924104_addnew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803190931020_addnew2.resx">
+      <DependentUpon>201803190931020_addnew2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803190943297_addnew1.resx">
+      <DependentUpon>201803190943297_addnew1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803260813157_del.resx">
+      <DependentUpon>201803260813157_del.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803260820323_uptime.resx">
+      <DependentUpon>201803260820323_uptime.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
