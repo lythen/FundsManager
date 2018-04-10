@@ -31,24 +31,22 @@ namespace FundsManager.Controllers
         {
 
             Sys_SiteInfo model = db.Sys_SiteInfo.FirstOrDefault();
-            if (model.site_name != info.name)
+            if (model != null)
             {
                 db.Sys_SiteInfo.Remove(model);
-                info.toDBModel(model);
-                db.Sys_SiteInfo.Add(model);
+                db.SaveChanges();
             }
-            else
-            {
-                info.toDBModel(model);
-                db.Entry<Sys_SiteInfo>(model).State = EntityState.Modified;
-            }
+            model = new Sys_SiteInfo();
+            info.toDBModel(model);
+            db.Sys_SiteInfo.Add(model);
+
             try
             {
                 db.SaveChanges();
                 DBCaches<Sys_SiteInfo>.ClearCache("site-name");
                 DBCaches<Sys_SiteInfo>.ClearCache("site-info");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 @ViewBag.msg = "修改失败。";
             }
@@ -60,15 +58,15 @@ namespace FundsManager.Controllers
         [wxAuthorize(Roles = "系统管理员")]
         public ActionResult ContrlModule()
         {
-            List<ModuleInfo> models =DBCaches2.getModuleInfo();
-            foreach(ModuleInfo model in models)
+            List<ModuleInfo> models = DBCaches2.getModuleInfo();
+            foreach (ModuleInfo model in models)
             {
                 int[] roles = (from rvc in db.Role_vs_Controller
                                where rvc.rvc_controller == model.name
                                select rvc.rvc_role_id
                                ).ToArray();
-               RoleInfo[] rvcs = DBCaches2.getRoleInfo();
-                foreach(RoleInfo item in rvcs)
+                RoleInfo[] rvcs = DBCaches2.getRoleInfo();
+                foreach (RoleInfo item in rvcs)
                 {
                     if (roles.Contains(item.id)) item.hasrole = true;
                     else item.hasrole = false;
@@ -77,17 +75,17 @@ namespace FundsManager.Controllers
             }
             return View(models);
         }
-        [HttpPost,wxAuthorize(Roles ="系统管理员")]
+        [HttpPost, wxAuthorize(Roles = "系统管理员")]
         public JsonResult ContrlModule(EditModules models)
         {
             BaseJsonData json = new BaseJsonData();
             if (ModelState.IsValid)
             {
                 string ctrl_name;
-                foreach(ModuleInfo info in models.modules)
+                foreach (ModuleInfo info in models.modules)
                 {
                     ctrl_name = info.name;
-                    var no1 = db.Role_vs_Controller.Where(x => x.rvc_role_id != 1&& x.rvc_controller== ctrl_name);
+                    var no1 = db.Role_vs_Controller.Where(x => x.rvc_role_id != 1 && x.rvc_controller == ctrl_name);
                     if (no1.Count() > 0)
                     {
                         db.Role_vs_Controller.RemoveRange(no1);
@@ -95,12 +93,12 @@ namespace FundsManager.Controllers
                     }
                     if (info.roles != null && info.roles.Length > 0)
                     {
-                        foreach(RoleInfo rinfo in info.roles)
+                        foreach (RoleInfo rinfo in info.roles)
                         {
                             Role_vs_Controller rvc = new Role_vs_Controller();
                             rvc.rvc_role_id = rinfo.id;
                             rvc.rvc_controller = ctrl_name;
-                            if (db.Role_vs_Controller.Find(rvc.rvc_role_id,rvc.rvc_controller) == null) db.Role_vs_Controller.Add(rvc);
+                            if (db.Role_vs_Controller.Find(rvc.rvc_role_id, rvc.rvc_controller) == null) db.Role_vs_Controller.Add(rvc);
                         }
                     }
                 }
@@ -125,7 +123,7 @@ namespace FundsManager.Controllers
             ViewData["PostList"] = DBCaches<Dic_Post>.getCache("cache_post"); ;
             return View(new Dic_Post());
         }
-        [HttpPost,wxAuthorize(Roles = "系统管理员")]
+        [HttpPost, wxAuthorize(Roles = "系统管理员")]
         [ValidateAntiForgeryToken]
         public ActionResult Post(Dic_Post model)
         {
@@ -147,7 +145,7 @@ namespace FundsManager.Controllers
             ViewData["PostList"] = DBCaches<Dic_Post>.getCache("cache_post");// db.Dic_Post.ToList();
             return View(model);
         }
-        [wxAuthorize(Roles ="系统管理员")]
+        [wxAuthorize(Roles = "系统管理员")]
         public JsonResult DeletePost(string pid)
         {
             int id = PageValidate.FilterParam(pid);
@@ -201,7 +199,7 @@ namespace FundsManager.Controllers
             ViewBag.Dept = DropDownList.SetDropDownList(options);
             Dic_Department model = new Dic_Department();
             model.dept_name = PageValidate.InputText(info.deptName, 50);
-            if (db.Dic_Department.Where(x => x.dept_name == model.dept_name&&x.dept_parent_id==info.parentId).Count() > 0) ViewBag.msg = "名称已存在";
+            if (db.Dic_Department.Where(x => x.dept_name == model.dept_name && x.dept_parent_id == info.parentId).Count() > 0) ViewBag.msg = "名称已存在";
             else
             {
                 model.dept_parent_id = info.parentId;

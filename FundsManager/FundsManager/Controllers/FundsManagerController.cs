@@ -176,7 +176,8 @@ namespace FundsManager.Controllers
                                     name = f.f_name,
                                     source = f.f_source,
                                     state = f.f_state,
-                                    year = f.f_in_year
+                                    year = f.f_in_year,
+                                    code=f.f_code
                                 }).FirstOrDefault();
             if (funds == null)
             {

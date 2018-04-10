@@ -57,7 +57,7 @@
                                         @citem.fundsCode
                                     </td>
                                     <td class="td-am">
-                                        @citem.amount
+                                        @citem.factGet
                                     </td>
                                     <td class="td-st">
                                         @citem.strState
@@ -69,10 +69,7 @@
                 </td>
                 <td>
                     @Html.ActionLink("详细", "Details", new { id = item.number })
-                    @if (item.state == 2)
-                    {
-                        <span>|</span> @Html.ActionLink("修改", "Edit", new { id = item.number })
-                    }
+                  |@Html.ActionLink("修改", "Edit", new { id = item.number })
                 </td>
             </tr>
         }

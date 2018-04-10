@@ -24,7 +24,8 @@ namespace FundsManager.ViewModels
     }
     public class ApplyListModel: ApplyModel
     {
-        [DisplayName("状态")]
+        [DisplayName("批复人")]
+        public int next { get; set; }
         public List<ApplyChildModel> child { get; set; }
     }
     public class ChildState
@@ -64,11 +65,6 @@ namespace FundsManager.ViewModels
         [DisplayName("申请单状态")]
         public string strState { get; set; }
         public List<ListResponseModel> processList { get; set; }
-    }
-    public class ApplyEditModel: ApplyModel
-    {
-        public int next { get; set; }
-        public List<ApplyChildModel> capply { get; set; }
     }
     /// <summary>
     /// 申请单详细信息

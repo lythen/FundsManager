@@ -30,13 +30,31 @@
 
                     <div>子申请单号：@item.Cnumber</div>
                     <div>申请单状态： @item.strState</div>
-                    @if(item.processList!=null){
-                        foreach(var citem in item.processList)
+                    @if (item.processList != null)
+                    {
+                        string color = "", display = "";
+                        foreach (var citem in item.processList)
                         {
-                            <div>@citem.number<span>. </span>@citem.user (
-                            @citem.strState <span>批复时间：</span>@citem.strTime
+                            <div>
+                                @citem.number<span>. </span>@citem.user (
+                                @if (@citem.state == 1)
+                                {color = "green";
+                                    display = "display:none;";
+                                }
+                                else if (citem.state == 2)
+                                {color= "red";
+                                    display = "";
+                                }
+                                else
+                                {color = "#FF8C00";
+                                    display = "display:none;";
+                                }
+                                <font style="color:@color">
+                                    @citem.strState
+                                </font> <span>批复时间：</span>@citem.strTime<span style="@display">，原因： @citem.content</span>
 
-                    )</div>
+                                )
+                            </div>
                         }
                     }
                 </div>
@@ -45,7 +63,7 @@
     }
     <div class="form-group">
         <div class="col-md-10">
-            @Html.ActionLink("返    回", "Index", null, new { @class = "btn btn-warning" })
+            @Html.ActionLink("返    回", "MyFunds", null, new { @class = "btn btn-warning" })
         </div>
     </div>
 </div>
