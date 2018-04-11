@@ -25,9 +25,10 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            bool isAdmin = RoleCheck.CheckIsAdmin(user);
             //管理的经费
             var mfunds = (from funds in db.Funds
-                          where funds.f_manager == user
+                          where funds.f_manager == (isAdmin? funds.f_manager: user)
                           select new mFundsListModel
                           {
                               code=funds.f_code,
@@ -601,6 +602,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
+            if (RoleCheck.CheckIsAdmin(user)) user = 0;
             setSearchSelect(user);
             FundsSearchModel info = new FundsSearchModel();
             FundsStatistics model = new FundsStatistics();
@@ -612,7 +614,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-
+            if (RoleCheck.CheckIsAdmin(user)) user = 0;
             setSearchSelect(user);
             FundsStatistics model = new FundsStatistics();
             switch (info.statorDetail)
@@ -634,7 +636,7 @@ namespace FundsManager.Controllers
                          join apply in db.Funds_Apply on capply.c_apply_number equals apply.apply_number
                          join user in db.User_Info on apply.apply_user_id equals user.user_id
                          join funds in db.Funds on capply.c_funds_id equals funds.f_id
-                         where funds.f_manager == id && funds.f_id==info.fund && apply.apply_state==1
+                         where funds.f_manager == (id==0? funds.f_manager:id) && funds.f_id==info.fund && apply.apply_state==1
                          select new FundsStatDetail
                          {
                              applyAmount = capply.c_amount,
@@ -653,7 +655,7 @@ namespace FundsManager.Controllers
         List<FundsStat> getStatistics(FundsSearchModel info, int id)
         {
             var query = (from funds in db.Funds
-                         where funds.f_manager== id && funds.f_in_year==info.year.ToString() && funds.f_id==((info.fund==null||info.fund==0)?funds.f_id:info.fund)
+                         where funds.f_manager== (id == 0 ? funds.f_manager : id) && funds.f_in_year==info.year.ToString() && funds.f_id==((info.fund==null||info.fund==0)?funds.f_id:info.fund)
                          select new FundsStat
                          {
                               amount=funds.f_amount,

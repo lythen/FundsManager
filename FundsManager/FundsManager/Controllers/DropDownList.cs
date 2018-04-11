@@ -217,7 +217,7 @@ namespace FundsManager.Controllers
         }
         public static List<SelectOption> RespondUserSelect()
         {
-            string key = cache_user_state + "0";
+            string key = cache_response_user + "0";
             List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(key);
             if (options == null)
             {

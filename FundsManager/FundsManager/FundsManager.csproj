@@ -323,6 +323,7 @@
     <Compile Include="Common\IpHelper.cs" />
     <Compile Include="Common\PageValidate.cs" />
     <Compile Include="Common\PasswordUnit.cs" />
+    <Compile Include="Common\RoleCheck.cs" />
     <Compile Include="Common\TokenProccessor.cs" />
     <Compile Include="Common\WeeK.cs" />
     <Compile Include="Controllers\ApplyManagerController.cs" />
