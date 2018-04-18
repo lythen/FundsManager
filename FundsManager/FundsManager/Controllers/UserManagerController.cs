@@ -372,6 +372,12 @@ namespace FundsManager.Controllers
             if(id==1) goto next;
             if (!User.Identity.IsAuthenticated) goto next;
             if (id == null) goto next;
+            if (id == 1)
+            {
+                json.state = 1;
+                json.msg_text = "该帐号不允许删除。";
+                goto next;
+            }
             User_Info user_Info = db.User_Info.Find(id);
             if (user_Info == null)
             {

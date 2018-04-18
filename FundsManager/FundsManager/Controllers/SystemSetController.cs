@@ -253,6 +253,58 @@ namespace FundsManager.Controllers
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
+        [wxAuthorize(Roles = "系统管理员")]
+        public JsonResult UpdateDept(DepartMentModel dept)
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                goto next;
+            }
+            if (dept.deptId == null || dept.deptId == 0)
+            {
+                json.msg_text = "获取部门/科室的ID出错。";
+                json.msg_code = "IDError";
+                goto next;
+            }
+            int id = (int)dept.deptId;
+            Dic_Department model = db.Dic_Department.Find(id);
+            if (model == null)
+            {
+                json.msg_text = "没有找到该部门/科室，该部门/科室可能已被删除。";
+                json.msg_code = "noThis";
+                goto next;
+            }
+            var same = db.Dic_Department.Where(x => x.dept_name == dept.deptName && x.dept_id != dept.deptId);
+            if (same.Count() > 0)
+            {
+                json.msg_text = "该名称已存在。";
+                json.msg_code = "NameExists";
+                goto next;
+            }
+            model.dept_name = dept.deptName;
+            model.dept_parent_id = dept.parentId;
+
+            db.Entry(model).State = EntityState.Modified;
+            try
+            {
+                db.SaveChanges();
+                DBCaches2.ClearCache("cache_depts");
+            }
+            catch
+            {
+                json.msg_text = "更新，请重新操作。";
+                json.msg_code = "UpdateErr";
+                goto next;
+            }
+            json.state = 1;
+            json.msg_code = "success";
+            json.msg_text = "更新成功！";
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
         #endregion
         #region 角色设置
         [wxAuthorize(Roles = "系统管理员")]
