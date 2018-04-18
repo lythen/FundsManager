@@ -5,11 +5,14 @@
 }
 <style>
     .form-control{width:200px;display:inline-block;}
+     .displayN{display:none;}
 </style>
 <h4>职务表</h4>
 
 <div class="col-md-10" style="color:red;width:100%;text-align:center;">
-    @ViewBag.msg
+    <div class="alert alert-danger err displayN" role="alert">
+        @ViewBag.msg
+    </div>
 </div>
 @using (Html.BeginForm())
 {
@@ -48,8 +51,9 @@
                         {
                         <tr>
                             <td>@item.post_id</td>
-                            <td>@item.post_name</td>
-                            <td><a href="javascript:void(0);" onclick="DelFunds(@item.post_id)">删除</a></td>
+                            <td><span class="td-date" id="name_@item.post_id">@item.post_name</span></td>
+                            <td><a href="javascript:void(0);" class="vi1" onclick="DelFunds(@item.post_id)">删除</a>&nbsp;<a href="javascript:void(0);" class="vi1" onclick="EditRow(@item.post_id)">编辑</a>
+<a href="javascript:void(0);" class="vi2 displayN" onclick="Save(@item.post_id)">保存</a>&nbsp;<a href="javascript:void(0);" class="vi2 displayN" onclick="Cancel(@item.post_id)">取消</a></td>
                         </tr>
                             }
 
@@ -66,6 +70,7 @@
     </div>
 }
 <script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script src="~/scripts/alert.js"></script>
 <script>
     function DelFunds(id) {
         if (!confirm("是否删除该职务？删除后将无法恢复。")) return;
@@ -75,10 +80,54 @@
                 window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "Post" })";
             }else
             {
-                $('.err').text(data.msg_text);
+                $.ShowMsg(data.msg_text);
             }
         }).fail(function (err) {
-            alert(err.status+':'+err.statusText);
+            $.ShowMsg(err.status + ':' + err.statusText);
         });
+    }
+    function EditRow(id){
+        //名称列处理
+        var nameTD=$('#name_'+id).parent();
+        var input,inputId='txtName'+id;
+        input = $('#'+inputId);
+        if (input.length > 0) {
+            input.removeClass('displayN');
+        }else{
+            nameTD.append($('<input class="form-control text-box single-line" id="' + inputId + '" name="' + inputId + '" type="text" value="' + $('#name_' + id).text() + '">'))
+        }
+        $('#name_' + id).addClass('displayN');
+
+        //按钮列处理
+        $('.vi1').addClass('displayN');
+        $('.vi2').removeClass('displayN');
+
+        $('#'+inputId).focus();
+    }
+    function Save(id){
+        var obj=new Object();
+        obj.post_id = id;
+        obj.post_name = $('#txtName' + id).val();
+        
+        $.post("@Url.RouteUrl(new { controller = "SystemSet", action = "UpdatePost" })", obj, function (data) {
+            if (data.state == 1) {
+                alert('修改成功。');
+                window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "Post" })";
+            }else
+            {
+                $.ShowMsg(data.msg_text);
+            }
+        }).fail(function (err) {
+            $.ShowMsg(err.status + ':' + err.statusText);
+        });
+    }
+    function Cancel(id){
+        $('.vi2').addClass('displayN');
+        $('.vi1').removeClass('displayN');
+        $('#name_' + id).removeClass('displayN');
+        $('#txtName' + id).addClass('displayN');
+
+        $('#father_' + id).removeClass('displayN');
+        $('#select' + id).addClass('displayN');
     }
 </script>

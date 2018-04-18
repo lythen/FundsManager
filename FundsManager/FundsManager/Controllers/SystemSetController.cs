@@ -181,6 +181,48 @@ namespace FundsManager.Controllers
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
+        [wxAuthorize(Roles = "系统管理员")]
+        public JsonResult UpdatePost(Dic_Post post)
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                goto next;
+            }
+            if (post.post_id == 0)
+            {
+                json.msg_text = "获取部门/科室的ID出错。";
+                json.msg_code = "IDError";
+                goto next;
+            }
+            
+            var same = db.Dic_Post.Where(x => x.post_name == post.post_name && x.post_id != post.post_id);
+            if (same.Count() > 0)
+            {
+                json.msg_text = "该名称已存在。";
+                json.msg_code = "NameExists";
+                goto next;
+            }
+            db.Entry(post).State = EntityState.Modified;
+            try
+            {
+                db.SaveChanges();
+                DBCaches<Dic_Post>.ClearCache("cache_post");
+            }
+            catch
+            {
+                json.msg_text = "更新，请重新操作。";
+                json.msg_code = "UpdateErr";
+                goto next;
+            }
+            json.state = 1;
+            json.msg_code = "success";
+            json.msg_text = "更新成功！";
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
         #endregion
         #region 科室部门管理
         [wxAuthorize(Roles = "系统管理员")]
