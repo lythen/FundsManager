@@ -100,6 +100,7 @@ namespace FundsManager.Controllers
             SetSelect();
             return View(new FundsModel());
         }
+        [NonAction]
         void SetSelect()
         {
             List<SelectOption> options = DropDownList.UserStateSelect();
@@ -589,7 +590,8 @@ namespace FundsManager.Controllers
         }
         #endregion
         #region 统计
-        public void setSearchSelect(int user)
+        [NonAction]
+        void setSearchSelect(int user)
         {
             List<SelectOption> options = DropDownList.FundsYearsSelect();
             ViewBag.Year = DropDownList.SetDropDownList(options);

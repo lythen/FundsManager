@@ -15,20 +15,34 @@ namespace FundsManager.Controllers
         private FundsContext db = new FundsContext();
 
         #region 网站设置
+        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult SiteInfo()
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
+
             ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
             return View(info);
         }
+        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult SiteSet()
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+
             ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
             return View(info);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult SiteSet([Bind(Include = "name,company,introduce,companyAddress,companyPhone,companyEmail,managerName,managerPhone,managerEmail")]ViewModels.SiteInfo info)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             Sys_SiteInfo model = db.Sys_SiteInfo.FirstOrDefault();
             if (model != null)
@@ -58,6 +72,10 @@ namespace FundsManager.Controllers
         [wxAuthorize(Roles = "系统管理员")]
         public ActionResult ContrlModule()
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+
             List<ModuleInfo> models = DBCaches2.getModuleInfo();
             foreach (ModuleInfo model in models)
             {
@@ -79,6 +97,19 @@ namespace FundsManager.Controllers
         public JsonResult ContrlModule(EditModules models)
         {
             BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                goto next;
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
+                goto next;
+            }
             if (ModelState.IsValid)
             {
                 string ctrl_name;
@@ -113,6 +144,7 @@ namespace FundsManager.Controllers
                 json.msg_code = "error";
                 json.msg_text = "数据接收错误。";
             }
+            next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
         #endregion
@@ -120,6 +152,10 @@ namespace FundsManager.Controllers
         [wxAuthorize(Roles = "系统管理员")]
         public ActionResult Post()
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+
             ViewData["PostList"] = DBCaches<Dic_Post>.getCache("cache_post"); ;
             return View(new Dic_Post());
         }
@@ -127,6 +163,10 @@ namespace FundsManager.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Post(Dic_Post model)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+
             model.post_name = PageValidate.InputText(model.post_name, 50);
             if (db.Dic_Post.Where(x => x.post_name == model.post_name).Count() > 0) ViewBag.msg = "名称已存在";
             else
@@ -154,6 +194,13 @@ namespace FundsManager.Controllers
             {
                 json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
                 json.msg_code = "notLogin";
+                goto next;
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
                 goto next;
             }
             Dic_Post model = db.Dic_Post.Find(id);
@@ -189,6 +236,13 @@ namespace FundsManager.Controllers
             {
                 json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
                 json.msg_code = "notLogin";
+                goto next;
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
                 goto next;
             }
             if (post.post_id == 0)
@@ -228,6 +282,10 @@ namespace FundsManager.Controllers
         [wxAuthorize(Roles = "系统管理员")]
         public ActionResult Department()
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+
             List<SelectOption> options = DropDownList.getDepartment();
             ViewBag.Dept = DropDownList.SetDropDownList(options);
             ViewData["DeptList"] = DBCaches2.getDeptCache();
@@ -237,6 +295,10 @@ namespace FundsManager.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Department(DepartMentModel info)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+
             List<SelectOption> options = DropDownList.getDepartment();
             ViewBag.Dept = DropDownList.SetDropDownList(options);
             Dic_Department model = new Dic_Department();
@@ -268,6 +330,13 @@ namespace FundsManager.Controllers
             {
                 json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
                 json.msg_code = "notLogin";
+                goto next;
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
                 goto next;
             }
             Dic_Department model = db.Dic_Department.Find(id);
@@ -303,6 +372,13 @@ namespace FundsManager.Controllers
             {
                 json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
                 json.msg_code = "notLogin";
+                goto next;
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
                 goto next;
             }
             if (dept.deptId == null || dept.deptId == 0)
@@ -352,6 +428,9 @@ namespace FundsManager.Controllers
         [wxAuthorize(Roles = "系统管理员")]
         public ActionResult Role()
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err="没有权限当前内容。" });
             ViewData["RoleList"] = DBCaches<Dic_Role>.getCache("cache_role"); ;
             return View(new Dic_Role());
         }
@@ -359,6 +438,10 @@ namespace FundsManager.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Role(Dic_Role model)
         {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
+
             model.role_name = PageValidate.InputText(model.role_name, 50);
             if (db.Dic_Role.Where(x => x.role_name == model.role_name).Count() > 0) ViewBag.msg = "角色名称已存在";
             else
@@ -388,6 +471,19 @@ namespace FundsManager.Controllers
                 json.msg_code = "notLogin";
                 goto next;
             }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
+                goto next;
+            }
+            if (id == 1)
+            {
+                json.msg_text = "该角色不允许删除。";
+                json.msg_code = "CanNotDel";
+                goto next;
+            }
             Dic_Role model = db.Dic_Role.Find(id);
             if (model == null)
             {
@@ -410,6 +506,60 @@ namespace FundsManager.Controllers
             json.state = 1;
             json.msg_code = "success";
             json.msg_text = "删除成功！";
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
+        [wxAuthorize(Roles = "系统管理员")]
+        public JsonResult UpdateRole(Dic_Role model)
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                goto next;
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
+                goto next;
+            }
+            if (model.role_id == 0)
+            {
+                json.msg_text = "获取角色的ID出错。";
+                json.msg_code = "IDError";
+                goto next;
+            }
+            if (model.role_id == 1)
+            {
+                json.msg_text = "该角色不允许修改。";
+                json.msg_code = "CanNotUpdate";
+                goto next;
+            }
+            var same = db.Dic_Post.Where(x => x.post_name == model.role_name && x.post_id != model.role_id);
+            if (same.Count() > 0)
+            {
+                json.msg_text = "该名称已存在。";
+                json.msg_code = "NameExists";
+                goto next;
+            }
+            db.Entry(model).State = EntityState.Modified;
+            try
+            {
+                db.SaveChanges();
+                DBCaches<Dic_Post>.ClearCache("cache_post");
+            }
+            catch
+            {
+                json.msg_text = "更新，请重新操作。";
+                json.msg_code = "UpdateErr";
+                goto next;
+            }
+            json.state = 1;
+            json.msg_code = "success";
+            json.msg_text = "更新成功！";
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
