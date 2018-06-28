@@ -11,6 +11,10 @@
         margin-top: 15px;
         font-size: 15px;
     }
+    .bold{font-weight:bold;}
+    .col-md-10{width:auto;}
+    .alert{width:100%;}
+    .w100{width:100%;}
 </style>
 
 <h4>经费详细</h4>
@@ -18,7 +22,7 @@
 <div>
     <div class="form-group">
         <div class="col-md-10 alert">
-            <div id="div-res">经费申请单号：@ViewBag.number</div>
+            <div id="div-res" class="bold">经费申请单号：@ViewBag.number</div>
         </div>
     </div>
     @if (Model != null && Model.Count() > 0)
@@ -28,15 +32,16 @@
             <div class="form-group">
                 <div class="col-md-10 form-res">
 
-                    <div>子申请单号：@item.Cnumber</div>
-                    <div>申请单状态： @item.strState</div>
+                    <div class="bold">子申请单号：@item.Cnumber</div>
+                    <div>子申请单状态： @item.strState</div>
+                    <div>批复列表：</div>
                     @if (item.processList != null)
                     {
                         string color = "", display = "";
                         foreach (var citem in item.processList)
                         {
                             <div>
-                                @citem.number<span>. </span>@citem.user (
+                                @citem.number<span>. </span>批复人：@citem.user (
                                 @if (@citem.state == 1)
                                 {color = "green";
                                     display = "display:none;";
@@ -62,7 +67,7 @@
         }
     }
     <div class="form-group">
-        <div class="col-md-10">
+        <div class="col-md-10 w100">
             @Html.ActionLink("返    回", "MyFunds", null, new { @class = "btn btn-warning" })
         </div>
     </div>

@@ -26,17 +26,23 @@ namespace FundsManager.Controllers
                                     name = u.real_name,
                                     times = u.user_login_times
                                 }).FirstOrDefault();
-                var loginInfo = (from l in db.Sys_Log
-                                 where l.log_user_id == id
-                                 orderby l.log_time descending
-                                 select l
-                                 ).FirstOrDefault();
-                if (loginInfo != null)
+                var loginInfos = (from l in db.Sys_Log
+                                  where l.log_user_id == id
+                                  select l
+                                 );
+                if (loginInfos.Count() <= 1)
                 {
+                    userInfo.lastIp = "无";
+                    userInfo.lastTime = "无";
+
+                }
+                else
+                {
+                    var loginInfo = loginInfos.OrderByDescending(x=>x.log_time).Skip(1).FirstOrDefault();
                     userInfo.lastIp = loginInfo.log_ip;
                     userInfo.lastTime = loginInfo.log_time.ToString("yyyy年MM月dd日 HH时mm分");
-                    userInfo.roleName = role.roleName;
                 }
+                userInfo.roleName = role.roleName;
                 userInfo.name = AESEncrypt.Decrypt(userInfo.name);
                 //如果是有批复权限的，显示待批复列表
                 return View(userInfo);

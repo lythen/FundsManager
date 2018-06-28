@@ -7,7 +7,11 @@
 <hr />
 <style>
     .table .table tbody tr td, .table .table tbody tr th, .table .table tfoot tr td, .table .table tfoot tr th, .table .table thead tr td, .table .table thead tr th{border-top:none;}
+    .displayN{display:none;}
 </style>
+<div class="col-md-10" id="msg">
+    @ViewBag.msg
+</div>
 <table class="table">
     <tr>
         <th>
@@ -33,7 +37,8 @@
     {
         foreach (var item in Model)
         {
-            <tr>
+            var canDel = true;
+            <tr id="tr_@item.number">
                 <td>
                     @Html.DisplayFor(modelItem => item.number)
                 </td>
@@ -49,6 +54,7 @@
                         {
                             foreach (var citem in item.child)
                             {
+                                if (citem.state == 1) {canDel = false; }
                                 <tr>
                                     <td class="td-no">
                                         @citem.Cnumber
@@ -68,8 +74,12 @@
                     </table>
                 </td>
                 <td>
-                    @Html.ActionLink("详细", "Details", new { id = item.number })
-                  |@Html.ActionLink("修改", "Edit", new { id = item.number })
+                    @Html.ActionLink("详细", "Details", new { id = item.number },new { @class="btn btn-info"})
+                  @Html.ActionLink("修改", "Edit", new { id = item.number }, new { @class = "btn btn-success" })
+                    @if (@canDel)
+                    {
+                        <a href="javascript:void(0);" class="btn btn-default" onclick="DelCApply('@item.number')">撤销</a>
+                    }
                 </td>
             </tr>
         }
@@ -81,6 +91,32 @@
 </table>
 <script src="~/scripts/jquery-3.2.1.slim.js"></script>
 <script>
+    function DelCApply(number) {
+        var obj = new Object();
+        obj.number = number;
+        $.post("@Url.RouteUrl(new {controller= "ApplyManager", action= "Delete" })", obj, function (data) {
+            if (data.state == '1') {
+                $('#msg').removeClass();
+                $('#msg').addClass('alert alert alert-success');
+                $('#msg').text("申请单撤销成功。");
+                $('#' + number).remove();
+                removeAlert();
+                
+            } else {
+                if (data.msg_code == 'nologin') location.href = '@Url.RouteUrl(new { action = "LogOut", controller = "Login"})';
+                $('#msg').removeClass();
+                $('#msg').addClass('alert alert alert-danger');
+                $('#msg').text(data.msg_text);
+                removeAlert();
+            }
+        });
+    }
+    function removeAlert() {
+        setTimeout(function () {
+            $('#msg').removeClass();
+            $('#msg').addClass('displayN');
+        }, 3000);
+    }
     $(function () {
         var w = $('.th-no').width();
         $('.td-no').width(w);

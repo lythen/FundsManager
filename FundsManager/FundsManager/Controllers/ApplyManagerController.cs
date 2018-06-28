@@ -24,6 +24,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            //return RedirectToAction("myFunds");
             var waitList = (from apply in db.Funds_Apply
                             join s in db.Dic_Respond_State on apply.apply_state equals s.drs_state_id
                             where apply.apply_user_id == user && apply.apply_state != 3
@@ -481,9 +482,14 @@ namespace FundsManager.Controllers
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
+        /// <summary>
+        /// 删除订单
+        /// </summary>
+        /// <param name="cnumber"></param>
+        /// <returns></returns>
         [HttpPost]
         // GET: ApplyManager/Delete/5
-        public JsonResult Delete(string cnumber)
+        public JsonResult Delete(string number)
         {
             BaseJsonData json = new BaseJsonData();
             if (!User.Identity.IsAuthenticated)
@@ -491,42 +497,36 @@ namespace FundsManager.Controllers
                 json.msg_code = "nologin";
                 goto next;
             }
-            if (cnumber == null)
+            if (number == null)
             {
                 json.msg_code = "errorNumber";
                 json.msg_text = "申请单号获取失败。";
                 goto next;
             }
-            Funds_Apply_Child child = db.Funds_Apply_Child.Find(cnumber);
-            if (child == null)
+            //查询订单状态，如果已批复，不能撤销。如果没有，删除流程。
+            Funds_Apply fundsApply = db.Funds_Apply.Find(number);
+            if (fundsApply == null)
             {
                 json.msg_code = "nodate";
                 json.msg_text = "申请单不存在或被删除。";
                 goto next;
             }
-            if (child.c_state == 1)
+            if (fundsApply.apply_state == 1)
             {
                 json.msg_code = "forbidden";
-                json.msg_text = "已批复同意的子申请单不允许删除。";
+                json.msg_text = "已批复同意的申请单不允许删除。";
                 goto next;
             }
-            string number = child.c_apply_number;
-            int c_num = db.Funds_Apply_Child.Where(x => x.c_apply_number == number).Count();
-            if (c_num <= 1)
-            {
-                //只有一条子申请单情况，直接把父申请单也删除
-                var f = db.Funds_Apply.Find(number);
-                if (f != null)
-                    if (f.apply_state == 1)
-                    {
-                        json.msg_code = "forbidden";
-                        json.msg_text = "已批复同意的申请单不允许删除。";
-                        goto next;
-                    }
-                    else
-                        db.Funds_Apply.Remove(f);
-            }
-            db.Funds_Apply_Child.Remove(child);
+            var cs = db.Funds_Apply_Child.Where(x => x.c_apply_number == fundsApply.apply_number);
+            if (cs.Count() > 0)
+                foreach (Funds_Apply_Child citem in cs)
+                {
+                    var prs = db.Process_Respond.Where(x => x.pr_apply_number == citem.c_child_number);
+                    if(prs.Count()>0)
+                    foreach (Process_Respond pr in prs) db.Process_Respond.Remove(pr);
+                    db.Funds_Apply_Child.Remove(citem);
+                }
+            db.Funds_Apply.Remove(fundsApply);
             try
             {
                 db.SaveChanges();
@@ -577,6 +577,7 @@ namespace FundsManager.Controllers
                                              Cnumber = c.c_child_number,
                                              fundsCode = f.f_code,
                                              amount = c.c_amount,
+                                             state=c.c_state,
                                              strState = das.drs_state_name,
                                              factGet = c.c_get
                                          }

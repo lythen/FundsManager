@@ -59,8 +59,8 @@
                             <td>@item.deptId</td>
                             <td><span class="td-date" id="name_@item.deptId">@item.deptName</span></td>
                             <td><span class="td-date" id="father_@item.deptId">@item.parentName</span><input type="hidden" id="hid_@item.deptId" value="@item.parentId" /></td>
-                            <td><a href="javascript:void(0);" class="vi1" onclick="DelFunds(@item.deptId)">删除</a>&nbsp;<a href="javascript:void(0);" class="vi1" onclick="EditRow(@item.deptId)">编辑</a>
-                                <a href="javascript:void(0);" class="vi2 displayN" onclick="Save(@item.deptId)">保存</a>&nbsp;<a href="javascript:void(0);" class="vi2 displayN" onclick="Cancel(@item.deptId)">取消</a>
+                            <td><a href="javascript:void(0);" class="vi1 btn btn-default" onclick="DelFunds(@item.deptId)">删除</a>&nbsp;<a href="javascript:void(0);" class="vi1 btn btn-info" onclick="EditRow(@item.deptId)">编辑</a>
+                                <a href="javascript:void(0);" class="vi2 btn btn-success displayN" onclick="Save(@item.deptId)">保存</a>&nbsp;<a href="javascript:void(0);" class="vi2 btn btn-warning displayN" onclick="Cancel(@item.deptId)">取消</a>
                             </td>
                         </tr>
                             }
