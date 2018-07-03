@@ -445,7 +445,7 @@ namespace FundsManager.Controllers
             ViewBag.State = DropDownList.SetDropDownList(options);
             options = DropDownList.CardTypeSelect();
             ViewBag.CardType = DropDownList.SetDropDownList(options);
-            options = DropDownList.RoleSelect();
+            options = DropDownList.RoleSelect("");
             ViewBag.Role = DropDownList.SetDropDownList(options);
         }
         [HttpPost]

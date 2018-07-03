@@ -15,7 +15,6 @@ namespace FundsManager.Models
         public string f_name { get; set; }
         [StringLength(4)]
         public string f_in_year { get; set; }
-        public DateTime f_expireDate { get; set; }
         [StringLength(100)]
         public string f_source { get; set; }
         [DataType(DataType.Currency)]
@@ -29,5 +28,6 @@ namespace FundsManager.Models
         public DateTime f_delete_time { get; set; }
         public int f_state { get; set; }
         public int? f_process { get; set; }
+        public DateTime f_add_Time { get; set; }
     }
 }

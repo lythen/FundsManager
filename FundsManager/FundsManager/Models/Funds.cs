@@ -7,6 +7,7 @@ namespace FundsManager.Models
     /// </summary>
     public class Funds
     {
+        private DateTime _f_add_Time = DateTime.Now;
         [Key]
         public int f_id { get; set; }
         [StringLength(20)]
@@ -15,7 +16,6 @@ namespace FundsManager.Models
         public string f_name { get; set; }
         [StringLength(4)]
         public string f_in_year { get; set; }
-        public DateTime f_expireDate { get; set; }
         [StringLength(100)]
         public string f_source { get; set; }
         [DataType(DataType.Currency)]
@@ -26,6 +26,7 @@ namespace FundsManager.Models
         [StringLength(2000)]
         public string f_info { get; set; }
         public int f_state { get; set; }
+        public DateTime f_add_Time { get { return _f_add_Time; } set { _f_add_Time = value; } }
         public int? f_process { get; set; }
     }
 }

@@ -30,6 +30,9 @@ namespace FundsManager.DAL
         public DbSet<Dic_CardType> Dic_CardType { get; set; }
         public DbSet<Recycle_User> Recycle_User { get; set; }
         public DbSet<Process_Info> Process_Info { get; set; }
+        public DbSet<Sys_Authority> Sys_Authority { get; set; }
+        public DbSet<Role_vs_Authority> Role_vs_Authority { get; set; }
+        public DbSet<Dic_Reimbursement_Content> Dic_Reimbursement_Content { get; set; }
 
     }
 }

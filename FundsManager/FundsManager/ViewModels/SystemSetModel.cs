@@ -63,6 +63,19 @@ namespace FundsManager.ViewModels
         public string name { get; set; }
         public bool hasrole { get; set; }
     }
+    public class RoleAuthority
+    {
+        public int roleId { get; set; }
+        public int authId { get; set; }
+    }
+    public class AuthInfo
+    {
+        public int authId { get; set; }
+        public string authName { get; set; }
+        public string authInfo { get; set; }
+        public bool isController { get; set; }
+        public int mapController { get; set; }
+    }
     public class DepartMentModel
     {
         private int parent_id = 0;

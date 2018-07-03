@@ -54,21 +54,42 @@ namespace FundsManager.Migrations
             //string path = ConfigurationManager.AppSettings["cPath"];
             //DirectoryInfo dir = new DirectoryInfo(path);
             //string name;
+            //int i = 1;
+            //Role_vs_Authority rva; Sys_Authority auth;
             //foreach (FileInfo file in dir.GetFiles())
             //{
             //    if (!file.Name.Contains("Controller")) continue;
             //    name = file.Name.Replace("Controller.cs", "");
-            //    Sys_Controller c = new Sys_Controller()
+            //    auth = new Sys_Authority()
             //    {
-            //        controller_name = name
+            //        auth_name = name,
+            //         auth_is_Controller=true
             //    };
-            //    Role_vs_Controller rvc = new Role_vs_Controller()
+            //    rva = new Role_vs_Authority()
             //    {
-            //        rvc_role_id = 1,
-            //        rvc_controller = name
+            //        rva_role_id = 1,
+            //        rva_auth_id = i
             //    };
-            //    context.Sys_Controller.AddOrUpdate(x => x.controller_name, c);
-            //    context.Role_vs_Controller.AddOrUpdate(x => new { x.rvc_role_id, x.rvc_controller }, rvc);
+            //    i++;
+            //    context.Sys_Authority.AddOrUpdate(x => x.auth_name, auth);
+            //    context.Role_vs_Authority.AddOrUpdate(x => new { x.rva_role_id, x.rva_auth_id }, rva);
+            //}
+            //string[] auths = { "用户管理", "添加经费", "经费管理", "批复申请", "批复管理", "申请管理", "系统管理" };
+            //foreach (string name2 in auths)
+            //{
+            //    auth = new Sys_Authority()
+            //    {
+            //        auth_name = name2,
+            //        auth_is_Controller = true
+            //    };
+            //    rva = new Role_vs_Authority()
+            //    {
+            //        rva_role_id = 1,
+            //        rva_auth_id = i
+            //    };
+            //    i++;
+            //    context.Sys_Authority.AddOrUpdate(x => x.auth_name, auth);
+            //    context.Role_vs_Authority.AddOrUpdate(x => new { x.rva_role_id, x.rva_auth_id }, rva);
             //}
             //context.Sys_SiteInfo.AddOrUpdate(x => x.site_name,
             //    new Sys_SiteInfo() { site_name = "某某管理系统" }
@@ -82,6 +103,25 @@ namespace FundsManager.Migrations
             //    new Dic_CardType { ctype_name = "港澳居民来往内地通行证" },
             //    new Dic_CardType { ctype_name = "台湾居民来往大陆通行证" },
             //    new Dic_CardType { ctype_name = "其它有效证件" });
+            context.Dic_Reimbursement_Content.AddOrUpdate(x => x.content_title,
+                new Dic_Reimbursement_Content { content_title = "办公费" },
+                new Dic_Reimbursement_Content { content_title = "邮电费" },
+                new Dic_Reimbursement_Content { content_title = "印刷费" },
+                new Dic_Reimbursement_Content { content_title = "交通费" },
+                new Dic_Reimbursement_Content { content_title = "会议费" },
+                new Dic_Reimbursement_Content { content_title = "培训费" },
+                new Dic_Reimbursement_Content { content_title = "国际差旅费" },
+                new Dic_Reimbursement_Content { content_title = "招待费" },
+                new Dic_Reimbursement_Content { content_title = "试剂费" },
+                new Dic_Reimbursement_Content { content_title = "材料费" },
+                new Dic_Reimbursement_Content { content_title = "动物费" },
+                new Dic_Reimbursement_Content { content_title = "分析测试费" },
+                new Dic_Reimbursement_Content { content_title = "专家咨询费" },
+                new Dic_Reimbursement_Content { content_title = "劳务费" },
+                new Dic_Reimbursement_Content { content_title = "设备维修费" },
+                new Dic_Reimbursement_Content { content_title = "设备购置费" },
+                new Dic_Reimbursement_Content { content_title = "工程修缮费" },
+                new Dic_Reimbursement_Content { content_title = "其它" });
         }
 
     }

@@ -73,8 +73,8 @@
                     @Html.DisplayFor(modelItem => item.loginTimes)
                 </td>
                 <td>
-                    @Html.ActionLink("详细", "Edit", new { id = item.id }) |
-                    <a href="javascript:void(0);" onclick="Delete(@item.id)">删除</a>
+                    @Html.ActionLink("详细", "Edit", new { id = item.id }, new { @class = "btn btn-info" }) 
+                    <a href="javascript:void(0);" class="btn btn-default" onclick="Delete(@item.id)">删除</a>
                 </td>
             </tr>
         }

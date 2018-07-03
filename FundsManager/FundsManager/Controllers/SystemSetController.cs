@@ -425,6 +425,58 @@ namespace FundsManager.Controllers
         }
         #endregion
         #region 角色设置
+        public ActionResult RoleAuthSet()
+        {
+            List<SelectOption> options = DropDownList.RoleSelect("系统管理员");
+            ViewData["Roles"] = DropDownList.SetDropDownList(options);
+            List<AuthInfo> auths = DropDownList.AuthoritySelect();
+            ViewData["Auths"] = auths;
+            return View();
+        }
+        [HttpPost]
+        public JsonResult RoleAuthSet(int roleId)
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                goto next;
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
+                goto next;
+            }
+            if (roleId == 0)
+            {
+                json.msg_text = "获取角色出错。";
+                json.msg_code = "IDError";
+                goto next;
+            }
+            var rvas = from rva in db.Role_vs_Authority
+                       where rva.rva_role_id == roleId
+                       select new RoleAuthority
+                       {
+                           authId = rva.rva_auth_id,
+                           roleId = rva.rva_role_id
+                       };
+            if (rvas.Count() == 0)
+            {
+                json.state = 0;
+                json.msg_code = "noData";
+                json.msg_text = "没有数据。";
+            }
+            else
+            {
+                json.state = 1;
+                json.data = rvas.ToList();
+            }
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
         [wxAuthorize(Roles = "系统管理员")]
         public ActionResult Role()
         {
@@ -564,6 +616,7 @@ namespace FundsManager.Controllers
             return Json(json, JsonRequestBehavior.AllowGet);
         }
         #endregion
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

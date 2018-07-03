@@ -34,7 +34,6 @@ namespace FundsManager.Controllers
                               code=funds.f_code,
                               amount = funds.f_amount,
                               balance = funds.f_balance,
-                              expireDate = funds.f_expireDate,
                               id = funds.f_id,
                               name = funds.f_name,
                               strState = funds.f_state == 0 ? "未启用" : (funds.f_state == 1 ? "正常" : "锁定"),
@@ -67,7 +66,6 @@ namespace FundsManager.Controllers
                           {
                               code=funds.f_code,
                               amount = fac.c_amount,
-                              expireDate = funds.f_expireDate,
                               managerName = t1.user_name,
                               name = funds.f_name
                           }
@@ -116,7 +114,7 @@ namespace FundsManager.Controllers
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "code,name,expireDate,source,amount,balance,processId,info,state")] FundsModel funds)
+        public ActionResult Create([Bind(Include = "code,name,source,amount,balance,processId,info,state")] FundsModel funds)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
@@ -133,11 +131,11 @@ namespace FundsManager.Controllers
                     ViewBag.msg = "该名称已被使用";
                     return View(funds);
                 }
-                if (funds.processId == null || funds.processId == 0)
-                {
-                    ViewBag.msg = "未选择批复流程。";
-                    return View(funds);
-                }
+                //if (funds.processId == null || funds.processId == 0)
+                //{
+                //    ViewBag.msg = "未选择批复流程。";
+                //    return View(funds);
+                //}
                 if (funds.amount == 0)
                 {
                     ViewBag.msg = "请设置经费总额。";
@@ -172,7 +170,6 @@ namespace FundsManager.Controllers
                                     amount = f.f_amount,
                                     id = f.f_id,
                                     balance = f.f_balance,
-                                    expireDate = f.f_expireDate,
                                     info = f.f_info,
                                     manager = f.f_manager,
                                     name = f.f_name,
@@ -331,7 +328,6 @@ namespace FundsManager.Controllers
             rf.f_balance = funds.f_balance;
             rf.f_delete_time = DateTime.Now;
             rf.f_delete_user = user;
-            rf.f_expireDate = funds.f_expireDate;
             rf.f_id = funds.f_id;
             rf.f_info = funds.f_info;
             rf.f_in_year = funds.f_in_year;
@@ -339,6 +335,7 @@ namespace FundsManager.Controllers
             rf.f_name = funds.f_name;
             rf.f_source = funds.f_source;
             rf.f_state = funds.f_state;
+            rf.f_add_Time = funds.f_add_Time;
             db.Funds_Recycle.Add(rf);
             try
             {
@@ -657,7 +654,7 @@ namespace FundsManager.Controllers
         List<FundsStat> getStatistics(FundsSearchModel info, int id)
         {
             var query = (from funds in db.Funds
-                         where funds.f_manager== (id == 0 ? funds.f_manager : id) && funds.f_in_year==info.year.ToString() && funds.f_id==((info.fund==null||info.fund==0)?funds.f_id:info.fund)
+                         where funds.f_manager== (id == 0 ? funds.f_manager : id)  && funds.f_id==((info.fund==null||info.fund==0)?funds.f_id:info.fund)
                          select new FundsStat
                          {
                               amount=funds.f_amount,

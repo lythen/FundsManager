@@ -23,6 +23,7 @@ namespace FundsManager.Controllers
         private static string cache_fundsYear = "cache_fundsYear";
         private static string cache_stat_detail = "cache_stat_detail";
         private static string cache_response_user = "cache_response_user_";
+        private static string cache_authority = "cache_authority";
         public static List<SelectListItem> SetDropDownList(List<Models.SelectOption> options)
         {
             List<SelectListItem> items = new List<SelectListItem>();
@@ -137,10 +138,11 @@ namespace FundsManager.Controllers
                                          }).ToList();
             return option;
         }
-        public static List<SelectOption> RoleSelect()
+        public static List<SelectOption> RoleSelect(string ignor)
         {
             List<Dic_Role> depts = DBCaches<Dic_Role>.getCache(cache_role);
             List<SelectOption> option = (from ct in depts
+                                         where ct.role_name!=ignor
                                          select new SelectOption
                                          {
                                              id = ct.role_id.ToString(),
@@ -237,6 +239,20 @@ namespace FundsManager.Controllers
                 if (options.Count() > 0) DataCache.SetCache(key, options);
             }
             return options;
+        }
+        public static List<AuthInfo> AuthoritySelect()
+        {
+            List<Sys_Authority> funds = DBCaches<Sys_Authority>.getCache(cache_authority);
+            List<AuthInfo> option = (from auth in funds
+                                         select new AuthInfo
+                                         {
+                                             authId = auth.auth_id,
+                                             authInfo = auth.auth_info,
+                                             authName = auth.auth_name,
+                                             isController = auth.auth_is_Controller,
+                                             mapController = auth.auth_map_Controller
+                                         }).ToList();
+            return option;
         }
     }
 }

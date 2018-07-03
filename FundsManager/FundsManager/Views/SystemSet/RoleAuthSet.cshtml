@@ -1,0 +1,132 @@
+﻿@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "权限设置";
+    List<SelectListItem> roleInfo = ViewData["Roles"] as List<SelectListItem>;
+    List<FundsManager.ViewModels.AuthInfo> auths = ViewData["Auths"] as List<FundsManager.ViewModels.AuthInfo>;
+}
+<style>
+    .in-lab {
+        float: left;
+        display: inline-block;
+        width: 100px;
+    }
+
+        .in-lab span, .in-lab label {
+            float: left;
+            display: inline-block;
+            width: auto;
+            padding: 0px;
+            height: 50px;
+            line-height: 50px;
+        }
+
+    .table .in-lab label {
+        padding-top: 0px;
+    }
+
+    .table th {
+        text-align: center;
+    }
+
+    .form-horizontal .form-group {
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+</style>
+<h2>权限设置</h2>
+
+<div class="col-md-10" style="color:red;width:100%;text-align:center;">
+    @ViewBag.msg
+</div>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+
+        <div class="form-group">
+            <table class="table">
+                <tr>
+                    <td colspan="2">
+                        @Html.DropDownList("ddlRole", roleInfo as List<SelectListItem>, "请选择", new { @class = "select form-control" })
+                    </td>
+                </tr>
+
+                @foreach (var item in auths)
+                {
+                    var @id = "cbk" + @item.authId;
+                    <tr class="tr-c">         
+                        <td>
+                            <input type="hidden" id="hid_@item.authId" value="@item.mapController" />
+                                <div class="in-lab"> <span>
+                                    <input type="checkbox" id="@id" name="@id" onchange="SetChange(this);" /></span>&nbsp;
+                            <label class="control-label col-md-2" for="@id">@item.authName</label></div>
+                            
+                        </td>
+                        <td>
+                            @Html.EditorFor(Itemmodel => item.authName, new { htmlAttributes = new { @class = "form-control",@readOnly= "readOnly" } })
+                            @Html.ValidationMessageFor(Itemmodel => item.authName, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="保存更改" class="btn btn-default" onclick="Edit()" />
+            </div>
+        </div>
+    </div>
+}
+<script src="~/scripts/jquery-3.2.1.min.js"></script>
+<script>
+   
+    function SetChange(obj) {
+        $(obj).parent().parent().parent().parent().find('#item_hasChange').val(1);
+    }
+    function Edit() {
+        if (!confirm("是否确认当前修改？。")) return;
+        var list = new Array();
+        var trs = $('.tr-c');
+        var len = trs.length;
+        var hasChange;
+        var minfo, roles,boxes,rinfo;
+        for (var i = 0; i < len; i++) {
+            var tr = $(trs[i]);
+            hasChange = tr.find('#item_hasChange').val();
+            if (hasChange == "1") {
+                minfo = new Object();
+                minfo.id = parseInt(tr.find('#item_id').val());
+                minfo.info = tr.find('#item_info').val();
+                minfo.name = tr.find('#item_name').val();
+                roles = new Array();
+                boxes = tr.find('input[type="checkbox"]:checked');
+                if (boxes.length > 0) {
+                    for (var j = 0; j < boxes.length; j++) {
+                        rinfo=new Object();
+                        rinfo.id = parseInt(boxes[j].value);
+                        rinfo.hasrole = true;
+                        roles.push(rinfo);
+                    }
+                    minfo.roles = roles;
+                }
+                list.push(minfo);
+            }
+        }
+        var data = new Object();
+        data.modules = list;
+        $.post("@Url.RouteUrl(new { controller = "SystemSet", action = "ContrlModule" })", data, function (data) {
+            if (data.state == 1) {
+                alert('更新成功。');
+                window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "ContrlModule" })";
+            }else
+            {
+                $('.err').text(data.msg_text);
+            }
+        }).fail(function (err) {
+            alert(err.status+':'+err.statusText);
+        });
+    }
+</script>

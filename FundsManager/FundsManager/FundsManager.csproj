@@ -300,6 +300,7 @@
     <Content Include="Views\FundsManager\Statistics.cshtml" />
     <Content Include="Views\RespondManager\Responded.cshtml" />
     <Content Include="Views\ApplyManager\Edit.cshtml" />
+    <Content Include="Views\SystemSet\RoleAuthSet.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -410,9 +411,20 @@
     <Compile Include="Migrations\201803260820323_uptime.Designer.cs">
       <DependentUpon>201803260820323_uptime.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201806280325053_add20180628_1.cs" />
+    <Compile Include="Migrations\201806280325053_add20180628_1.Designer.cs">
+      <DependentUpon>201806280325053_add20180628_1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201806280330077_add20180628_2.cs" />
+    <Compile Include="Migrations\201806280330077_add20180628_2.Designer.cs">
+      <DependentUpon>201806280330077_add20180628_2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Dic_Reimbursement_Content.cs" />
     <Compile Include="Models\Process_Info.cs" />
     <Compile Include="Models\Recycle_Apply_Child.cs" />
+    <Compile Include="Models\Role_vs_Authority.cs" />
+    <Compile Include="Models\Sys_Authority.cs" />
     <Compile Include="ViewModels\ApplyModel.cs" />
     <Compile Include="Models\Dic_CardType.cs" />
     <Compile Include="Models\Dic_Department.cs" />
@@ -493,6 +505,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803260820323_uptime.resx">
       <DependentUpon>201803260820323_uptime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806280325053_add20180628_1.resx">
+      <DependentUpon>201806280325053_add20180628_1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806280330077_add20180628_2.resx">
+      <DependentUpon>201806280330077_add20180628_2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
