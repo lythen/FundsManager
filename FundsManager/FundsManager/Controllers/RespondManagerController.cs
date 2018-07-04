@@ -185,8 +185,8 @@ namespace FundsManager.Controllers
                 return Json(json, JsonRequestBehavior.AllowGet);
             }
             //是否为批复不通过
-            Funds_Apply_Child acm;
-            Funds_Apply fam;
+            Reimbursement_Content acm;
+            Reimbursement fam;
             if (state == 2)
             {
                 //一个不通过，全部不通过。

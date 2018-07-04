@@ -8,7 +8,7 @@ using System.Web;
 
 namespace FundsManager.ViewModels
 {
-    public class ApplyModel
+    public class ReimbursementModel
     {
         private DateTime _apply_time = DateTime.Now;
         private int _apply_state = 0;
@@ -22,17 +22,17 @@ namespace FundsManager.ViewModels
         public int state { get { return _apply_state; } set { _apply_state = value; } }
         public string strState { get; set; }
     }
-    public class ApplyListModel: ApplyModel
+    public class ApplyListModel: ReimbursementModel
     {
         [DisplayName("批复人")]
         public int next { get; set; }
-        public List<ApplyChildModel> child { get; set; }
+        public List<ViewContentModel> child { get; set; }
     }
     public class ChildState
     {
         public string childState { get; set; }
     }
-    public class ApplyChildModel
+    public class ViewContentModel
     {
         private int _apply_state = 0;
         [StringLength(9), DisplayName("申请编号")]
@@ -45,16 +45,6 @@ namespace FundsManager.ViewModels
         public string fundsCode { get; set; }
         [Required, DataType(DataType.Currency), DisplayName("金额")]
         public decimal amount { get; set; }
-        [DisplayName("状态")]
-        public int state { get { return _apply_state; } set { _apply_state = value; } }
-        [DisplayName("状态")]
-        public string strState { get; set; }
-        [StringLength(2000),DisplayName("备注")]
-        public string applyFor { get; set; }
-        [DisplayName("实际领取")]
-        public decimal? factGet { get; set; }
-        [StringLength(2000), DisplayName("领取说明")]
-        public string getInfo { get; set; }
     }
     public class ApplyFundsManager
     {
@@ -69,7 +59,7 @@ namespace FundsManager.ViewModels
     /// <summary>
     /// 申请单详细信息
     /// </summary>
-    public class ApplyDetail: ApplyModel
+    public class ApplyDetail: ReimbursementModel
     {
         public List<ApplyChildModel> applyList {get;set;}
     }

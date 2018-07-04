@@ -14,8 +14,8 @@ namespace FundsManager.DAL
         public DbSet<Dic_Respond_State> Dic_Respond_State { get; set; }
         public DbSet<Dic_Role> Dic_Role { get; set; }
         public DbSet<Funds> Funds { get; set; }
-        public DbSet<Funds_Apply> Funds_Apply { get; set; }
-        public DbSet<Funds_Apply_Child> Funds_Apply_Child { get; set; }
+        public DbSet<Reimbursement> Reimbursement { get; set; }
+        public DbSet<Reimbursement_Content> Reimbursement_Content { get; set; }
         public DbSet<Process_List> Process_List { get; set; }
         public DbSet<Process_Respond> Process_Respond { get; set; }
         public DbSet<Sys_Log> Sys_Log { get; set; }
@@ -25,14 +25,13 @@ namespace FundsManager.DAL
         public DbSet<Role_vs_Controller> Role_vs_Controller{ get; set; }
         public DbSet<Sys_Controller> Sys_Controller { get; set; }
         public DbSet<Sys_SiteInfo> Sys_SiteInfo { get; set; }
-        public DbSet<Recycle_Funds_Apply> Funds_Apply_Recycle { get; set; }
-        public DbSet<Recycle_Funds> Funds_Recycle { get; set; }
         public DbSet<Dic_CardType> Dic_CardType { get; set; }
-        public DbSet<Recycle_User> Recycle_User { get; set; }
         public DbSet<Process_Info> Process_Info { get; set; }
         public DbSet<Sys_Authority> Sys_Authority { get; set; }
         public DbSet<Role_vs_Authority> Role_vs_Authority { get; set; }
         public DbSet<Dic_Reimbursement_Content> Dic_Reimbursement_Content { get; set; }
+        public DbSet<Reimbursement_Attachment> Reimbursement_Attachment { get; set; }
+        public DbSet<Reimbursement_Detail> Reimbursement_Detail { get; set; }
 
     }
 }

@@ -25,20 +25,18 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
             //return RedirectToAction("myFunds");
-            var waitList = (from apply in db.Funds_Apply
-                            join s in db.Dic_Respond_State on apply.apply_state equals s.drs_state_id
-                            where apply.apply_user_id == user && apply.apply_state != 3
+            var waitList = (from bill in db.Reimbursement
+                            join s in db.Dic_Respond_State on bill.r_bill_state equals s.drs_state_id
+                            where bill.r_add_user_id == user && bill.r_bill_state != 3
                             select new ApplyListModel
                             {
-                                amount = apply.apply_amount,
-                                number = apply.apply_number,
-                                state = apply.apply_state,
-                                time = apply.apply_time,
+                                amount = bill.r_bill_amount,
+                                number = bill.reimbursement_code,
+                                state = bill.r_bill_state,
+                                time = bill.r_add_time,
                                 strState = s.drs_state_name,
-                                child = (from child in db.Funds_Apply_Child
-                                         join das in db.Dic_Respond_State on apply.apply_state equals das.drs_state_id
-                                         join f in db.Funds on child.c_funds_id equals f.f_id
-                                         where child.c_apply_number == apply.apply_number
+                                child = (from content in db.Reimbursement_Content
+                                         where child.c_apply_number == bill.apply_number
                                          select new ApplyChildModel
                                          {
                                              Cnumber = child.c_child_number,
@@ -61,7 +59,7 @@ namespace FundsManager.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Funds_Apply funds_Apply = db.Funds_Apply.Where(x => x.apply_number == id).FirstOrDefault();
+            Reimbursement funds_Apply = db.Funds_Apply.Where(x => x.apply_number == id).FirstOrDefault();
             if (funds_Apply == null)
             {
                 return HttpNotFound();
@@ -133,7 +131,7 @@ namespace FundsManager.Controllers
             SetSelect(0);
             if (ModelState.IsValid)
             {
-                Funds_Apply apply = new Funds_Apply();
+                Reimbursement apply = new Reimbursement();
                 apply.apply_amount = funds_Apply.amount;
                 apply.apply_state = 0;
                 apply.apply_time = DateTime.Now;
@@ -172,7 +170,7 @@ namespace FundsManager.Controllers
                         json.msg_text = string.Format("申请单提交失败,id为{0}的经费不足。", citem.Fid);
                         goto next;
                     }
-                    Funds_Apply_Child capply = new Funds_Apply_Child();
+                    Reimbursement_Content capply = new Reimbursement_Content();
                     capply.c_apply_number = apply.apply_number;
                     capply.c_child_number = string.Format("{0}-{1}", apply.apply_number, GetIntStr(i));
                     capply.c_amount = citem.amount;
@@ -327,7 +325,7 @@ namespace FundsManager.Controllers
             SetSelect(0);
             if (ModelState.IsValid)
             {
-                Funds_Apply apply = db.Funds_Apply.Find(funds_Apply.number);
+                Reimbursement apply = db.Funds_Apply.Find(funds_Apply.number);
                 if (apply == null)
                 {
                     json.msg_code = "error";
@@ -386,7 +384,7 @@ namespace FundsManager.Controllers
                             json.msg_text = string.Format("申请单提交失败,id为{0}的经费不足。", citem.Fid);
                             goto next;
                         }
-                        Funds_Apply_Child capply = new Funds_Apply_Child();
+                        Reimbursement_Content capply = new Reimbursement_Content();
                         capply.c_apply_number = apply.apply_number;
                         capply.c_child_number = string.Format("{0}-{1}", apply.apply_number, GetIntStr(i));
                         capply.c_amount = citem.amount;
@@ -448,7 +446,7 @@ namespace FundsManager.Controllers
                     foreach (ApplyChildModel citem in funds_Apply.child)
                     {
                         if (string.IsNullOrEmpty(citem.Cnumber)) continue;
-                        Funds_Apply_Child fac = db.Funds_Apply_Child.Find(citem.Cnumber);
+                        Reimbursement_Content fac = db.Funds_Apply_Child.Find(citem.Cnumber);
                         if (fac == null) continue;
                         if (citem.factGet != null && citem.factGet != 0)
                         {
@@ -504,7 +502,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             //查询订单状态，如果已批复，不能撤销。如果没有，删除流程。
-            Funds_Apply fundsApply = db.Funds_Apply.Find(number);
+            Reimbursement fundsApply = db.Funds_Apply.Find(number);
             if (fundsApply == null)
             {
                 json.msg_code = "nodate";
@@ -519,7 +517,7 @@ namespace FundsManager.Controllers
             }
             var cs = db.Funds_Apply_Child.Where(x => x.c_apply_number == fundsApply.apply_number);
             if (cs.Count() > 0)
-                foreach (Funds_Apply_Child citem in cs)
+                foreach (Reimbursement_Content citem in cs)
                 {
                     var prs = db.Process_Respond.Where(x => x.pr_apply_number == citem.c_child_number);
                     if(prs.Count()>0)
@@ -593,7 +591,7 @@ namespace FundsManager.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Funds_Apply funds_Apply = db.Funds_Apply.Where(x => x.apply_number == number).FirstOrDefault();
+            Reimbursement funds_Apply = db.Funds_Apply.Where(x => x.apply_number == number).FirstOrDefault();
             if (funds_Apply == null)
             {
                 return HttpNotFound();
