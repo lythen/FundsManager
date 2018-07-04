@@ -8,7 +8,7 @@ namespace FundsManager.Models
     /// </summary>
     public class Reimbursement
     {
-        private DateTime _add_time = DateTime.Now;
+        private DateTime _add_date = DateTime.Now;
         private int _apply_state = 0;
         /// <summary>
         /// 报销单号
@@ -22,7 +22,7 @@ namespace FundsManager.Models
         /// <summary>
         /// 填表时间
         /// </summary>
-        public DateTime r_add_time { get { return _add_time; }set { _add_time = value; } }
+        public DateTime r_add_date { get { return _add_date; }set { _add_date = value; } }
         /// <summary>
         /// 报销金额合计
         /// </summary>

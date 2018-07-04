@@ -16,7 +16,7 @@ namespace FundsManager.ViewModels
         private DateTime _apply_time = DateTime.Now;
         private int _apply_state = 0;
         [StringLength(9),DisplayName("报销单编号")]
-        public string nureimbursementCodember { get; set; }
+        public string nureimbursementCode { get; set; }
         public int userId { get; set; }
         [DisplayName("填表时间")]
         public DateTime time { get { return _apply_time; } set { _apply_time = value; } }
@@ -58,7 +58,7 @@ namespace FundsManager.ViewModels
         public int? contentId { get; set; }
         [Required, DataType(DataType.Currency), DisplayName("金额")]
         public decimal amount { get; set; }
-        List<ViewDetailContent> details { get; set; }
+        public List<ViewDetailContent> details { get; set; }
     }
     /// <summary>
     /// 明细
@@ -72,7 +72,7 @@ namespace FundsManager.ViewModels
         [DataType(DataType.Currency), DisplayName("明细金额")]
         public decimal amount { get; set; }
         [DisplayName("日期")]
-        public DateTime detail_date { get; set; }
+        public DateTime detailDate { get; set; }
     }
     public class ApplyFundsManager
     {

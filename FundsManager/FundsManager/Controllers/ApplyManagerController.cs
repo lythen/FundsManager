@@ -27,30 +27,30 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
             //return RedirectToAction("myFunds");
-            var waitList = (from bill in db.Reimbursement
-                            join s in db.Dic_Respond_State on bill.r_bill_state equals s.drs_state_id
-                            where bill.r_add_user_id == user && bill.r_bill_state != 3
-                            select new ApplyListModel
-                            {
-                                amount = bill.r_bill_amount,
-                                number = bill.reimbursement_code,
-                                state = bill.r_bill_state,
-                                time = bill.r_add_time,
-                                strState = s.drs_state_name,
-                                child = (from content in db.Reimbursement_Content
-                                         where child.c_apply_number == bill.apply_number
-                                         select new ApplyChildModel
-                                         {
-                                             Cnumber = child.c_child_number,
-                                             fundsCode = f.f_code,
-                                             amount = child.c_amount,
-                                             strState = das.drs_state_name,
-                                             factGet = child.c_get
-                                         }
-                                              ).ToList()
-                            }
-                            ).ToList();
-            return View(waitList);
+            //var waitList = (from bill in db.Reimbursement
+            //                join s in db.Dic_Respond_State on bill.r_bill_state equals s.drs_state_id
+            //                where bill.r_add_user_id == user && bill.r_bill_state != 3
+            //                select new ApplyListModel
+            //                {
+            //                    amount = bill.r_bill_amount,
+            //                    number = bill.reimbursement_code,
+            //                    state = bill.r_bill_state,
+            //                    time = bill.r_add_time,
+            //                    strState = s.drs_state_name,
+            //                    child = (from content in db.Reimbursement_Content
+            //                             where child.c_apply_number == bill.apply_number
+            //                             select new ApplyChildModel
+            //                             {
+            //                                 Cnumber = child.c_child_number,
+            //                                 fundsCode = f.f_code,
+            //                                 amount = child.c_amount,
+            //                                 strState = das.drs_state_name,
+            //                                 factGet = child.c_get
+            //                             }
+            //                                  ).ToList()
+            //                }
+            //                ).ToList();
+            return View();
         }
 
         // GET: ApplyManager/Details/5
@@ -61,19 +61,16 @@ namespace FundsManager.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Reimbursement funds_Apply = db.Funds_Apply.Where(x => x.apply_number == id).FirstOrDefault();
-            if (funds_Apply == null)
+            Reimbursement bill = db.Reimbursement.Where(x => x.reimbursement_code == id).FirstOrDefault();
+            if (bill == null)
             {
                 return HttpNotFound();
             }
-            var cmList = (from child in db.Funds_Apply_Child
-                          join funds in db.Funds
-                          on child.c_funds_id equals funds.f_id
-                          join das in db.Dic_Respond_State on child.c_state equals das.drs_state_id
-                          where child.c_apply_number == id
+            var cmList = (from content in db.Reimbursement_Content
+                          where content.c_reimbursement_code == id
                           select new ApplyFundsManager
                           {
-                              Cnumber = child.c_child_number,
+                              co = child.c_child_number,
                               strState = das.drs_state_name
                           }
                           ).ToList();
@@ -172,8 +169,44 @@ namespace FundsManager.Controllers
                     content.c_reimbursement_code = bill.reimbursement_code;
                     content.c_amount = citem.amount;
                     db.Reimbursement_Content.Add(content);
+                    try
+                    {
+                        //必需先提交更改，因为下面添加明细需要用到自动生成的ID。
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        Delete(bill.reimbursement_code);
+                        json.msg_code = "error";
+                        json.msg_text = "申请单提交失败。";
+                        goto next;
+                    }
                     //添加明细
-
+                    if (citem.details!=null && citem.details.Count() > 0)
+                    {
+                        foreach(ViewDetailContent viewDetail in citem.details)
+                        {
+                            Reimbursement_Detail detail = new Reimbursement_Detail()
+                            {
+                                detail_amount = viewDetail.amount,
+                                detail_content_id = content.content_id,
+                                detail_date = viewDetail.detailDate,
+                                detail_info = viewDetail.detailInfo
+                            };
+                        }
+                        try
+                        {
+                            //干脆都先提交得了
+                            db.SaveChanges();
+                        }
+                        catch (Exception e)
+                        {
+                            Delete(bill.reimbursement_code);
+                            json.msg_code = "error";
+                            json.msg_text = "申请单提交失败。";
+                            goto next;
+                        }
+                    }
                 }
 
                 //添加附件
@@ -206,6 +239,18 @@ namespace FundsManager.Controllers
                             atta_reimbursement_code = bill.reimbursement_code
                         };
                         db.Reimbursement_Attachment.Add(attachment);
+                    }
+                    try
+                    {
+                        //干脆都先提交得了
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        Delete(bill.reimbursement_code);
+                        json.msg_code = "error";
+                        json.msg_text = "申请单提交失败。";
+                        goto next;
                     }
                 }
                 //添加批复人
@@ -258,37 +303,46 @@ namespace FundsManager.Controllers
             SetSelect(0);
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            ApplyListModel funds_Apply = (from apply in db.Funds_Apply
-                                          join das in db.Dic_Respond_State
-                                          on apply.apply_state equals das.drs_state_id
-                                          where apply.apply_number==id
-                                          select new ApplyListModel
-                                          {
-                                              amount = apply.apply_amount,
-                                              number = apply.apply_number,
-                                              state = apply.apply_state,
-                                              strState = das.drs_state_name,
-                                              time = apply.apply_time,
-                                              child = (from c in db.Funds_Apply_Child
-                                                       join das in db.Dic_Respond_State on c.c_state equals das.drs_state_id
-                                                       join f in db.Funds on c.c_funds_id equals f.f_id
-                                                       where c.c_apply_number == apply.apply_number
-                                                       select new ApplyChildModel
+            ApplyListModel viewBill = (from bill in db.Reimbursement
+                                       join das in db.Dic_Respond_State
+                                       on bill.r_bill_state equals das.drs_state_id
+                                       where bill.reimbursement_code == id && bill.r_add_user_id == user
+                                       select new ApplyListModel
+                                       {
+                                           amount = bill.r_bill_amount,
+                                           nureimbursementCode = bill.reimbursement_code,
+                                           state = bill.r_bill_state,
+                                           strState = das.drs_state_name,
+                                           time = bill.r_add_date,
+                                           Fid = bill.r_funds_id,
+                                           factAmount = bill.r_fact_amount,
+
+                                           contents = (from c in db.Reimbursement_Content
+                                                       where c.c_reimbursement_code == bill.reimbursement_code
+                                                       select new ViewContentModel
                                                        {
-                                                           Cnumber = c.c_child_number,
-                                                           fundsCode = f.f_code,
+                                                           reimbursementCode = c.c_reimbursement_code,
                                                            amount = c.c_amount,
-                                                           strState = das.drs_state_name,
-                                                           factGet = c.c_get,
-                                                           applyFor = c.c_apply_for,
-                                                           Fid = c.c_funds_id,
-                                                           getInfo = c.c_get_info,
-                                                           state = c.c_state
+                                                           contentId = c.content_id,
+                                                           details = (from detail in db.Reimbursement_Detail
+                                                                      where detail.detail_content_id == c.content_id
+                                                                      select new ViewDetailContent
+                                                                      {
+                                                                          amount = detail.detail_amount,
+                                                                          contentId = detail.detail_content_id,
+                                                                          detailDate = detail.detail_date,
+                                                                          detailId = detail.detail_id,
+                                                                          detailInfo = detail.detail_info
+                                                                      }
+                                                                      ).ToList()
                                                        }
-                                                            ).ToList()
-                                          }
+                                                         ).ToList(),
+                                           attachments = (from attachment in db.Reimbursement_Attachment
+                                                          where attachment.atta_reimbursement_code == bill.reimbursement_code
+                                                          select attachment.atta_reimbursement_code).ToList<string>()
+                                       }
                             ).FirstOrDefault();
-            return View(funds_Apply);
+            return View(viewBill);
         }
 
         // POST: ApplyManager/Edit/5
