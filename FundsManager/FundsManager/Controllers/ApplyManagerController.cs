@@ -12,6 +12,8 @@ using FundsManager.Common;
 using FundsManager.Common.DEncrypt;
 using System.Data.Entity.Validation;
 using System.Text;
+using System.Configuration;
+using System.IO;
 
 namespace FundsManager.Controllers
 {
@@ -108,18 +110,14 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
             SetSelect(0);
-            ApplyListModel model = new ApplyListModel();
-            List<ApplyChildModel> list = new List<ApplyChildModel>();
-            list.Add(new ApplyChildModel());
-            model.child = list;
-            return View(model);
+            return View();
         }
 
         // POST: ApplyManager/Create
         // 为了防止“过多发布”攻击，请启用要绑定到的特定属性，有关 
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
-        public JsonResult Create(ApplyListModel funds_Apply)
+        public JsonResult Create(ApplyListModel _sbill)
         {
             BaseJsonData json = new BaseJsonData();
             if (!User.Identity.IsAuthenticated)
@@ -131,16 +129,32 @@ namespace FundsManager.Controllers
             SetSelect(0);
             if (ModelState.IsValid)
             {
-                Reimbursement apply = new Reimbursement();
-                apply.apply_amount = funds_Apply.amount;
-                apply.apply_state = 0;
-                apply.apply_time = DateTime.Now;
-                apply.apply_user_id = user;
-                var maxfa = db.Funds_Apply.OrderByDescending(x => x.apply_number).FirstOrDefault();
+                var funds = (from fs in db.Funds
+                             where fs.f_id == _sbill.Fid
+                             select fs).FirstOrDefault();
+                if (funds.f_amount == 0)
+                {
+                    json.msg_code = "error";
+                    json.msg_text = string.Format("报销单提交失败,id为{0}的经费没有设置总额。", _sbill.Fid);
+                    goto next;
+                }
+                if (funds.f_balance < _sbill.amount)
+                {
+                    json.msg_code = "error";
+                    json.msg_text = string.Format("报销单提交失败,id为{0}的经费不足。", _sbill.Fid);
+                    goto next;
+                }
+
+                Reimbursement bill = new Reimbursement();
+                bill.r_bill_amount = _sbill.amount;
+                bill.r_bill_state = 0;
+                bill.r_add_time = DateTime.Now;
+                bill.r_add_user_id = user;
+                var maxfa = db.Reimbursement.OrderByDescending(x => x.reimbursement_code).FirstOrDefault();
                 //apply_number:年份+10001自增
-                if (maxfa == null) apply.apply_number = DateTime.Now.Year.ToString() + "10001";
-                else apply.apply_number = DateTime.Now.Year.ToString() + (int.Parse(maxfa.apply_number.Substring(4)) + 1);
-                db.Funds_Apply.Add(apply);
+                if (maxfa == null) bill.reimbursement_code = DateTime.Now.Year.ToString() + "10001";
+                else bill.reimbursement_code = DateTime.Now.Year.ToString() + (int.Parse(maxfa.reimbursement_code.Substring(4)) + 1);
+                db.Reimbursement.Add(bill);
                 try
                 {
                     db.SaveChanges();
@@ -151,103 +165,69 @@ namespace FundsManager.Controllers
                     json.msg_text = "申请单提交失败。";
                     goto next;
                 }
-                //子申请单号由申请单号+3位序号如 201710001-001
-                int i = 1;
-                foreach (ApplyChildModel citem in funds_Apply.child)
+                //添加报销内容
+                foreach (ViewContentModel citem in _sbill.contents)
                 {
-                    var funds = (from fs in db.Funds
-                                 where fs.f_id == citem.Fid
-                                 select fs).FirstOrDefault();
-                    if (funds.f_amount == 0)
-                    {
-                        json.msg_code = "error";
-                        json.msg_text = string.Format("申请单提交失败,id为{0}的经费没有设置总额。", citem.Fid);
-                        goto next;
-                    }
-                    if (funds.f_balance < citem.amount)
-                    {
-                        json.msg_code = "error";
-                        json.msg_text = string.Format("申请单提交失败,id为{0}的经费不足。", citem.Fid);
-                        goto next;
-                    }
-                    Reimbursement_Content capply = new Reimbursement_Content();
-                    capply.c_apply_number = apply.apply_number;
-                    capply.c_child_number = string.Format("{0}-{1}", apply.apply_number, GetIntStr(i));
-                    capply.c_amount = citem.amount;
-                    capply.c_get = citem.amount;
-                    capply.c_get_info = "";
-                    capply.c_apply_for = citem.applyFor;
-                    capply.c_funds_id = citem.Fid;
-                    capply.c_state = 0;
-                    db.Funds_Apply_Child.Add(capply);
-                    try
-                    {
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-                        var list = db.Funds_Apply_Child.Where(x => x.c_apply_number == apply.apply_number);
-                        if (list.Count() > 0) db.Funds_Apply_Child.RemoveRange(list);
-                        db.Funds_Apply.Remove(apply);
+                    Reimbursement_Content content = new Reimbursement_Content();
+                    content.c_reimbursement_code = bill.reimbursement_code;
+                    content.c_amount = citem.amount;
+                    db.Reimbursement_Content.Add(content);
+                    //添加明细
 
-                        try
-                        {
-                            db.SaveChanges();
-                        }
-                        catch { }
-                        json.msg_code = "error";
-                        json.msg_text = "申请单提交失败。";
-                        goto next;
-                    }
-                    Process_Respond pr = new Process_Respond();
-                    pr.pr_apply_number = capply.c_child_number;
-                    pr.pr_user_id = funds_Apply.next;
-                    pr.pr_number = 1;
-                    db.Process_Respond.Add(pr);
-                    //写入批复流程
-                    //var plist = (from pl in db.Process_List
-                    //             where pl.po_process_id == funds.f_process
-                    //             select new
-                    //             {
-                    //                 pr_apply_number = capply.c_child_number,
-                    //                 pr_user_id = pl.po_user_id,
-                    //                 pr_number = pl.po_sort
-                    //             }).ToList();
-                    //foreach(var item in plist)
-                    //{
-                    //    Process_Respond pr = new Process_Respond();
-                    //    pr.pr_apply_number = item.pr_apply_number;
-                    //    pr.pr_user_id = item.pr_user_id;
-                    //    pr.pr_number = item.pr_number;
-                    //    db.Process_Respond.Add(pr);
-                    //}
-                    try
-                    {
-                        db.SaveChanges();
-                    }
-                    catch (Exception e)
-                    {
-
-                        var list = db.Funds_Apply_Child.Where(x => x.c_apply_number == apply.apply_number);
-                        if (list.Count() > 0) db.Funds_Apply_Child.RemoveRange(list);
-                        db.Funds_Apply.Remove(apply);
-                        try
-                        {
-                            db.SaveChanges();
-                        }
-                        catch (Exception et) { }
-                        json.msg_code = "error";
-                        json.msg_text = "申请单批复流程生成失败。";
-                        goto next;
-                    }
-                    i++;
                 }
 
-                //db.Funds_Apply.Add(funds_Apply);
-                //db.SaveChanges();
+                //添加附件
+                StringBuilder sbErr = new StringBuilder();
+                if (_sbill.attachments != null && _sbill.attachments.Count() > 0)
+                {
+                    string attachment_path = ConfigurationManager.AppSettings["attachmentPath"];
+                    string attachment_temp_path = ConfigurationManager.AppSettings["attachmentTempPath"];
+                    if (!Directory.Exists(attachment_path)) Directory.CreateDirectory(attachment_path);
+                    string filePath,tempFile,saveFileName;
+                    foreach (string file in _sbill.attachments)
+                    {
+                        try
+                        {
+                            saveFileName = string.Format("{0}\\{1}\\{2}", bill.reimbursement_code, DateTime.Now.ToString("yyyyMMdd"), file);
+                            tempFile = attachment_temp_path + file;
+                            filePath = string.Format("{0}{1}", attachment_path, saveFileName);
+                            if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                            System.IO.File.Move(tempFile, filePath);
+                        }
+                        catch
+                        {
+                            sbErr.Append("文件【").Append(file).Append("】保存失败，请重新上传");
+                            continue;
+                        }
+                        Reimbursement_Attachment attachment = new Reimbursement_Attachment
+                        {
+                            attachment_path = saveFileName,
+                            atta_detail_id = 0,
+                            atta_reimbursement_code = bill.reimbursement_code
+                        };
+                        db.Reimbursement_Attachment.Add(attachment);
+                    }
+                }
+                //添加批复人
+                Process_Respond pr = new Process_Respond();
+                pr.pr_reimbursement_code = bill.reimbursement_code;
+                pr.pr_user_id = _sbill.next;
+                pr.pr_number = 1;
+                db.Process_Respond.Add(pr);
+                try
+                {
+                    db.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Delete(bill.reimbursement_code);
+                    json.msg_code = "error";
+                    json.msg_text = "申请单提交失败。";
+                    goto next;
+                }
                 json.state = 1;
                 json.msg_code = "success";
-                json.msg_text = apply.apply_number;
+                json.msg_text = bill.reimbursement_code; 
             }
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
@@ -262,7 +242,9 @@ namespace FundsManager.Controllers
         {
 
             List<SelectOption> options = DropDownList.FundsSelect(user);
-            ViewBag.Funds = DropDownList.SetDropDownList(options);
+            ViewData["Funds"] = DropDownList.SetDropDownList(options);
+            options = DropDownList.ContentSelect();
+            ViewData["Contents"] = DropDownList.SetDropDownList(options);
             ViewData["ViewUsers"] = DropDownList.RespondUserSelect();
         }
         // GET: ApplyManager/Edit/5

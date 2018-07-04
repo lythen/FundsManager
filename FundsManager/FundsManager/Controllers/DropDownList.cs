@@ -24,6 +24,7 @@ namespace FundsManager.Controllers
         private static string cache_stat_detail = "cache_stat_detail";
         private static string cache_response_user = "cache_response_user_";
         private static string cache_authority = "cache_authority";
+        private static string cache_content = "cache_content";
         public static List<SelectListItem> SetDropDownList(List<Models.SelectOption> options)
         {
             List<SelectListItem> items = new List<SelectListItem>();
@@ -251,6 +252,17 @@ namespace FundsManager.Controllers
                                              authName = auth.auth_name,
                                              isController = auth.auth_is_Controller,
                                              mapController = auth.auth_map_Controller
+                                         }).ToList();
+            return option;
+        }
+        public static List<SelectOption> ContentSelect()
+        {
+            List<Dic_Reimbursement_Content> contents = DBCaches<Dic_Reimbursement_Content>.getCache(cache_content);
+            List<SelectOption> option = (from content in contents
+                                         select new SelectOption
+                                         {
+                                             id = content.content_id.ToString(),
+                                             text = content.content_title
                                          }).ToList();
             return option;
         }

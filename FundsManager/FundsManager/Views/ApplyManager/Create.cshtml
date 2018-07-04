@@ -1,8 +1,9 @@
 ﻿@model FundsManager.ViewModels.ApplyListModel
 
 @{
-    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费申请";
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "报销单填写";
     List<FundsManager.Models.SelectOption> users = (List<FundsManager.Models.SelectOption>)ViewData["ViewUsers"];
+    List<SelectListItem> contents = ViewData["Contents"] as List<SelectListItem>;
 }
 <style>
     .out-form{width:100%;
@@ -41,7 +42,8 @@
             <div class="col-md-10">
                 @Html.EditorFor(model => model.amount, new { htmlAttributes = new { @class = "form-control funds-all", @readonly = "readonly" } })
                 @Html.ValidationMessageFor(model => model.amount, "", new { @class = "text-danger" })
-                <input type="button" onclick="addChild();" class="btn btn-info" value="添加经费" />
+                报销内容@Html.DropDownList("ddlContent", contents, "", new { @class = "select form-control" })
+                <input type="button" onclick="addChild();" class="btn btn-info" value="添加" />
             </div>
         </div>
         @foreach (var item in Model.child)

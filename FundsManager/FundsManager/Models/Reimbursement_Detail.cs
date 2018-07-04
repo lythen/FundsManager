@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace FundsManager.Models
 {
@@ -14,5 +15,6 @@ namespace FundsManager.Models
         public string detail_info { get; set; }
         [DataType(DataType.Currency)]
         public decimal detail_amount { get; set; }
+        public DateTime detail_date { get; set; }
     }
 }

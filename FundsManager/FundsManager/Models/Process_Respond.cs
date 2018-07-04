@@ -12,7 +12,7 @@ namespace FundsManager.Models
         [Key]
         public int pr_id { get; set; }
         [StringLength(20)]
-        public string pr_apply_number { get; set; }
+        public string pr_reimbursement_code { get; set; }
         public int pr_user_id { get; set; }
         public int pr_number { get; set; }
         public DateTime? pr_time { get; set; }
