@@ -8,8 +8,8 @@ namespace FundsManager.ViewModels
         private DateTime? _pr_time = DateTime.Now;
         [DisplayName("申请序号")]
         public int id { get; set; }
-        [DisplayName("子单号")]
-        public string capply_number { get; set; }
+        [DisplayName("报销单号")]
+        public string reimbursementCode { get; set; }
         [DisplayName("批复人")]
         public string user { get; set; }
         public int number { get; set; }
@@ -26,8 +26,8 @@ namespace FundsManager.ViewModels
     {
         [DisplayName("经费编号")]
         public string fundsCode { get; set; }
-        [DisplayName("申请单号")]
-        public string apply_number { get; set; }
+        [DisplayName("报销单号")]
+        public string reimbursementCode { get; set; }
         [DisplayName("申请名")]
         public string name { get; set; }
         [DisplayName("申请时间")]

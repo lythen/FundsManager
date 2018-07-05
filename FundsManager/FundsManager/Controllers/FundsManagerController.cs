@@ -37,35 +37,29 @@ namespace FundsManager.Controllers
                               id = funds.f_id,
                               name = funds.f_name,
                               strState = funds.f_state == 0 ? "未启用" : (funds.f_state == 1 ? "正常" : "锁定"),
-                              userCount = (from fac in db.Funds_Apply_Child
-                                           join fa in db.Funds_Apply
-                                           on fac.c_apply_number equals fa.apply_number
-                                           where fac.c_funds_id == funds.f_id && fa.apply_state == 1
-                                           select fac
+                              userCount = (from bill in db.Reimbursement
+                                           where bill.r_funds_id == funds.f_id && bill.r_bill_state == 1
+                                           select bill
                                           ).Count(),
                               applyamount = (
-                                from fac in db.Funds_Apply_Child
-                                join fa in db.Funds_Apply
-                                on fac.c_apply_number equals fa.apply_number
-                                where fac.c_funds_id == funds.f_id && fa.apply_state == 1
-                                select fac.c_amount
+                                from bill in db.Reimbursement
+                                where bill.r_funds_id == funds.f_id && bill.r_bill_state == 1
+                                select bill.r_fact_amount
                                 ).DefaultIfEmpty(0).Sum()
                           }
                           ).ToList();
             //使用的经费
             var ufunds = (from funds in db.Funds
-                          join fac in db.Funds_Apply_Child
-                          on funds.f_id equals fac.c_funds_id
-                          join apply in db.Funds_Apply
-                          on fac.c_apply_number equals apply.apply_number
+                          join bill in db.Reimbursement
+                          on funds.f_id equals bill.r_funds_id
                           join u in db.User_Info
                           on funds.f_manager equals u.user_id into T1
                           from t1 in T1.DefaultIfEmpty()
-                          where apply.apply_user_id == user && apply.apply_state == 1
+                          where bill.r_add_user_id == user && bill.r_bill_state == 1
                           select new uFundsListModel
                           {
                               code=funds.f_code,
-                              amount = fac.c_amount,
+                              amount = bill.r_fact_amount,
                               managerName = t1.user_name,
                               name = funds.f_name
                           }
@@ -232,15 +226,13 @@ namespace FundsManager.Controllers
                 {
                     //自动设置余额
                     decimal usedfunds = (from fs in db.Funds
-                                  join fac in db.Funds_Apply_Child
-                                  on fs.f_id equals fac.c_funds_id
-                                  join apply in db.Funds_Apply
-                                  on fac.c_apply_number equals apply.apply_number
-                                  join u in db.User_Info
+                                  join bill in db.Reimbursement
+                                  on fs.f_id equals bill.r_funds_id
+                                         join u in db.User_Info
                                   on fs.f_manager equals u.user_id into T1
                                   from t1 in T1.DefaultIfEmpty()
-                                  where fs.f_id == funds.id && apply.apply_user_id == user && apply.apply_state == 1
-                                  select fac.c_get).DefaultIfEmpty(0).Sum();
+                                  where fs.f_id == funds.id && bill.r_add_user_id == user && bill.r_bill_state == 1
+                                  select bill.r_fact_amount).DefaultIfEmpty(0).Sum();
                     if (usedfunds > 0) funds.balance = funds.amount - usedfunds;
                     if (funds.balance < 0)
                     {
@@ -311,10 +303,8 @@ namespace FundsManager.Controllers
                 json.msg_code = "noThis";
                 return Json(json, JsonRequestBehavior.AllowGet);
             }
-            var used = (from apply in db.Funds_Apply
-                        join ac in db.Funds_Apply_Child
-                        on apply.apply_number equals ac.c_apply_number
-                        where ac.c_funds_id == funds.f_id && ac.c_state == 1
+            var used = (from bill in db.Reimbursement
+                        where bill.r_funds_id == funds.f_id && bill.r_bill_state == 1
                         select 1).Count();
             if (used > 0)
             {
@@ -322,21 +312,6 @@ namespace FundsManager.Controllers
                 json.msg_code = "inUsed";
                 return Json(json, JsonRequestBehavior.AllowGet);
             }
-            //db.Funds.Remove(funds);
-            Recycle_Funds rf = new Recycle_Funds();
-            rf.f_amount = funds.f_amount;
-            rf.f_balance = funds.f_balance;
-            rf.f_delete_time = DateTime.Now;
-            rf.f_delete_user = user;
-            rf.f_id = funds.f_id;
-            rf.f_info = funds.f_info;
-            rf.f_in_year = funds.f_in_year;
-            rf.f_manager = funds.f_manager;
-            rf.f_name = funds.f_name;
-            rf.f_source = funds.f_source;
-            rf.f_state = funds.f_state;
-            rf.f_add_Time = funds.f_add_Time;
-            db.Funds_Recycle.Add(rf);
             try
             {
                 db.SaveChanges();
@@ -631,15 +606,14 @@ namespace FundsManager.Controllers
                 ViewBag.msg = "请选择经费。";
                 return null;
             }
-            var query = (from capply in db.Funds_Apply_Child
-                         join apply in db.Funds_Apply on capply.c_apply_number equals apply.apply_number
-                         join user in db.User_Info on apply.apply_user_id equals user.user_id
-                         join funds in db.Funds on capply.c_funds_id equals funds.f_id
-                         where funds.f_manager == (id==0? funds.f_manager:id) && funds.f_id==info.fund && apply.apply_state==1
+            var query = (from bill in db.Reimbursement
+                         join user in db.User_Info on bill.r_add_user_id equals user.user_id
+                         join funds in db.Funds on bill.r_funds_id equals funds.f_id
+                         where funds.f_manager == (id==0? funds.f_manager:id) && funds.f_id==info.fund && bill .r_bill_state== 1
                          select new FundsStatDetail
                          {
-                             applyAmount = capply.c_amount,
-                             applyTime = apply.apply_time,
+                             applyAmount = bill.r_fact_amount,
+                             applyTime = bill.r_add_date,
                              fname = funds.f_name,
                              uname = user.real_name
                          });
@@ -665,16 +639,14 @@ namespace FundsManager.Controllers
                        ).ToList();
             foreach(var item in query)
             {
-                int count = (from a in db.Funds_Apply_Child
-                             join fa in db.Funds_Apply on a.c_apply_number equals fa.apply_number
-                             where a.c_funds_id == item.id && fa.apply_state == 1
-                             select a
+                int count = (from bill in db.Reimbursement
+                             where bill.r_funds_id == item.id && bill.r_bill_state == 1
+                             select bill
                            ).Count();
                 item.applyNum = count;
-                decimal used = (from a in db.Funds_Apply_Child
-                                join fa in db.Funds_Apply on a.c_apply_number equals fa.apply_number
-                                where a.c_funds_id == item.id && fa.apply_state==1
-                                select a.c_amount
+                decimal used = (from bill in db.Reimbursement
+                                where bill.r_funds_id== item.id && bill .r_bill_state== 1
+                                select bill.r_fact_amount
                            ).DefaultIfEmpty(0).Sum();
                 item.hasUsed = used;
             }

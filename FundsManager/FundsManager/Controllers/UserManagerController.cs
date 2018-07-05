@@ -386,12 +386,8 @@ namespace FundsManager.Controllers
                 goto next;
             }
             User_Extend extend = db.User_Extend.Find(id);
-            Recycle_User ru = new Recycle_User();
-            ru.FromUserInfo(user_Info);
-            ru.FromUserExtend(extend);
             db.User_Info.Remove(user_Info);
             if (extend != null) db.User_Extend.Remove(extend);
-            db.Recycle_User.Add(ru);
             try
             {
                 db.SaveChanges();

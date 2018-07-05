@@ -30,6 +30,8 @@ namespace FundsManager.ViewModels
         public int Fid { get; set; }
         [DisplayName("开支项目代码")]
         public string fundsCode { get; set; }
+        [DisplayName("报销事由")]
+        public string info { get; set; }
         
     }
     /// <summary>
@@ -39,8 +41,19 @@ namespace FundsManager.ViewModels
     {
         [DisplayName("批复人")]
         public int next { get; set; }
-        public List<string> attachments { get; set; }
+        public string fundsName { get; set; }
+        public int? attachmentsCount { get; set; }
+        public List<ViewAttachment> attachments { get; set; }
         public List<ViewContentModel> contents { get; set; }
+    }
+    /// <summary>
+    /// 附件内容
+    /// </summary>
+    public class ViewAttachment
+    {
+        public int? id { get; set; }
+        public string reimbursementCode { get; set; }
+        public string fileName { get; set; }
     }
     public class ChildState
     {
@@ -55,10 +68,12 @@ namespace FundsManager.ViewModels
         [StringLength(9), DisplayName("报销单编号")]
         public string reimbursementCode { get; set; }
         [StringLength(13), DisplayName("报销内容ID")]
-        public int? contentId { get; set; }
+        public int? contentId { get; set; }//不是字典的报销内容的ID（select）
         [Required, DataType(DataType.Currency), DisplayName("金额")]
         public decimal amount { get; set; }
         public List<ViewDetailContent> details { get; set; }
+        public int selectId { get; set; }//传入的select的value
+        public string contentTitle { get; set; }
     }
     /// <summary>
     /// 明细
@@ -76,11 +91,11 @@ namespace FundsManager.ViewModels
     }
     public class ApplyFundsManager
     {
-        [StringLength(13), DisplayName("子编号")]
-        public string Cnumber { get; set; }
+        [StringLength(13), DisplayName("报销单编号")]
+        public string reimbursementCode { get; set; }
         [DisplayName("管理员")]
         public string strManager { get; set; }
-        [DisplayName("申请单状态")]
+        [DisplayName("报销单状态")]
         public string strState { get; set; }
         public List<ListResponseModel> processList { get; set; }
     }
