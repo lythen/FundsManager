@@ -9,7 +9,7 @@
         var controller = ViewContext.RouteData.Values["controller"].ToString().ToLower();
         var action = ViewContext.RouteData.Values["action"].ToString().ToLower();
         var ac = controller + action;
-        string[] acs = { "home", "homeindex", "teacherteachercourses", "courserollcall", "courserollcalllist", "error", "errorindex", "loginindex" };
+        string[] acs = { "home", "homeindex", "error", "errorindex", "loginindex" };
         if (!acs.Contains(ac))
         {
             HttpContext.Current.Response.RedirectToRoute(new { controller = "Error", action = "Index", err = "无法找到页面" });

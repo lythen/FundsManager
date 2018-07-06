@@ -425,6 +425,10 @@
     <Compile Include="Migrations\201806280330077_add20180628_2.Designer.cs">
       <DependentUpon>201806280330077_add20180628_2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807060104402_bigChange0706.cs" />
+    <Compile Include="Migrations\201807060104402_bigChange0706.Designer.cs">
+      <DependentUpon>201807060104402_bigChange0706.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Dic_Reimbursement_Content.cs" />
     <Compile Include="Models\Process_Info.cs" />
@@ -515,6 +519,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201806280330077_add20180628_2.resx">
       <DependentUpon>201806280330077_add20180628_2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807060104402_bigChange0706.resx">
+      <DependentUpon>201807060104402_bigChange0706.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

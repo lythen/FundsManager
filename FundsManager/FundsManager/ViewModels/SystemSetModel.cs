@@ -63,11 +63,6 @@ namespace FundsManager.ViewModels
         public string name { get; set; }
         public bool hasrole { get; set; }
     }
-    public class RoleAuthority
-    {
-        public int roleId { get; set; }
-        public int authId { get; set; }
-    }
     public class AuthInfo
     {
         public int authId { get; set; }
@@ -87,5 +82,10 @@ namespace FundsManager.ViewModels
         public int parentId { get { return parent_id; } set { parent_id = value; } }
         [DisplayName("上级部门名称")]
         public string parentName { get; set; }
+    }
+    public class ViewRoleAuthority
+    {
+        public int roleId { get; set; }
+        public int authId { get; set; }
     }
 }

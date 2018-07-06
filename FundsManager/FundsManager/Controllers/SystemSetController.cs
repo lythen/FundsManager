@@ -433,8 +433,7 @@ namespace FundsManager.Controllers
             ViewData["Auths"] = auths;
             return View();
         }
-        [HttpPost]
-        public JsonResult RoleAuthSet(int roleId)
+        public JsonResult GetRoleAuth(int roleId)
         {
             BaseJsonData json = new BaseJsonData();
             if (!User.Identity.IsAuthenticated)
@@ -458,7 +457,7 @@ namespace FundsManager.Controllers
             }
             var rvas = from rva in db.Role_vs_Authority
                        where rva.rva_role_id == roleId
-                       select new RoleAuthority
+                       select new ViewRoleAuthority
                        {
                            authId = rva.rva_auth_id,
                            roleId = rva.rva_role_id
@@ -473,6 +472,60 @@ namespace FundsManager.Controllers
             {
                 json.state = 1;
                 json.data = rvas.ToList();
+            }
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public JsonResult SetRoleAuth(List<ViewRoleAuthority> auths)
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                goto next;
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckIsAdmin(user))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
+                goto next;
+            }
+            if (auths == null || auths.Count() == 0)
+            {
+                json.msg_text = "没有接收任何数据。";
+                json.msg_code = "NoReceive";
+                goto next;
+            }
+            bool firstIn = true;
+            foreach (ViewRoleAuthority item in auths)
+            {
+                if (firstIn)
+                {
+                    db.Role_vs_Authority.RemoveRange(db.Role_vs_Authority.Where(x => x.rva_role_id == item.roleId));
+                    firstIn = false;
+                }
+                Role_vs_Authority rva = new Role_vs_Authority()
+                {
+                    rva_auth_id = item.authId,
+                    rva_role_id = item.roleId
+                };
+                db.Role_vs_Authority.Add(rva);
+            }
+            try
+            {
+                db.SaveChanges();
+                json.state = 1;
+                json.msg_text = "角色的权限修改成功。";
+                json.msg_code = "success";
+            }
+            catch(Exception ex)
+            {
+                json.msg_text = "角色权限修改出错。";
+                json.msg_code = "error";
+                Common.ErrorUnit.WriteErrorLog(ex.ToString(), this.GetType().ToString());
             }
             next:
             return Json(json, JsonRequestBehavior.AllowGet);

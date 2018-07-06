@@ -1,7 +1,4 @@
 ﻿@{
-    Layout = null;
-}
-@{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "权限设置";
     List<SelectListItem> roleInfo = ViewData["Roles"] as List<SelectListItem>;
     List<FundsManager.ViewModels.AuthInfo> auths = ViewData["Auths"] as List<FundsManager.ViewModels.AuthInfo>;
@@ -29,11 +26,12 @@
     .table th {
         text-align: center;
     }
-
+    .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{height:67px;line-height:67px;vertical-align:middle;padding:0px;}
     .form-horizontal .form-group {
         margin-left: 2px;
         margin-right: 2px;
     }
+    .w200{width:200px;}
 </style>
 <h2>权限设置</h2>
 
@@ -48,8 +46,8 @@
         <div class="form-group">
             <table class="table">
                 <tr>
-                    <td colspan="2">
-                        @Html.DropDownList("ddlRole", roleInfo as List<SelectListItem>, "请选择", new { @class = "select form-control" })
+                    <td colspan="3">
+                        @Html.DropDownList("ddlRole", roleInfo as List<SelectListItem>, "请选择", new { @class = "select form-control w200",@onchange="RoleChange();" })
                     </td>
                 </tr>
 
@@ -57,16 +55,23 @@
                 {
                     var @id = "cbk" + @item.authId;
                     <tr class="tr-c">         
-                        <td>
+                        <td width="80px" align="center">
                             <input type="hidden" id="hid_@item.authId" value="@item.mapController" />
-                                <div class="in-lab"> <span>
-                                    <input type="checkbox" id="@id" name="@id" onchange="SetChange(this);" /></span>&nbsp;
-                            <label class="control-label col-md-2" for="@id">@item.authName</label></div>
-                            
+                            <span>
+                                <input type="checkbox" id="@id" name="@id" class="cbk-auth" onchange="SetChange(this);"/>
+                            </span>
+                        </td>
+                        <td width="180px">
+                            <div class="in-lab">
+                                <label class="control-label col-md-2" for="@id">@item.authName</label>
+                            </div>
+
                         </td>
                         <td>
-                            @Html.EditorFor(Itemmodel => item.authName, new { htmlAttributes = new { @class = "form-control",@readOnly= "readOnly" } })
-                            @Html.ValidationMessageFor(Itemmodel => item.authName, "", new { @class = "text-danger" })
+                            <div>
+                                @Html.EditorFor(Itemmodel => item.authInfo, new { htmlAttributes = new { @class = "form-control", @readOnly = "readOnly" } })
+                                @Html.ValidationMessageFor(Itemmodel => item.authInfo, "", new { @class = "text-danger" })
+                            </div>
                         </td>
                     </tr>
                 }
@@ -82,45 +87,63 @@
 }
 <script src="~/scripts/jquery-3.2.1.min.js"></script>
 <script>
-   
+
     function SetChange(obj) {
-        $(obj).parent().parent().parent().parent().find('#item_hasChange').val(1);
+        
+    }
+    function RoleChange() {
+        var id = $('#ddlRole').val();
+        if (!id || id == '0') {
+            alert('没有选择角色。');
+            return;
+        }
+        var cbk = $('.cbk-auth:checked');
+        var len = cbk.length;
+        for (var i = 0; i < len; i++) {
+            cbk[i].checked = false;
+        }
+        //GetRoleAuth
+        $.get("@Url.RouteUrl(new { controller = "SystemSet", action = "GetRoleAuth" })?roleId="+id, function (data) {
+            if (data.state == 1) {
+                if (data.data) {
+                    var list = data.data;
+                    len = list.length;
+                    var id;
+                    for (var i = 0; i < len; i++) {
+                        id = 'cbk' + list[i].authId;
+                        document.getElementById(id).checked = true;
+                    }
+                }
+            }else
+            {
+                $('.err').text(data.msg_text);
+            }
+        }).fail(function (err) {
+            alert(err.status+':'+err.statusText);
+        });
     }
     function Edit() {
         if (!confirm("是否确认当前修改？。")) return;
+        var id = $('#ddlRole').val();
+        if (!id || id == '0') {
+            alert('没有选择角色。');
+            return;
+        }
         var list = new Array();
-        var trs = $('.tr-c');
-        var len = trs.length;
-        var hasChange;
+        var cbk = $('.cbk-auth:checked');
+        var len = cbk.length;
         var minfo, roles,boxes,rinfo;
         for (var i = 0; i < len; i++) {
-            var tr = $(trs[i]);
-            hasChange = tr.find('#item_hasChange').val();
-            if (hasChange == "1") {
-                minfo = new Object();
-                minfo.id = parseInt(tr.find('#item_id').val());
-                minfo.info = tr.find('#item_info').val();
-                minfo.name = tr.find('#item_name').val();
-                roles = new Array();
-                boxes = tr.find('input[type="checkbox"]:checked');
-                if (boxes.length > 0) {
-                    for (var j = 0; j < boxes.length; j++) {
-                        rinfo=new Object();
-                        rinfo.id = parseInt(boxes[j].value);
-                        rinfo.hasrole = true;
-                        roles.push(rinfo);
-                    }
-                    minfo.roles = roles;
-                }
-                list.push(minfo);
-            }
+            var ViewRoleAuthority = new Object();
+            ViewRoleAuthority.roleId = id;
+            ViewRoleAuthority.authId = cbk[i].id.replace('cbk', '');
+            list.push(ViewRoleAuthority);
         }
         var data = new Object();
-        data.modules = list;
-        $.post("@Url.RouteUrl(new { controller = "SystemSet", action = "ContrlModule" })", data, function (data) {
+        data.auths = list;
+        $.post("@Url.RouteUrl(new { controller = "SystemSet", action = "SetRoleAuth" })", data, function (data) {
             if (data.state == 1) {
                 alert('更新成功。');
-                window.location.href="@Url.RouteUrl(new { controller = "SystemSet", action = "ContrlModule" })";
             }else
             {
                 $('.err').text(data.msg_text);
