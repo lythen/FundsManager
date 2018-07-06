@@ -10,8 +10,6 @@ namespace FundsManager.ViewModels
     public class FundsModel : FundsBaseModel
     {
         private int _state = 1;
-        [StringLength(4), DisplayName("到期时间")]
-        public string year { get; set; }
         [DisplayName("经费管理员")]
         public int? manager { get; set; }
         [StringLength(2000), DisplayName("备注")]

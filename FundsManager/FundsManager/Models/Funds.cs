@@ -14,8 +14,6 @@ namespace FundsManager.Models
         public string f_code { get; set; }
         [StringLength(100)]
         public string f_name { get; set; }
-        [StringLength(4)]
-        public string f_in_year { get; set; }
         [StringLength(100)]
         public string f_source { get; set; }
         [DataType(DataType.Currency)]

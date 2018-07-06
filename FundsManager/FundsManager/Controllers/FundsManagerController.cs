@@ -169,7 +169,6 @@ namespace FundsManager.Controllers
                                     name = f.f_name,
                                     source = f.f_source,
                                     state = f.f_state,
-                                    year = f.f_in_year,
                                     code=f.f_code
                                 }).FirstOrDefault();
             if (funds == null)
@@ -565,9 +564,7 @@ namespace FundsManager.Controllers
         [NonAction]
         void setSearchSelect(int user)
         {
-            List<SelectOption> options = DropDownList.FundsYearsSelect();
-            ViewBag.Year = DropDownList.SetDropDownList(options);
-            options = DropDownList.FundsSelect(user);
+            List<SelectOption> options = DropDownList.FundsSelect(user);
             ViewBag.Funds = DropDownList.SetDropDownList(options);
             options = DropDownList.StatOrDetailSelect();
             ViewBag.StatorDetail=DropDownList.SetDropDownList(options);

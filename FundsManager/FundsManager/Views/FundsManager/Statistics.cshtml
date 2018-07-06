@@ -17,8 +17,6 @@
     <div class="form-horizontal">
         <div class="form-group">
             <div class="col-md-10">
-            年份：@Html.DropDownListFor(model => model.year, Model.year, ViewBag.Year as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" } })
-            @Html.ValidationMessageFor(model => model.year, "", new { @class = "text-danger" })
             经费：@Html.DropDownListFor(model => model.fund, Model.fund, ViewBag.Funds as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" } })
             @Html.ValidationMessageFor(model => model.fund, "", new { @class = "text-danger" })
             统计选项：@Html.DropDownListFor(model => model.statorDetail, Model.statorDetail, ViewBag.StatorDetail as List<SelectListItem>, "", new Dictionary<string, object> { { "class", "select form-control" } })

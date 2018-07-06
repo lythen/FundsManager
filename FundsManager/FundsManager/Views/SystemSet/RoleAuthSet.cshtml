@@ -89,9 +89,10 @@
 <script>
 
     function SetChange(obj) {
-        var hid = $(obj).parent().parent().find('input[typ="hidden"]');
-        if (hid.value != '0')
-            $('#cbk' + hid.value).check();
+        if (!obj.checked) return;
+        var hid = $(obj).parent().parent().find('input[type="hidden"]');
+        if (hid.val()&&hid.val() != '0')
+            document.getElementById('cbk' + hid.val()).checked = true;
     }
     function RoleChange() {
         var id = $('#ddlRole').val();

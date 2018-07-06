@@ -180,26 +180,6 @@ namespace FundsManager.Controllers
                                          }).ToList();
             return option;
         }
-        public static List<SelectOption> FundsYearsSelect()
-        {
-            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_fundsYear);
-            if (options == null)
-            {
-                var glist = (from op in db.Funds
-                             group op by op.f_in_year into p
-                             select p).ToList();
-                options = new List<SelectOption>();
-                foreach (var item in glist)
-                {
-                    SelectOption so = new SelectOption();
-                    so.id = item.Key;
-                    so.text = item.Key;
-                    options.Add(so);
-                }
-                if (options.Count() > 0) DataCache.SetCache(cache_funds_manger, options);
-            }
-            return options;
-        }
         public static List<SelectOption> StatOrDetailSelect()
         {
             List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_stat_detail);
