@@ -100,8 +100,8 @@ namespace FundsManager.Controllers
         // GET: ApplyManager/Create
         public ActionResult Create()
         {
-            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
-            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            //if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            //int user = Common.PageValidate.FilterParam(User.Identity.Name);
             SetSelect(0);
             return View();
         }
@@ -131,6 +131,12 @@ namespace FundsManager.Controllers
                     json.msg_text = string.Format("报销单提交失败,id为{0}的经费没有设置总额。", _sbill.Fid);
                     goto next;
                 }
+                if (funds.f_manager == user)
+                {
+                    json.msg_code = "forbidden";
+                    json.msg_text = "不允许申请自己的经费。";
+                    goto next;
+                }
                 if (funds.f_balance < _sbill.amount)
                 {
                     json.msg_code = "error";
@@ -155,6 +161,7 @@ namespace FundsManager.Controllers
                 }
                 catch (Exception e)
                 {
+                    ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
                     json.msg_code = "error";
                     json.msg_text = "报销单提交失败。";
                     goto next;
@@ -174,6 +181,7 @@ namespace FundsManager.Controllers
                     }
                     catch (Exception e)
                     {
+                        ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
                         Delete(bill.reimbursement_code);
                         json.msg_code = "error";
                         json.msg_text = "报销单提交失败。";
@@ -199,6 +207,7 @@ namespace FundsManager.Controllers
                         }
                         catch (Exception e)
                         {
+                            ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
                             Delete(bill.reimbursement_code);
                             json.msg_code = "error";
                             json.msg_text = "报销单提交失败。";
@@ -245,6 +254,7 @@ namespace FundsManager.Controllers
                     }
                     catch (Exception e)
                     {
+                        ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
                         Delete(bill.reimbursement_code);
                         json.msg_code = "error";
                         json.msg_text = "报销单提交失败。";
@@ -263,6 +273,7 @@ namespace FundsManager.Controllers
                 }
                 catch (Exception e)
                 {
+                    ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
                     Delete(bill.reimbursement_code);
                     json.msg_code = "error";
                     json.msg_text = "报销单提交失败。";
@@ -288,7 +299,8 @@ namespace FundsManager.Controllers
             ViewData["Funds"] = DropDownList.SetDropDownList(options);
             options = DropDownList.ContentSelect();
             ViewData["Contents"] = DropDownList.SetDropDownList(options);
-            ViewData["ViewUsers"] = DropDownList.RespondUserSelect();
+            options = DropDownList.RespondUserSelect();
+            ViewData["ViewUsers"] = DropDownList.SetDropDownList(options);
         }
         // GET: ApplyManager/Edit/5
         public ActionResult Edit(string id)

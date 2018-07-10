@@ -2,32 +2,86 @@
 
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "报销单填写";
-    List<FundsManager.Models.SelectOption> users = (List<FundsManager.Models.SelectOption>)ViewData["ViewUsers"];
-    List<SelectListItem> contents = ViewData["Contents"] as List<SelectListItem>;
 }
+<link href="~/content/bootstrap-datetimepicker.min.css" rel="stylesheet" />
 <style>
-    .out-form{width:100%;
-                  background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding:15px 10px 0px 0px;
-    margin-top:15px;
+    .out-form {
+        width: 100%;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 15px 10px 0px 0px;
+        margin-top: 15px;
     }
-    .funds-all{
-        width:auto;
-        min-width:250px;
-        display:inline-block;
-        height:36px;
+
+    .form-horizontal .form-group {
+        margin-top: 15px;
     }
-    .div-user{margin-top:15px;}
-    .ul-users li{list-style:none;}
-    #msg{display:none;}
+
+    .funds-all, .fl {
+        width: auto;
+        min-width: 250px;
+        display: inline-block;
+        height: 36px;
+    }
+
+    .div-user {
+        margin-top: 15px;
+    }
+
+    .ul-users li {
+        list-style: none;
+    }
+
+    #msg {
+        display: none;
+    }
+
+    .time {
+        width: 150px;
+    }
+
+    .detail {
+        width: 400px;
+    }
+
+    .amount {
+        width: 120px;
+    }
+
+    .displayN {
+        display: none;
+    }
+
+    .det-attachment {
+        position: relative;
+        width: 100px;
+        overflow: hidden;
+        display: inline-block;
+        top: 3px;
+        height: 20px;
+    }
+
+    .detail-div {
+        display: inline-block;
+        width: 150px;
+    }
+
+    .spDel {
+        cursor: pointer;
+    }
+
+    .a-b {
+        border: 1px solid #ebebeb;
+        border-radius: 2px;
+    }
+    .detail-out{margin-top:5px;}
 </style>
 <h4>经费申请</h4>
-    <div class="col-md-10" id="msg">
-        @ViewBag.msg
-    </div>
+<div class="col-md-10" id="msg">
+    @ViewBag.msg
+</div>
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -38,63 +92,54 @@
         @Html.HiddenFor(model => model.userId, new { Value = User.Identity.Name })
 
         <div class="form-group">
-            @Html.LabelFor(model => model.amount, htmlAttributes: new { @class = "control-label col-md-2" })
+            <label class="control-label col-md-2">报销事由</label>
             <div class="col-md-10">
-                @Html.EditorFor(model => model.amount, new { htmlAttributes = new { @class = "form-control funds-all", @readonly = "readonly" } })
+                @Html.EditorFor(model => model.info, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.amount, "", new { @class = "text-danger" })
-                报销内容@Html.DropDownList("ddlContent", contents, "", new { @class = "select form-control" })
-                <input type="button" onclick="addChild();" class="btn btn-info" value="添加" />
             </div>
         </div>
-        @foreach (var item in Model.child)
-        {
-            <div class="out-form">
-                @Html.HiddenFor(model => item.Fid, new { Value = "0" })
-                <div class="form-group">
-                    @Html.LabelFor(model => item.Fid, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.DropDownListFor(model => item.Fid, ViewBag.Funds as List<SelectListItem>, new { @class = "select form-control f-sel",onchange="FundsChange(this);" })
-                        @Html.ValidationMessageFor(model => item.Fid, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(model => item.amount, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => item.amount, new { htmlAttributes = new { @class = "form-control txt-funds",@type="number", onblur= "ResetAmount();" } })
-                        @Html.ValidationMessageFor(model => item.amount, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    @Html.LabelFor(model => item.applyFor, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextAreaFor(model => item.applyFor, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => item.applyFor, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label col-md-2"></label>
-                    <div class="col-md-10">
-                        <input type="button" class="btn btn-danger" value="删除" onclick="DeleteThis(this)" />
-                    </div>
-                </div>
-            </div>
-        }
-        <div class="form-group div-user">
-            <label class="control-label col-md-2" for="amount">选择下一步批复</label>
+        <div class="form-group">
+            <label class="control-label col-md-2">报销金额</label>
             <div class="col-md-10">
-                <ul class="ul-users">
-                    @if (users != null && users.Count() > 0)
-                    {
-                        foreach(var item in users)
-                        {
-                            string id = "cbk" + @item.id;
-                            <li>
-                                <input type="radio" class="cbkuser" name="cbkUsers" id="@id" value="@item.id" /><label for="@id">@item.text</label>
-                            </li>
-                        }
-                    }
-                </ul>
+                @Html.EditorFor(model => model.amount, new { htmlAttributes = new { @class = "form-control funds-all" } })
+                @Html.ValidationMessageFor(model => model.amount, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">选择经费</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.Fid, ViewData["Funds"] as List<SelectListItem>, new { @class = "select form-control f-sel fl", onchange = "FundsChange(this);" })
+                @Html.ValidationMessageFor(model => model.Fid, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">报销内容</label>
+            <div class="col-md-10">
+                @Html.DropDownList("ddlContents", ViewData["Contents"] as List<SelectListItem>, new { @class = "select form-control f-sel fl" })
+                <input type="button" onclick="addChild();" class="btn btn-info" value="添加报销内容" />
+            </div>
+        </div>
+        <div class="out-form">
+            
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2" style="cursor:pointer" onclick="UploadAttachment();">附件上传</label>
+            <input type="file" id="upAttachment" multiple name="upAttachment" style="display:none;" onchange="FileChange(this);" />
+            <div class="col-md-10 atta-div">
+                
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <ol id="flist"></ol>
+            </div>
+        </div>
+        <div class="form-group div-user">
+            <label class="control-label col-md-2" for="amount">选择批复领导</label>
+            <div class="col-md-10">
+                @Html.DropDownList("ddlUser", ViewData["ViewUsers"] as List<SelectListItem>, new { @class = "select form-control f-sel fl ddl-users" })
+                @Html.ValidationMessageFor(model => model.Fid, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="form-group btn-div">
@@ -107,8 +152,31 @@
         </div>
     </div>
 }
-<script src="~/scripts/jquery-3.2.1.slim.js"></script>
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script src="~/scripts/extendindexof.js"></script>
 <script>
+    $(function () {
+        $.ajaxSetup({
+            cache: true
+        });
+        $.getScript('../scripts/bootstrap.min.js').done(function () {
+            $.getScript('../Scripts/bootstrap-datetimepicker.js').done(function () {
+                $.getScript('../Scripts/locales/bootstrap-datetimepicker.zh-CN.js');
+            });
+        });
+
+    });
+    function ShowDetailDel(obj) {
+        $(obj).find('.spDel').removeClass('displayN');
+        $(obj).addClass('a-b');
+    }
+    function HidDetailDel(obj) {
+        $(obj).find('.spDel').addClass('displayN ');
+        $(obj).removeClass('a-b');
+    }
+    function DeleteAtta(obj) {
+        $(obj).parent().remove();
+    }
     function ResetAmount() {
         var txts = $('.txt-funds');
         var m = 0;
@@ -120,58 +188,48 @@
         $('.funds-all').val(m);
     }
     function addChild() {
-        var div = $('.out-form').get(0);
-        if (div == null) {
-            alert('添加出错');
+        var id = $('#ddlContents').val();
+        if ($('#amount' + id).length>0) {
+            alert('相同报销内容仅允许添加一项，请在明细中添加明细支出。');
+            return;
         }
-        var str = div.outerHTML;
-        var newdiv = $(str);
-        newdiv.find('#item_amount').val('');
-        newdiv.find('#item_applyFor').val('');
-        newdiv.insertBefore($('.div-user'));
+        var div = $('.out-form');
+        var txt = $('#ddlContents').find(':checked').text();
+        var contentDiv = '<div class="form-group content-group-' + id + '"><label class="control-label col-md-2">' + txt + '</label><div class="col-md-10"><input type="number" id="amount' + id + '" name="amount' + id + '" class="amount form-control txt-funds fl" onblur="ResetAmount();" />&nbsp;元&nbsp;&nbsp;&nbsp;<input type="button" class="btn btn-danger" value="删除" onclick="DeleteThis(this)" /><input type="button" class="btn btn-success" value="添加明细" onclick="AddDetail(this)" /><input type="hidden" class="hidContent" value="' + id + '" /></div></div><div class="form-group detail-group-' + id + '"><label class="control-label col-md-2"></label><div class="col-md-10"></div></div>';
+        div.append($(contentDiv));
+        $('.form_date').datetimepicker({
+            language: 'zh-CN',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            minView: 2,
+            forceParse: 0,
+            format: 'yyyy-mm-dd'
+        });
+    }
+    function AddDetail(obj) {
+        var div = $(obj).parent().parent().next().find('.col-md-10');
+        var detail = '<div class="detail-out"><input type="text" class="time form-control fl form_date" placeholder="请选择时间" /><input type="text" class="detail form-control fl" placeholder="请输入明细" /><input type="number" class="amount form-control fl txt-funds" onblur="ResetAmount();" placeholder="请输入金额" /><a href="javascript:void(0)" onclick="DeleteDetail(this)" class="btn btn-danger btn-sm">X</a></div>';
+        div.append(detail);
+    }
+    function DeleteDetail(obj) {
+        $(obj).parent().remove();
     }
     function FundsChange(obj) {
 
     }
+    var err = 0;
     function Add(obj) {
         var formdata = new Object();
+        formdata.attachments = GetAttachment();
+        formdata.contents = GetContents();
+        formdata.next = $('#ddlUser').val();
+        formdata.info = $('#info').val();
+        formdata.Fid = $('#Fid').val();
         formdata.amount = $('#amount').val();
-        var divs = $('.out-form');
-        var list = new Array();
-        var len = divs.length;
-        if (len == 0) {
-            alert('没有填写任何申请单。');
-            return;
-        }
-        for (var i = 0; i < len; i++) {
-            var child = new Object();
-            child.amount = $(divs[i]).find('#item_amount').val();
-            if (!child.amount || child.amount == 0) {
-                alert('金额不可为空！');
-                return false;
-            }
-            child.applyFor = $(divs[i]).find('#item_applyFor').val();
-            //$('.f-sel').val()
-            child.Fid = $(divs[i]).find('.f-sel').val();
-            if (!child.Fid || child.Fid == 0) {
-                alert('请选择经费！');
-                return false;
-            }
-            list.push(child);
-        }
-        formdata.child = list;
-        var cbks = $('.cbkuser');
-        len = cbks.length;
-        for (var i = 0; i < len; i++) {
-            if (cbks[i].checked) {
-                formdata.next = cbks[i].value;
-                break;
-            }
-        }
-        if (!formdata.next) {
-            alert('请选择下一步批复的领导！');
-            return false;
-        }
+        if (err == 1) return;
         //var $btn = $(obj).button('loading');
         $.post("@Url.RouteUrl(new {controller= "ApplyManager", action= "Create" })", formdata, function (data, status) {
             if (data.state == '1') {
@@ -188,9 +246,199 @@
             //}, 5000);
         });
     }
+    function GetContents() {
+        var groups = $('.hidContent');
+        var len = groups.length;
+        if (len == 0) {
+            alert('请添加报销内容。');
+            return;
+        }
+        var group;
+        var groupName;
+        var contentId;
+        var contents = new Array();
+        var amount;
+        var dTime, dInfo, dAmount;
+        for (var i = 0; i < len; i++) {
+            contentId = groups[i].value;
+            try {
+                amount = parseFloat($('#amount' + contentId).val());
+            } catch (err) {
+                alert('金额设置出错。');
+                $('#amount' + contentId).focus();
+                err = 1;
+                return;
+            }
+            if (amount == 0) {
+                alert('金额设置出错。');
+                $('#amount' + contentId).focus();
+                err = 1;
+                return;
+            }
+            var content = new Object();
+            content.amount = amount;
+            content.selectId = contentId;
+            //明细
+            group = $('.detail-group-' + contentId);
+            var detailOut = group.find('.detail-out');
+            var dlen = detailOut.length;
+            if (dlen > 0) {
+                var details = new Array();
+                for (var j = 0; j < dlen; j++) {
+                    var d = $(detailOut[j]);
+                    dTime = d.find('.time').val();
+                    dInfo = d.find('.detail').val();
+                    try {
+                        dAmount = d.find('.amount').val();
+                    } catch (err) {
+                        alert('金额设置出错。');
+                        d.find('.amount').focus();
+                        err = 1;
+                        return;
+                    }
+                    if (dAmount == 0) {
+                        alert('金额设置出错。');
+                        d.find('.amount').focus();
+                        err = 1;
+                        return;
+                    }
+                    if (dTime == '' || dTime == undefined) {
+                        alert('请选择时间。');
+                        d.find('.time').focus();
+                        err = 1;
+                        return;
+                    }
+                    if (dInfo == '' || dInfo == undefined) {
+                        alert('请选择时间。');
+                        d.find('.detail').focus();
+                        err = 1;
+                        return;
+                    }
+                    var detail = new Object();
+                    detail.detailInfo = dInfo;
+                    detail.detailDate = dTime;
+                    detail.amount = dAmount;
+                    details.push(detail);
+                }
+            }
+            content.details = detail;
+            contents.push(content);
+        }
+        return contents;
+    }
+    function GetAttachment() {
+        var alist = new Array();
+        var items = $('.det-attachment');
+        var len = items.length;
+        if (len == 0) return alist;
+        for (var i = 0; i < len; i++) {
+            var link = new Object();
+            link.fileName = $(items[i]).attr('file');
+            alist.push(link);
+        }
+        return alist;
+    }
     function DeleteThis(obj) {
-        var div = $(obj).parent().parent().parent();
+        var div = $(obj).parent().parent();
+        div.next().remove();
         div.remove();
-        ResetAmount();
+        //ResetAmount();
+    }
+    //文件上传部份
+    var fl = 0;
+    function UploadAttachment() {
+        if (fl > 0) {
+            alert("请等待当前操作完成。");
+            return;
+        }
+        document.getElementById('upAttachment').files == null;
+        $('#upAttachment').click();
+    }
+    function FileChange(obj) {
+        $('#flist').children().remove();
+        if(!CheckFiles(obj.files))return;
+        var len = obj.files.length;
+        fl = len;
+        if (len == 0) {
+            fl = 0;
+            alert("没有选择任何文件。");
+            return;
+        }
+        if (len > 15) {
+            fl = 0;
+            alert("最多选择15个文件。");
+            return;
+        }
+        ReadFile(obj.files);
+    }
+    var sindex = 0;
+    var sizestr = new Array("B", "KB", "MB", "GB", "TB");
+    var zipType = /.jpg|.png|.gif|.bmp|.jpeg|.rar|.zip|.doc|.docx|.xls|.xlsx|.ppt|.pptx/;
+    function GetSizeStr(size) {
+        if (size > 1024) {
+            size = size / 1024;
+            sindex++;
+            return GetSizeStr(size);
+        }
+        var re = Math.ceil(size) + sizestr[sindex];
+        sindex = 0;
+        return re;
+    }
+    function CheckFiles(files) {
+        var len = files.length;
+        for (var file_index = 0; file_index < len; file_index++) {
+            if (!files[file_index].name.match(zipType)) {
+                fl = 0;
+                alert("上传文件类型不符合要救济。");
+                return false;
+            }
+        }
+        return true;
+    }
+    var fileList = new Array();
+    function ReadFile(files) {
+        //fileList = new Array();
+        fileList.length = 0;
+        var len = files.length;
+        fl = len;
+        var per;
+        var uploadLength = new Array(len);
+        var attaDiv = $('.atta-div');
+        for (var file_index = 0; file_index < len; file_index++) {
+            var file = files[file_index];
+            $('#flist').append('<li class="list' + file_index + '"><div class="w100">' + file.name + '&nbsp;&nbsp;&nbsp;&nbsp;' + GetSizeStr(file.size) + '&nbsp;&nbsp;&nbsp;&nbsp;<span class="spprocess"></span></div><div class="w100 pro"><div class="probar"></div></div></li>');
+            var formdata = new FormData();
+            formdata.append("data", file);
+            $.ajax({
+                url: "@Url.RouteUrl(new { controller = "FileUpload", action = "FileUpload" })",
+                type: "post",
+                data: formdata,
+                async: true,
+                processData: false, //不对form进行处理
+                contentType: false, //指定为false才能形成正确的Content-Type
+                success: function (data, textStatus) {
+                    if (data.state == 1) {
+                        $('.list' + file_index + ' .pro .probar').width('100%');
+                        $('.list' + file_index + ' .w100 .spprocess').text('上传完成。');
+                        var name = data.data.split(',');
+                        var atta = '<div onmousemove="ShowDetailDel(this);" onmouseout="HidDetailDel(this);" class="detail-div"><span class="glyphicon glyphicon-paperclip"></span><a href="../temp/' + name[0] + '" title="点击预览' + name[2] + '" file="' + name[1] + '" class="det-attachment">' + name[2] + '</a><span title="点击删除该附件" class="spDel displayN glyphicon glyphicon-remove" onclick="DeleteAtta(this)"></span></div>';
+                        attaDiv.append($(atta));
+                    }
+                    else{
+                        //发生错误，重新上传
+                        $('.list' + file_index + ' .w100 .spprocess').text("发生错误，重新上传");
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //发生错误，重新上传
+                    $('.list' + file_index + ' .w100 .spprocess').text("发生错误，重新上传");
+                }
+            }).complete(function () {
+                fl--;
+                if (fl <= 0) {
+                    $('#flist').children().remove();
+                }
+            });
+        }
     }
 </script>
