@@ -107,9 +107,9 @@ namespace FundsManager.ViewModels
         [DisplayName("统计或详细")]
         public int statorDetail { get; set; }
     }
-    /// <summary>
-    /// 经费统计
-    /// </summary>
+        /// <summary>
+         /// 经费统计
+         /// </summary>
     public class FundsStatistics
     {
         /// <summary>

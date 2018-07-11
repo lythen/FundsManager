@@ -16,7 +16,7 @@ namespace FundsManager.ViewModels
         private DateTime _apply_time = DateTime.Now;
         private int _apply_state = 0;
         [StringLength(9),DisplayName("报销单编号")]
-        public string nureimbursementCode { get; set; }
+        public string reimbursementCode { get; set; }
         public int userId { get; set; }
         [DisplayName("填表时间")]
         public DateTime time { get { return _apply_time; } set { _apply_time = value; } }
@@ -87,7 +87,8 @@ namespace FundsManager.ViewModels
         [DataType(DataType.Currency), DisplayName("明细金额")]
         public decimal amount { get; set; }
         [DisplayName("日期")]
-        public DateTime detailDate { get; set; }
+        public DateTime? detailDate { get; set; }
+        public string strDate { get; set; }
     }
     public class ApplyFundsManager
     {
@@ -105,5 +106,21 @@ namespace FundsManager.ViewModels
     public class ApplyDetail: ReimbursementModel
     {
         public List<ViewContentModel> contentList {get;set;}
+    }
+    public class BillsSearchModel : BasePagerModel
+    {
+        private int _state = -1;
+        private int _userId = 0;
+        private int _fid = 0;
+        [DisplayName("状态")]
+        public int state { get { return _state; } set { _state = value; } }
+        [DisplayName("开始时间")]
+        public string strBeginDate { get; set; }
+        [DisplayName("结束时间")]
+        public string strEndDate { get; set; }
+        public int userId { get { return _userId; } set { _userId = value; } }
+        public int fid { get { return _fid; }set { _fid = value; } }
+        public DateTime? beginDate { get; set; }
+        public DateTime? endDate { get; set; }
     }
 }

@@ -1,7 +1,8 @@
-﻿@model IEnumerable<FundsManager.ViewModels.ApplyListModel>
-
+﻿@model FundsManager.ViewModels.BillsSearchModel
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "我的经费列表";
+    List <FundsManager.ViewModels.ApplyListModel> Bills = (List<FundsManager.ViewModels.ApplyListModel>)ViewData["Bills"];
+
 }
 
 <hr />
@@ -9,76 +10,93 @@
     .table .table tbody tr td, .table .table tbody tr th, .table .table tfoot tr td, .table .table tfoot tr th, .table .table thead tr td, .table .table thead tr th{border-top:none;}
     .displayN{display:none;}
 </style>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                @*经费：@Html.DropDownListFor(model => model.fund, Model.fund, ViewBag.Funds as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" } })
+                @Html.ValidationMessageFor(model => model.fund, "", new { @class = "text-danger" })
+                统计选项：@Html.DropDownListFor(model => model.statorDetail, Model.statorDetail, ViewBag.StatorDetail as List<SelectListItem>, "", new Dictionary<string, object> { { "class", "select form-control" } })
+                @Html.ValidationMessageFor(model => model.statorDetail, "", new { @class = "text-danger" })*@
+                <input type="submit" value="刷新" class="btn btn-info" />
+            </div>
+        </div>
+    </div>
 <div class="col-md-10" id="msg">
     @ViewBag.msg
 </div>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.number)
+            编号
+        </th>
+        <th>使用经费</th>
+        <th>报销金额</th>
+        <th>
+            填表时间
+        </th>
+        <th>报销项目</th>
+        <th>
+            附件数
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.time)
-        </th>
-        <th>订单状态</th>
-        <th class="th-no">
-            子申请单号
-        </th>
-        <th class="th-co">经费代码</th>
-        <th class="th-am">
-            金额
-        </th>
-        <th class="th-st">
             状态
         </th>
         <th class="th-no">操作</th>
     </tr>
-    @if (Model != null && Model.Count() > 0)
+    @if (Bills != null && Bills.Count() > 0)
     {
-        foreach (var item in Model)
+        var canDel = true;
+        foreach (var item in Bills)
         {
-            var canDel = true;
-            <tr id="tr_@item.number">
+
+            if (item.state == 1) { canDel = false; }
+            <tr id="tr_@item.reimbursementCode">
                 <td>
-                    @Html.DisplayFor(modelItem => item.number)
+                    @Html.DisplayFor(modelItem => item.reimbursementCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.fundsName) (@Html.DisplayFor(modelItem => item.fundsCode))
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.amount) 元
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.time)
                 </td>
                 <td>
-                    @item.strState
-                </td>
-                <td colspan="4">
                     <table class="table">
-                        @if (item.child != null && item.child.Count() > 0)
+                        @if (item.contents != null && item.contents.Count() > 0)
                         {
-                            foreach (var citem in item.child)
+                            foreach (var citem in item.contents)
                             {
-                                if (citem.state == 1) {canDel = false; }
                                 <tr>
                                     <td class="td-no">
-                                        @citem.Cnumber
+                                        @citem.contentTitle
                                     </td>
                                     <td class="td-co">
-                                        @citem.fundsCode
-                                    </td>
-                                    <td class="td-am">
-                                        @citem.factGet
-                                    </td>
-                                    <td class="td-st">
-                                        @citem.strState
+                                        @Html.DisplayFor(@Citem => @citem.amount) 元
                                     </td>
                                 </tr>
                             }
                         }
                     </table>
                 </td>
+               <td>
+                   @item.attachmentsCount
+               </td>
                 <td>
-                    @Html.ActionLink("详细", "Details", new { id = item.number },new { @class="btn btn-info"})
-                  @Html.ActionLink("修改", "Edit", new { id = item.number }, new { @class = "btn btn-success" })
+                    @item.strState
+                </td>
+                <td>
+                    @Html.ActionLink("详细", "Details", new { id = item.reimbursementCode }, new { @class = "btn btn-info" })
+                  @Html.ActionLink("修改", "Edit", new { id = item.reimbursementCode }, new { @class = "btn btn-success" })
                     @if (@canDel)
                     {
-                        <a href="javascript:void(0);" class="btn btn-default" onclick="DelCApply('@item.number')">撤销</a>
+                        <a href="javascript:void(0);" class="btn btn-default" onclick="DelCApply('@item.reimbursementCode')">撤销</a>
                     }
                 </td>
             </tr>
@@ -89,7 +107,8 @@
         <tr><td colspan="8" align="center">当前没有申请的经费</td></tr>
     }
 </table>
-<script src="~/scripts/jquery-3.2.1.slim.js"></script>
+}
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
 <script>
     function DelCApply(number) {
         var obj = new Object();
@@ -99,7 +118,7 @@
                 $('#msg').removeClass();
                 $('#msg').addClass('alert alert alert-success');
                 $('#msg').text("申请单撤销成功。");
-                $('#' + number).remove();
+                $('#tr_' + number).remove();
                 removeAlert();
                 
             } else {

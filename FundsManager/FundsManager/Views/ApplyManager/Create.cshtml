@@ -77,6 +77,9 @@
         border-radius: 2px;
     }
     .detail-out{margin-top:5px;}
+    .progress {
+        width: 50%;
+    }
 </style>
 <h4>经费申请</h4>
 <div class="col-md-10" id="msg">
@@ -101,7 +104,7 @@
         <div class="form-group">
             <label class="control-label col-md-2">报销金额</label>
             <div class="col-md-10">
-                @Html.EditorFor(model => model.amount, new { htmlAttributes = new { @class = "form-control funds-all" } })
+                @Html.EditorFor(model => model.amount, new { htmlAttributes = new { @class = "form-control funds-all" } }) 元
                 @Html.ValidationMessageFor(model => model.amount, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -132,7 +135,7 @@
         <div class="form-group">
             <label class="control-label col-md-2"></label>
             <div class="col-md-10">
-                <ol id="flist"></ol>
+                <ol id="flist" style="padding-left:0px;"></ol>
             </div>
         </div>
         <div class="form-group div-user">
@@ -197,6 +200,11 @@
         var txt = $('#ddlContents').find(':checked').text();
         var contentDiv = '<div class="form-group content-group-' + id + '"><label class="control-label col-md-2">' + txt + '</label><div class="col-md-10"><input type="number" id="amount' + id + '" name="amount' + id + '" class="amount form-control txt-funds fl" onblur="ResetAmount();" />&nbsp;元&nbsp;&nbsp;&nbsp;<input type="button" class="btn btn-danger" value="删除" onclick="DeleteThis(this)" /><input type="button" class="btn btn-success" value="添加明细" onclick="AddDetail(this)" /><input type="hidden" class="hidContent" value="' + id + '" /></div></div><div class="form-group detail-group-' + id + '"><label class="control-label col-md-2"></label><div class="col-md-10"></div></div>';
         div.append($(contentDiv));
+    }
+    function AddDetail(obj) {
+        var div = $(obj).parent().parent().next().find('.col-md-10');
+        var detail = '<div class="detail-out"><input type="text" class="time form-control fl form_date" placeholder="请选择时间" /><input type="text" class="detail form-control fl" placeholder="请输入明细" /><input type="number" class="amount form-control fl txt-funds" onblur="ResetAmount();" placeholder="请输入金额" /><a href="javascript:void(0)" onclick="DeleteDetail(this)" class="btn btn-danger btn-sm">X</a></div>';
+        div.append(detail);
         $('.form_date').datetimepicker({
             language: 'zh-CN',
             weekStart: 1,
@@ -208,11 +216,6 @@
             forceParse: 0,
             format: 'yyyy-mm-dd'
         });
-    }
-    function AddDetail(obj) {
-        var div = $(obj).parent().parent().next().find('.col-md-10');
-        var detail = '<div class="detail-out"><input type="text" class="time form-control fl form_date" placeholder="请选择时间" /><input type="text" class="detail form-control fl" placeholder="请输入明细" /><input type="number" class="amount form-control fl txt-funds" onblur="ResetAmount();" placeholder="请输入金额" /><a href="javascript:void(0)" onclick="DeleteDetail(this)" class="btn btn-danger btn-sm">X</a></div>';
-        div.append(detail);
     }
     function DeleteDetail(obj) {
         $(obj).parent().remove();
@@ -233,7 +236,7 @@
         //var $btn = $(obj).button('loading');
         $.post("@Url.RouteUrl(new {controller= "ApplyManager", action= "Create" })", formdata, function (data, status) {
             if (data.state == '1') {
-                location.href = '@Url.RouteUrl(new { action = "ApplyNext", controller = "ApplyManager"})?number='+data.msg_text;
+                //location.href = '@Url.RouteUrl(new { action = "ApplyNext", controller = "ApplyManager"})?number='+data.msg_text;
             } else {
                 if (data.msg_code == 'nologin') location.href = '@Url.RouteUrl(new { action = "LogOut", controller = "Login"})';
                 $('#msg').removeClass();
@@ -241,9 +244,6 @@
                 $('#msg').text(data.msg_text);
             }
             $('#msg').slideDown("slow");
-            //setTimeout(function () {
-            //    $('#msg').slideToggle("slow");
-            //}, 5000);
         });
     }
     function GetContents() {
@@ -316,12 +316,12 @@
                     }
                     var detail = new Object();
                     detail.detailInfo = dInfo;
-                    detail.detailDate = dTime;
+                    detail.strDate = dTime;
                     detail.amount = dAmount;
                     details.push(detail);
                 }
             }
-            content.details = detail;
+            content.details = details;
             contents.push(content);
         }
         return contents;
@@ -344,7 +344,7 @@
         div.remove();
         //ResetAmount();
     }
-    //文件上传部份
+    //文件上传部份-----------------------------
     var fl = 0;
     function UploadAttachment() {
         if (fl > 0) {
@@ -355,8 +355,8 @@
         $('#upAttachment').click();
     }
     function FileChange(obj) {
+        if (!CheckFiles(obj.files)) return;
         $('#flist').children().remove();
-        if(!CheckFiles(obj.files))return;
         var len = obj.files.length;
         fl = len;
         if (len == 0) {
@@ -373,7 +373,7 @@
     }
     var sindex = 0;
     var sizestr = new Array("B", "KB", "MB", "GB", "TB");
-    var zipType = /.jpg|.png|.gif|.bmp|.jpeg|.rar|.zip|.doc|.docx|.xls|.xlsx|.ppt|.pptx/;
+    var zipType = /.jpg|.png|.gif|.bmp|.jpeg|.rar|.zip|.doc|.docx|.xls|.xlsx|.ppt|.pptx|.pdf/;
     function GetSizeStr(size) {
         if (size > 1024) {
             size = size / 1024;
@@ -389,7 +389,7 @@
         for (var file_index = 0; file_index < len; file_index++) {
             if (!files[file_index].name.match(zipType)) {
                 fl = 0;
-                alert("上传文件类型不符合要救济。");
+                alert("上传文件类型不符合要求。");
                 return false;
             }
         }
@@ -404,9 +404,8 @@
         var per;
         var uploadLength = new Array(len);
         var attaDiv = $('.atta-div');
-        for (var file_index = 0; file_index < len; file_index++) {
-            var file = files[file_index];
-            $('#flist').append('<li class="list' + file_index + '"><div class="w100">' + file.name + '&nbsp;&nbsp;&nbsp;&nbsp;' + GetSizeStr(file.size) + '&nbsp;&nbsp;&nbsp;&nbsp;<span class="spprocess"></span></div><div class="w100 pro"><div class="probar"></div></div></li>');
+        $.each(files,function(file_index,file){
+            $('#flist').append('<li class="list' + file_index + '"><div class="w100">' + file.name + '&nbsp;&nbsp;&nbsp;&nbsp;' + GetSizeStr(file.size) + '&nbsp;&nbsp;&nbsp;&nbsp;<literal id="lit' + file_index + '"></literal><div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only"></span></div></div></li>');
             var formdata = new FormData();
             formdata.append("data", file);
             $.ajax({
@@ -418,27 +417,28 @@
                 contentType: false, //指定为false才能形成正确的Content-Type
                 success: function (data, textStatus) {
                     if (data.state == 1) {
-                        $('.list' + file_index + ' .pro .probar').width('100%');
-                        $('.list' + file_index + ' .w100 .spprocess').text('上传完成。');
+                        $('.list' + file_index).find('.progress .progress-bar').width('100%');
+                        $('#lit' + file_index).text('上传完成 100%。');
                         var name = data.data.split(',');
                         var atta = '<div onmousemove="ShowDetailDel(this);" onmouseout="HidDetailDel(this);" class="detail-div"><span class="glyphicon glyphicon-paperclip"></span><a href="../temp/' + name[0] + '" title="点击预览' + name[2] + '" file="' + name[1] + '" class="det-attachment">' + name[2] + '</a><span title="点击删除该附件" class="spDel displayN glyphicon glyphicon-remove" onclick="DeleteAtta(this)"></span></div>';
                         attaDiv.append($(atta));
                     }
                     else{
                         //发生错误，重新上传
-                        $('.list' + file_index + ' .w100 .spprocess').text("发生错误，重新上传");
+                        $('#lit' + file_index).text('上传完成 100%。');
                     }
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     //发生错误，重新上传
-                    $('.list' + file_index + ' .w100 .spprocess').text("发生错误，重新上传");
+                    $('#lit' + file_index).text('上传完成 100%。');
                 }
             }).complete(function () {
                 fl--;
                 if (fl <= 0) {
-                    $('#flist').children().remove();
+                    //$('#flist').children().remove();
                 }
             });
-        }
+        });
     }
+    //----文件上传结束
 </script>

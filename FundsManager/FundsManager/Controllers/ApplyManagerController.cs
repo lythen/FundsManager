@@ -150,6 +150,7 @@ namespace FundsManager.Controllers
                 bill.r_add_date = DateTime.Now;
                 bill.r_add_user_id = user;
                 bill.reimbursement_info = _sbill.info;
+                bill.r_funds_id = _sbill.Fid;
                 var maxfa = db.Reimbursement.OrderByDescending(x => x.reimbursement_code).FirstOrDefault();
                 //apply_number:年份+10001自增
                 if (maxfa == null) bill.reimbursement_code = DateTime.Now.Year.ToString() + "10001";
@@ -196,9 +197,10 @@ namespace FundsManager.Controllers
                             {
                                 detail_amount = viewDetail.amount,
                                 detail_content_id = content.content_id,
-                                detail_date = viewDetail.detailDate,
+                                detail_date = DateTime.Parse(viewDetail.strDate+" 00:00"),
                                 detail_info = viewDetail.detailInfo
                             };
+                            db.Reimbursement_Detail.Add(detail);
                         }
                         try
                         {
@@ -220,28 +222,30 @@ namespace FundsManager.Controllers
                 StringBuilder sbErr = new StringBuilder();
                 if (_sbill.attachments != null && _sbill.attachments.Count() > 0)
                 {
-                    string attachment_path = ConfigurationManager.AppSettings["attachmentPath"];
-                    string attachment_temp_path = ConfigurationManager.AppSettings["attachmentTempPath"];
+                    string attachment_path = string.Format("{0}\\{1}\\{2}\\", MyConfiguration.GetAttachmentPath(), bill.reimbursement_code,DateTime.Now.ToString("yyyyMMdd"));
+                    string attachment_temp_path = MyConfiguration.GetAttachmentTempPath(); ;
                     if (!Directory.Exists(attachment_path)) Directory.CreateDirectory(attachment_path);
-                    string filePath,tempFile,saveFileName;
+                    string filePath,tempFile, saveFileName = "",storeFileName;
                     foreach (ViewAttachment item in _sbill.attachments)
                     {
                         try
                         {
-                            saveFileName = string.Format("{0}\\{1}\\{2}", bill.reimbursement_code, DateTime.Now.ToString("yyyyMMdd"), item.fileName);
+                            saveFileName = Path.GetFileName(item.fileName);
+                            storeFileName = string.Format("{0}/{1}", DateTime.Now.ToString("yyyyMMdd"), saveFileName);
                             tempFile = attachment_temp_path + item.fileName;
                             filePath = string.Format("{0}{1}", attachment_path, saveFileName);
                             if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
                             System.IO.File.Move(tempFile, filePath);
                         }
-                        catch
+                        catch(Exception e)
                         {
-                            sbErr.Append("文件【").Append(item.fileName).Append("】保存失败，请重新上传");
+                            ErrorUnit.WriteErrorLog(e.ToString(), GetType().ToString());
+                            sbErr.Append("文件【").Append(saveFileName).Append("】保存失败，请重新上传");
                             continue;
                         }
                         Reimbursement_Attachment attachment = new Reimbursement_Attachment
                         {
-                            attachment_path = saveFileName,
+                            attachment_path = storeFileName,
                             atta_detail_id = 0,
                             atta_reimbursement_code = bill.reimbursement_code
                         };
@@ -280,8 +284,8 @@ namespace FundsManager.Controllers
                     goto next;
                 }
                 json.state = 1;
-                json.msg_code = "success";
-                json.msg_text = bill.reimbursement_code; 
+                json.msg_code = bill.reimbursement_code;
+                json.msg_text = sbErr.ToString(); 
             }
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
@@ -320,7 +324,7 @@ namespace FundsManager.Controllers
                                        select new ApplyListModel
                                        {
                                            amount = bill.r_bill_amount,
-                                           nureimbursementCode = bill.reimbursement_code,
+                                           reimbursementCode = bill.reimbursement_code,
                                            state = bill.r_bill_state,
                                            strState = das.drs_state_name,
                                            time = bill.r_add_date,
@@ -374,7 +378,7 @@ namespace FundsManager.Controllers
             SetSelect(0);
             if (ModelState.IsValid)
             {
-                Reimbursement bill = db.Reimbursement.Find(viewBill.nureimbursementCode);
+                Reimbursement bill = db.Reimbursement.Find(viewBill.reimbursementCode);
                 if (bill == null)
                 {
                     json.msg_code = "error";
@@ -464,7 +468,7 @@ namespace FundsManager.Controllers
                                     detail.detail_content_id = content.content_id;
                                 }
                                 detail.detail_amount = item.amount;
-                                detail.detail_date = item.detailDate;
+                                detail.detail_date = DateTime.Parse(item.strDate+" 00:00");
                                 detail.detail_info = item.detailInfo;
                                 if (item.detailId != null && item.detailId != 0)
                                     db.Entry(detail).State = EntityState.Modified;
@@ -628,28 +632,28 @@ namespace FundsManager.Controllers
         {
             throw new Exception();
         }
-        public ActionResult MyFunds()
+        public ActionResult MyFunds(BillsSearchModel info)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
-            int user = Common.PageValidate.FilterParam(User.Identity.Name);
-            var waitList = (from bill in db.Reimbursement
-                            join das in db.Dic_Respond_State
-                            on bill.r_bill_state equals das.drs_state_id
-                            join f in db.Funds on bill.r_funds_id equals f.f_id
-                            where bill.r_add_user_id == user// && apply.apply_state == 3
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            ApplyManager dal = new ApplyManager();
+            if (!RoleCheck.CheckIsAdmin(user)) info.userId = user;
+            info.PageSize = 0;
+            var list = dal.GetApplyList(info);
+            var waitList = (from bill in list
                             select new ApplyListModel
                             {
-                                amount = bill.r_bill_amount,
-                                nureimbursementCode = bill.reimbursement_code,
-                                state = bill.r_bill_state,
-                                strState = das.drs_state_name,
-                                time = bill.r_add_date,
-                                 fundsCode=f.f_code,
-                                 fundsName=f.f_name,
-                                attachmentsCount = (from a in db.Reimbursement_Attachment where a.atta_reimbursement_code == bill.reimbursement_code select a.attachment_id).DefaultIfEmpty(0).Count(),
+                                amount = bill.amount,
+                                reimbursementCode = bill.reimbursementCode,
+                                state = bill.state,
+                                strState = bill.strState,
+                                time = bill.time,
+                                 fundsCode= bill.fundsCode,
+                                 fundsName= bill.fundsName,
+                                attachmentsCount = (from a in db.Reimbursement_Attachment where a.atta_reimbursement_code == bill.reimbursementCode select a.attachment_id).Count(),
                                 contents = (from c in db.Reimbursement_Content
                                             join Dic in db.Dic_Reimbursement_Content on c.c_dic_id equals Dic.content_id
-                                            where c.c_reimbursement_code == bill.reimbursement_code
+                                            where c.c_reimbursement_code == bill.reimbursementCode
                                             select new ViewContentModel
                                             {
                                                 amount = c.c_amount,
@@ -661,7 +665,8 @@ namespace FundsManager.Controllers
                                               ).ToList()
                             }
                             ).ToList();
-            return View(waitList);
+            ViewData["Bills"] = waitList;
+            return View(info);
         }
         public ActionResult ApplyNext(string number)
         {
@@ -679,7 +684,7 @@ namespace FundsManager.Controllers
                           select new ApplyListModel
                           {
                               amount = bill.r_bill_amount,
-                              nureimbursementCode = bill.reimbursement_code,
+                              reimbursementCode = bill.reimbursement_code,
                               state = bill.r_bill_state,
                               strState = das.drs_state_name,
                               time = bill.r_add_date,

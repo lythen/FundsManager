@@ -102,6 +102,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.5.0\lib\net45\System.Diagnostics.DiagnosticSource.dll</HintPath>
       <Private>True</Private>
@@ -354,6 +355,7 @@
     <Compile Include="Controllers\UserManagerController.cs" />
     <Compile Include="Controllers\ValidateCodeController.cs" />
     <Compile Include="Controllers\wxAuthorizeAttribute.cs" />
+    <Compile Include="DAL\ApplyManager.cs" />
     <Compile Include="DAL\FundsContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
