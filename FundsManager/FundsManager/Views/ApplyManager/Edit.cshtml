@@ -2,32 +2,88 @@
 
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "修改申请单";
-    List<FundsManager.Models.SelectOption> users = (List<FundsManager.Models.SelectOption>)ViewData["ViewUsers"];
 }
 <style>
-    .out-form{width:100%;
-                  background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding:15px 10px 0px 0px;
-    margin-top:15px;
+    .out-form {
+        width: 100%;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 15px 10px 0px 0px;
+        margin-top: 15px;
     }
-    .funds-all{
-        width:auto;
-        min-width:250px;
-        display:inline-block;
-        height:36px;
+
+    .form-horizontal .form-group {
+        margin-top: 15px;
     }
-    .div-user{margin-top:15px;}
-    .ul-users li{list-style:none;}
-    #msg{display:none;}
-    .btn-div{margin-top:5px;}
+
+    .funds-all, .fl {
+        width: auto;
+        min-width: 250px;
+        display: inline-block;
+        height: 36px;
+    }
+
+    .div-user {
+        margin-top: 15px;
+    }
+
+    .ul-users li {
+        list-style: none;
+    }
+
+    #msg {
+        display: none;
+    }
+
+    .time {
+        width: 150px;
+    }
+
+    .detail {
+        width: 400px;
+    }
+
+    .amount {
+        width: 120px;
+    }
+
+    .displayN {
+        display: none;
+    }
+
+    .det-attachment {
+        position: relative;
+        width: 100px;
+        overflow: hidden;
+        display: inline-block;
+        top: 3px;
+        height: 20px;
+    }
+
+    .detail-div {
+        display: inline-block;
+        width: 150px;
+    }
+
+    .spDel {
+        cursor: pointer;
+    }
+
+    .a-b {
+        border: 1px solid #ebebeb;
+        border-radius: 2px;
+    }
+    .detail-out{margin-top:5px;}
+    .progress {
+        width: 50%;
+    }
 </style>
-<h4>经费申请</h4>
-    <div class="col-md-10" id="msg">
-        @ViewBag.msg
-    </div>
+<h4>@Model.reimbursementCode-报账单详细信息</h4>
+<div class="col-md-10" id="msg">
+    @ViewBag.msg
+</div>
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -36,112 +92,191 @@
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.userId, new { Value = User.Identity.Name })
-        @Html.HiddenFor(model => model.number, new { Value = Model.number,id="hidNumber" })
-        
+        @Html.HiddenFor(model => model.reimbursementCode)
+
         <div class="form-group">
-            @Html.LabelFor(model => model.amount, htmlAttributes: new { @class = "control-label col-md-2" })
+            <label class="control-label col-md-2">报销事由</label>
             <div class="col-md-10">
-                @Html.EditorFor(model => model.amount, new { htmlAttributes = new { @class = "form-control funds-all", @readonly = "readonly" } })
+                @Html.EditorFor(model => model.info, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.amount, "", new { @class = "text-danger" })
-@if (Model.state != 1)
-{
-                <input type="button" onclick="addChild();" class="btn btn-info" value="添加经费" />
-}
             </div>
         </div>
-        
-        @foreach (var item in Model.child)
-        {
-            
-            <div class="out-form">
-                @Html.HiddenFor(citem => item.Cnumber)
-                <div class="form-group">
-                    @Html.LabelFor(model => item.Fid, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="form-group">
+            <label class="control-label col-md-2">报销金额</label>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.amount, new { htmlAttributes = new { @class = "form-control funds-all", type = "number" } }) 元
+                @Html.ValidationMessageFor(model => model.amount, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">选择经费</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.Fid, Model.Fid, ViewData["Funds"] as List<SelectListItem>, "", new Dictionary<string, object> { { "class", "select form-control f-sel fl" }, { "onchange", "FundsChange(this);" } })
+                @Html.ValidationMessageFor(model => model.Fid, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">报销内容</label>
+            <div class="col-md-10">
+                @Html.DropDownList("ddlContents", ViewData["Contents"] as List<SelectListItem>, new { @class = "select form-control f-sel fl" })
+                @if (Model.state != 1)
+                {
+                    <input type="button" onclick="addChild();" class="btn btn-info" value="添加报销内容" />
+                }
+            </div>
+        </div>
+        <div class="out-form">
+            @foreach (var item in Model.contents)
+            {
+                <div class="form-group content-group-@item.selectId">
+                    <label class="control-label col-md-2">@item.contentTitle</label>
                     <div class="col-md-10">
-                        @Html.DropDownListFor(model => item.Fid,item.Fid, ViewBag.Funds as List<SelectListItem>,"", new Dictionary<string, object> { { "class", "select form-control f-sel" }, { "onchange", "FundsChange(this);" } })
-                        @Html.ValidationMessageFor(model => item.Fid, "", new { @class = "text-danger" })
+                        @Html.EditorFor(@citem => item.amount, new { htmlAttributes = new { @class = "amount form-control txt-funds fl", onblur = "ResetAmount();", ID = "amount"+item.selectId } }) &nbsp;元&nbsp;&nbsp;&nbsp;
+                        @if (Model.state != 1)
+                        {
+                            <input type="button" class="btn btn-danger" value="删除" onclick="DeleteThis(this,@item.contentId)">
+                            <input type="button" class="btn btn-success" value="添加明细" onclick="AddDetail(this)">
+                        }
+                        <input type="hidden" class="hidContent" value="@item.selectId">
+                        <input type="hidden" class="hidThisContent" id="content_@item.selectId" value="@item.contentId">
                     </div>
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(model => item.amount, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="form-group detail-group-@item.selectId">
+                    <label class="control-label col-md-2"></label>
                     <div class="col-md-10">
-                        @Html.EditorFor(model => item.amount, new { htmlAttributes = new { @class = "form-control txt-funds",@type="number", onblur= "ResetAmount();" } })
-                        @Html.ValidationMessageFor(model => item.amount, "", new { @class = "text-danger" })
+                        @if (item.details != null && item.details.Count() > 0)
+                    {
+                        foreach (var detail in item.details)
+                        {
+                                <div class="detail-out">
+                                    @Html.HiddenFor(Ditem => detail.detailId)
+                                    @Html.EditorFor(ditem => detail.detailDate, new { htmlAttributes = new { @class = "time form-control fl form_date", Value = ((DateTime)detail.detailDate).ToString("yyyy-MM-dd") }})
+                                    @Html.EditorFor(ditem => detail.detailInfo, new { htmlAttributes = new { @class = "detail form-control fl" } })
+                                    @Html.EditorFor(ditem => detail.amount, new { htmlAttributes = new { @class = "amount form-control fl", type = "number" } })
+                                    @if (Model.state != 1)
+                                    {
+                                        <a href="javascript:void(0)" onclick="DeleteDetail(this,@detail.detailId)" class="btn btn-danger btn-sm">X</a>
+                                    }
+                                </div>
+                            }
+                        }
                     </div>
                 </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(model => item.applyFor, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextAreaFor(model => item.applyFor, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => item.applyFor, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                @if (Model.state == 1)
+            }
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2" style="cursor:pointer" onclick="UploadAttachment();">附件上传</label>
+            <input type="file" id="upAttachment" multiple="" name="upAttachment" style="display:none;" onchange="FileChange(this);">
+            <div class="col-md-10 atta-div">
+                @if (Model.attachments != null && Model.attachments.Count() > 0)
                 {
-                <div class="form-group">
-                    @Html.LabelFor(model => item.factGet, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => item.factGet, new { htmlAttributes = new { @class = "form-control txt-funds", @type = "number" } })
-                        @Html.ValidationMessageFor(model => item.factGet, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group">
-                    @Html.LabelFor(model => item.getInfo, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.TextAreaFor(model => item.getInfo, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => item.getInfo, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                }
-                else
-                {
-                    <div class="form-group">
-                        <label class="control-label col-md-2"></label>
-                        <div class="col-md-10">
-                           <input type="button" class="btn btn-danger" value="删除" onclick="DeleteThis(this)"  />
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        @if (Model.state != 1) { 
-        <div class="form-group div-user">
-            <label class="control-label col-md-2" for="amount">选择下一步批复</label>
-            <div class="col-md-10">
-                <ul class="ul-users">
-                    @if (users != null && users.Count() > 0)
+                    foreach (var aitem in Model.attachments)
                     {
-                        string strchecked= "";
-                        foreach (var item in users)
-                        {
-                            string id = "cbk" + @item.id;
-                            if (item.id == Model.next.ToString()) strchecked = "checked";
-                            else strchecked = "";
-                            <li>
-                                <input type="radio" class="cbkuser" name="cbkUsers" id="@id" value="@item.id" @strchecked/><label for="@id">@item.text</label>
-                            </li>
-                        }
+                        string path = "../../attachments/" + Model.reimbursementCode + "/" + @aitem.fileName;
+                        <div onmousemove="ShowDetailDel(this);" onmouseout="HidDetailDel(this);" class="detail-div">
+                            <span class="glyphicon glyphicon-paperclip"></span>
+                            <a href="@path" attaid="@aitem.id" target="_blank" title="点击预览 @Path.GetFileName(aitem.fileName)" file="@aitem.fileName" class="det-attachment">@Path.GetFileName(aitem.fileName)</a>
+                            @if (Model.state != 1)
+                            {
+                                <span title="点击删除该附件" class="spDel displayN glyphicon glyphicon-remove" onclick="DeleteAtta(this,@aitem.id)"></span>
+                            }
+                        </div>
                     }
-                </ul>
+                }
             </div>
         </div>
-        }else
+        <div class="form-group">
+            <label class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <ol id="flist" style="padding-left:0px;"></ol>
+            </div>
+        </div>
+        @if (Model.state != 1)
+        {
+            <div class="form-group div-user">
+                <label class="control-label col-md-2" for="amount">选择批复领导</label>
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => Model.next, Model.next, ViewData["ViewUsers"] as List<SelectListItem>, null, new Dictionary<string, object> { { "class", "select form-control f-sel fl ddl-users" }, { "ID", "ddlUser" } })
+                    @Html.ValidationMessageFor(model => model.next, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+        else
         {
             <input type="hidden" id="hidNoNext" value="1" />
         }
         <div class="form-group btn-div">
             <div class="col-md-offset-2 col-md-10">
-                <button type="button" id="fat-btn" onclick="Add(this);" data-loading-text="加载中..." class="btn btn-primary" autocomplete="off">
-                    提 交
-                </button>
+                @if (Model.state != 1)
+                {
+                    <button type="button" id="fat-btn" onclick="Add(this);" data-loading-text="加载中..." class="btn btn-primary" autocomplete="off">
+                        提 交
+                    </button>
+                }
                 @Html.ActionLink("返 回", "myFunds", null, new { @class = "btn btn-warning" })
             </div>
         </div>
     </div>
 }
 <script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script src="~/scripts/extendindexof.js"></script>
 <script>
+    var state=@Model.state;
+    var code='@Model.reimbursementCode';
+    var isConfirm=false;
+    $(function () {
+        $.ajaxSetup({
+            cache: true
+        });
+        $.getScript('../../scripts/bootstrap.min.js').done(function () {
+            $.getScript('../../Scripts/bootstrap-datetimepicker.js').done(function () {
+                $.getScript('../../Scripts/locales/bootstrap-datetimepicker.zh-CN.js').done(function(){
+                    $('.form_date').datetimepicker({
+                        language: 'zh-CN',
+                        weekStart: 1,
+                        todayBtn: 1,
+                        autoclose: 1,
+                        todayHighlight: 1,
+                        startView: 2,
+                        minView: 2,
+                        forceParse: 0,
+                        format: 'yyyy-mm-dd'
+                    });
+                });
+            });
+        });
+
+    });
+    function ShowDetailDel(obj) {
+        $(obj).find('.spDel').removeClass('displayN');
+        $(obj).addClass('a-b');
+    }
+    function HidDetailDel(obj) {
+        $(obj).find('.spDel').addClass('displayN ');
+        $(obj).removeClass('a-b');
+    }
+    //删除附件
+    function DeleteAtta(obj,id) {
+        if(!id){
+            $(obj).parent().remove();
+            return;
+        }
+        if(state==1){
+            alert('不允许删除。');
+            return;
+        }
+        if(!isConfirm){
+            if(!confirm('当前页面所有删除操作将直接删除所选内容，并不可恢复，是否确定删除？')) return;
+            isConfirm=true;
+        }
+        $.get("../../ApplyManager/DeleteAttachment?id="+id,function(data){
+            if(data.state==1)
+                $(obj).parent().remove();
+            else alert(data.msg_text);
+        });
+    }
     function ResetAmount() {
         var txts = $('.txt-funds');
         var m = 0;
@@ -153,79 +288,306 @@
         $('.funds-all').val(m);
     }
     function addChild() {
-        var div = $('.out-form').get(0);
-        if (div == null) {
-            alert('添加出错');
-        }
-        var str = div.outerHTML;
-        var newdiv = $(str);
-        newdiv.find('#item_amount').val('');
-        newdiv.find('#item_applyFor').val('');
-        newdiv.insertBefore($('.div-user'));
-    }
-    function Add(obj) {
-        var formdata = new Object();
-        formdata.amount = $('#amount').val();
-        formdata.number = $('#hidNumber').val();
-        var divs = $('.out-form');
-        var list = new Array();
-        var len = divs.length;
-        if (len == 0) {
-            alert('没有填写任何申请单。');
+        var id = $('#ddlContents').val();
+        if ($('#amount' + id).length>0) {
+            alert('相同报销内容仅允许添加一项，请在明细中添加明细支出。');
             return;
         }
-        for (var i = 0; i < len; i++) {
-            var child = new Object();
-            child.amount = $(divs[i]).find('#item_amount').val();
-            if (!child.amount || child.amount == 0) {
-                alert('金额不可为空！');
-                return false;
-            }
-            child.applyFor = $(divs[i]).find('#item_applyFor').val();
-            //$('.f-sel').val()
-            child.Fid = $(divs[i]).find('.f-sel').val();
-            if (!child.Fid || child.Fid == 0) {
-                alert('请选择经费！');
-                return false;
-            }
-            child.factGet = $(divs[i]).find('#item_factGet').val();
-            child.getInfo = $(divs[i]).find('#item_getInfo').val();
-            child.Cnumber = $(divs[i]).find('#item_Cnumber').val();
-            list.push(child);
+        var div = $('.out-form');
+        var txt = $('#ddlContents').find(':checked').text();
+        var contentDiv = '<div class="form-group content-group-' + id + '"><label class="control-label col-md-2">' + txt + '</label><div class="col-md-10"><input type="number" id="amount' + id + '" name="amount' + id + '" class="amount form-control txt-funds fl text-box single-line" onblur="ResetAmount();" />&nbsp;元&nbsp;&nbsp;&nbsp;<input type="button" class="btn btn-danger" value="删除" onclick="DeleteThis(this)" /><input type="button" class="btn btn-success" value="添加明细" onclick="AddDetail(this)" /><input type="hidden" class="hidContent" value="' + id + '" /></div></div><div class="form-group detail-group-' + id + '"><label class="control-label col-md-2"></label><div class="col-md-10"></div></div>';
+        div.append($(contentDiv));
+    }
+    function AddDetail(obj) {
+        var div = $(obj).parent().parent().next().find('.col-md-10');
+        var detail = '<div class="detail-out"><input type="text" class="time form-control fl form_date text-box single-line" placeholder="请选择时间" /><input type="text" class="detail form-control fl text-box single-line" placeholder="请输入明细" /><input type="number" class="amount form-control fl text-box single-line" placeholder="请输入金额" /><a href="javascript:void(0)" onclick="DeleteDetail(this)" class="btn btn-danger btn-sm">X</a></div>';
+        div.append(detail);
+        $('.form_date').datetimepicker({
+            language: 'zh-CN',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            minView: 2,
+            forceParse: 0,
+            format: 'yyyy-mm-dd'
+        });
+    }
+    //删除明细
+    function DeleteDetail(obj,id) {
+        if(!id){
+            $(obj).parent().remove();
+            return;
         }
-        formdata.child = list;
-        var cbks = $('.cbkuser');
-        len = cbks.length;
-        for (var i = 0; i < len; i++) {
-            if (cbks[i].checked) {
-                formdata.next = cbks[i].value;
-                break;
-            }
+        if(state==1){
+            alert('不允许删除。');
+            return;
         }
-        if (!formdata.next&&!$('#hidNoNext').val()) {
-            alert('请选择下一步批复的领导！');
-            return false;
+        if(!isConfirm){
+            if(!confirm('当前页面所有删除操作将直接删除所选内容，并不可恢复，是否确定删除？')) return;
+            isConfirm=true;
         }
+        $.get("../../ApplyManager/DeleteContentDetail?id="+id,function(data){
+            if(data.state==1)
+                $(obj).parent().remove();
+            else alert(data.msg_text);
+        });
+    }
+    function FundsChange(obj) {
+
+    }
+    var err = 0;
+    function Add(obj) {
+        var formdata = new Object();
+        formdata.attachments = GetAttachment();
+        formdata.contents = GetContents();
+        formdata.next = $('#ddlUser').val();
+        formdata.info = $('#info').val();
+        formdata.Fid = $('#Fid').val();
+        formdata.amount = $('#amount').val();
+        formdata.reimbursementCode=$('#reimbursementCode').val();
+        if (err == 1) return;
         //var $btn = $(obj).button('loading');
-        $.post("../Edit", formdata, function (data, status) {
+        $.post("@Url.RouteUrl(new {controller= "ApplyManager", action= "Edit" })", formdata, function (data, status) {
             if (data.state == '1') {
-                location.href = '@Url.RouteUrl(new { action = "ApplyNext", controller = "ApplyManager"})?number='+data.msg_text;
+                if(data.msg_text) $('#msg').text(data.msg_text);
+                else location.href = '@Url.RouteUrl(new { action = "ApplyNext", controller = "ApplyManager"})?number='+data.msg_text;
             } else {
                 if (data.msg_code == 'nologin') location.href = '@Url.RouteUrl(new { action = "LogOut", controller = "Login"})';
                 $('#msg').removeClass();
                 $('#msg').addClass('col-md-offset-2 col-md-10 alert alert alert-danger');
                 $('#msg').text(data.msg_text);
-                alert(data.msg_text);
             }
             $('#msg').slideDown("slow");
-            //setTimeout(function () {
-            //    $('#msg').slideToggle("slow");
-            //}, 5000);
         });
     }
-    function DeleteThis(obj) {
-        var div = $(obj).parent().parent().parent();
-        div.remove();
+    function GetContents() {
+        var groups = $('.hidContent');
+        var len = groups.length;
+        if (len == 0) {
+            alert('请添加报销内容。');
+            return;
+        }
+        var group;
+        var groupName;
+        var contentId;
+        var contents = new Array();
+        var amount;
+        var dTime, dInfo, dAmount;
+        for (var i = 0; i < len; i++) {
+            contentId = groups[i].value;
+            try {
+                amount = parseFloat($('#amount' + contentId).val());
+            } catch (err) {
+                alert('金额设置出错。');
+                $('#amount' + contentId).focus();
+                err = 1;
+                return;
+            }
+            if (amount == 0) {
+                alert('金额设置出错。');
+                $('#amount' + contentId).focus();
+                err = 1;
+                return;
+            }
+            var content = new Object();
+            content.amount = amount;
+            content.selectId = contentId;
+            try{
+                var cid=parseInt($('#content_'+contentId).val());
+                if(cid>0)
+                    content.contentId=cid;
+            }catch(err){}
+            //明细
+            group = $('.detail-group-' + contentId);
+            var detailOut = group.find('.detail-out');
+            var dlen = detailOut.length;
+            if (dlen > 0) {
+                var details = new Array();
+                for (var j = 0; j < dlen; j++) {
+                    var d = $(detailOut[j]);
+                    dTime = d.find('.time').val();
+                    dInfo = d.find('.detail').val();
+                    try {
+                        dAmount = d.find('.amount').val();
+                    } catch (err) {
+                        alert('金额设置出错。');
+                        d.find('.amount').focus();
+                        err = 1;
+                        return;
+                    }
+                    if (dAmount == 0) {
+                        alert('金额设置出错。');
+                        d.find('.amount').focus();
+                        err = 1;
+                        return;
+                    }
+                    if (dTime == '' || dTime == undefined) {
+                        alert('请选择时间。');
+                        d.find('.time').focus();
+                        err = 1;
+                        return;
+                    }
+                    if (dInfo == '' || dInfo == undefined) {
+                        alert('请选择时间。');
+                        d.find('.detail').focus();
+                        err = 1;
+                        return;
+                    }
+                    var detail = new Object();
+                    try{
+                        var did=parseInt(d.find('#detail_detailId').val());
+                        if(did>0)
+                            detail.detailId=did;
+                    }catch(err){}
+                    detail.detailInfo = dInfo;
+                    detail.strDate = dTime;
+                    detail.amount = dAmount;
+                    details.push(detail);
+                }
+            }
+            content.details = details;
+            contents.push(content);
+        }
+        return contents;
+    }
+    function GetAttachment() {
+        var alist = new Array();
+        var items = $('.det-attachment');
+        var len = items.length;
+        if (len == 0) return alist;
+        for (var i = 0; i < len; i++) {
+            var link = new Object();
+            try{
+                var aid=parseInt($(items[i]).attr('attaid'));
+                if(aid>0)
+                    link.id=aid;
+            }catch(err){}
+            link.fileName = $(items[i]).attr('file');
+            alist.push(link);
+        }
+        return alist;
+    }
+    //删除报销内容
+    function DeleteThis(obj,id) {
+        if(!id){
+            $(obj).parent().remove();
+            return;
+        }
+        if(state==1){
+            alert('不允许删除。');
+            return;
+        }
+        if(!isConfirm){
+            if(!confirm('当前页面所有删除操作将直接删除所选内容，并不可恢复，是否确定删除？')) return;
+            isConfirm=true;
+        }
+        $.get("../../ApplyManager/DeleteContent?id="+id,function(data){
+            if(data.state==1)
+            {
+                var div = $(obj).parent().parent();
+                div.next().remove();
+                div.remove();
+            }else alert(data.msg_text);
+        });
         ResetAmount();
     }
+    //文件上传部份-----------------------------
+    var fl = 0;
+    function UploadAttachment() {
+        if (fl > 0) {
+            alert("请等待当前操作完成。");
+            return;
+        }
+        document.getElementById('upAttachment').files == null;
+        $('#upAttachment').click();
+    }
+    function FileChange(obj) {
+        if (!CheckFiles(obj.files)) return;
+        $('#flist').children().remove();
+        var len = obj.files.length;
+        fl = len;
+        if (len == 0) {
+            fl = 0;
+            alert("没有选择任何文件。");
+            return;
+        }
+        if (len > 15) {
+            fl = 0;
+            alert("最多选择15个文件。");
+            return;
+        }
+        ReadFile(obj.files);
+    }
+    var sindex = 0;
+    var sizestr = new Array("B", "KB", "MB", "GB", "TB");
+    var zipType = /.jpg|.png|.gif|.bmp|.jpeg|.rar|.zip|.doc|.docx|.xls|.xlsx|.ppt|.pptx|.pdf/;
+    function GetSizeStr(size) {
+        if (size > 1024) {
+            size = size / 1024;
+            sindex++;
+            return GetSizeStr(size);
+        }
+        var re = Math.ceil(size) + sizestr[sindex];
+        sindex = 0;
+        return re;
+    }
+    function CheckFiles(files) {
+        var len = files.length;
+        for (var file_index = 0; file_index < len; file_index++) {
+            if (!files[file_index].name.match(zipType)) {
+                fl = 0;
+                alert("上传文件类型不符合要求。");
+                return false;
+            }
+        }
+        return true;
+    }
+    var fileList = new Array();
+    function ReadFile(files) {
+        //fileList = new Array();
+        fileList.length = 0;
+        var len = files.length;
+        fl = len;
+        var per;
+        var uploadLength = new Array(len);
+        var attaDiv = $('.atta-div');
+        $.each(files,function(file_index,file){
+            $('#flist').append('<li class="list' + file_index + '"><div class="w100">' + file.name + '&nbsp;&nbsp;&nbsp;&nbsp;' + GetSizeStr(file.size) + '&nbsp;&nbsp;&nbsp;&nbsp;<literal id="lit' + file_index + '"></literal><div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only"></span></div></div></li>');
+            var formdata = new FormData();
+            formdata.append("data", file);
+            $.ajax({
+                url: "@Url.RouteUrl(new { controller = "FileUpload", action = "FileUpload" })",
+                type: "post",
+                data: formdata,
+                async: true,
+                processData: false, //不对form进行处理
+                contentType: false, //指定为false才能形成正确的Content-Type
+                success: function (data, textStatus) {
+                    if (data.state == 1) {
+                        $('.list' + file_index).find('.progress .progress-bar').width('100%');
+                        $('#lit' + file_index).text('上传完成 100%。');
+                        var name = data.data.split(',');
+                        var atta = '<div onmousemove="ShowDetailDel(this);" onmouseout="HidDetailDel(this);" class="detail-div"><span class="glyphicon glyphicon-paperclip"></span><a href="../temp/' + name[0] + '" title="点击预览' + name[2] + '" file="' + name[1] + '" class="det-attachment">' + name[2] + '</a><span title="点击删除该附件" class="spDel displayN glyphicon glyphicon-remove" onclick="DeleteAtta(this)"></span></div>';
+                        attaDiv.append($(atta));
+                    }
+                    else{
+                        //发生错误，重新上传
+                        $('#lit' + file_index).text('上传完成 100%。');
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    //发生错误，重新上传
+                    $('#lit' + file_index).text('上传完成 100%。');
+                }
+            }).complete(function () {
+                fl--;
+                if (fl <= 0) {
+                    //$('#flist').children().remove();
+                }
+            });
+        });
+    }
+    //----文件上传结束
 </script>

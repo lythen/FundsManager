@@ -56,6 +56,7 @@ namespace FundsManager.Controllers
         public ActionResult Details(string id)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -320,6 +321,8 @@ namespace FundsManager.Controllers
             ApplyListModel viewBill = (from bill in db.Reimbursement
                                        join das in db.Dic_Respond_State
                                        on bill.r_bill_state equals das.drs_state_id
+                                       join respond in db.Process_Respond on bill.reimbursement_code equals respond.pr_reimbursement_code into T1
+                                       from t1 in T1.DefaultIfEmpty()
                                        where bill.reimbursement_code == id && bill.r_add_user_id == user
                                        select new ApplyListModel
                                        {
@@ -330,14 +333,18 @@ namespace FundsManager.Controllers
                                            time = bill.r_add_date,
                                            Fid = bill.r_funds_id,
                                            factAmount = bill.r_fact_amount,
-
+                                           info=bill.reimbursement_info,
+                                           next=t1.pr_user_id,
                                            contents = (from c in db.Reimbursement_Content
+                                                       join dic in db.Dic_Reimbursement_Content on c.c_dic_id equals dic.content_id
                                                        where c.c_reimbursement_code == bill.reimbursement_code
                                                        select new ViewContentModel
                                                        {
                                                            reimbursementCode = c.c_reimbursement_code,
                                                            amount = c.c_amount,
                                                            contentId = c.content_id,
+                                                           contentTitle=dic.content_title,
+                                                           selectId=c.c_dic_id,
                                                            details = (from detail in db.Reimbursement_Detail
                                                                       where detail.detail_content_id == c.content_id
                                                                       select new ViewDetailContent
@@ -435,8 +442,7 @@ namespace FundsManager.Controllers
                                 content.c_amount = citem.amount;
                                 db.Entry(content).State = EntityState.Modified;
                             }
-                        }
-                        if(content==null)
+                        }else
                         {
                             content = new Reimbursement_Content();
                             content.c_reimbursement_code = bill.reimbursement_code;
@@ -451,6 +457,7 @@ namespace FundsManager.Controllers
                         }
                         catch (Exception e)
                         {
+                            ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
                             sbmsg.Append("报销内容录入失败<br />");
                             continue;
                         }
@@ -463,13 +470,15 @@ namespace FundsManager.Controllers
                             {
                                 if (item.detailId != null && item.detailId != 0)
                                     detail = db.Reimbursement_Detail.Find(item.detailId);
-                                if (detail == null)
+                                else
                                 {
+                                    detail = new Reimbursement_Detail();
                                     detail.detail_content_id = content.content_id;
                                 }
                                 detail.detail_amount = item.amount;
                                 detail.detail_date = DateTime.Parse(item.strDate+" 00:00");
                                 detail.detail_info = item.detailInfo;
+                                detail.detail_content_id = content.content_id;
                                 if (item.detailId != null && item.detailId != 0)
                                     db.Entry(detail).State = EntityState.Modified;
                                 else db.Reimbursement_Detail.Add(detail);
@@ -480,6 +489,7 @@ namespace FundsManager.Controllers
                             }
                             catch (Exception e)
                             {
+                                ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
                                 sbmsg.Append("报销明细录入失败<br />");
                                 continue;
                             }
@@ -488,29 +498,31 @@ namespace FundsManager.Controllers
                     //录入附件
                     if (viewBill.attachments != null && viewBill.attachments.Count() > 0)
                     {
-                        string attachment_path = ConfigurationManager.AppSettings["attachmentPath"];
-                        string attachment_temp_path = ConfigurationManager.AppSettings["attachmentTempPath"];
+                        string attachment_path = string.Format("{0}\\{1}\\{2}\\", MyConfiguration.GetAttachmentPath(), bill.reimbursement_code, DateTime.Now.ToString("yyyyMMdd"));
+                        string attachment_temp_path = MyConfiguration.GetAttachmentTempPath(); ;
                         if (!Directory.Exists(attachment_path)) Directory.CreateDirectory(attachment_path);
-                        string filePath, tempFile, saveFileName;
+                        string filePath, tempFile, saveFileName = "", storeFileName;
                         foreach (ViewAttachment item in viewBill.attachments)
                         {
                             if (item.id > 0) continue;
                             try
                             {
-                                saveFileName = string.Format("{0}\\{1}\\{2}", bill.reimbursement_code, DateTime.Now.ToString("yyyyMMdd"), item.fileName);
+                                saveFileName = Path.GetFileName(item.fileName);
+                                storeFileName = string.Format("{0}/{1}", DateTime.Now.ToString("yyyyMMdd"), saveFileName);
                                 tempFile = attachment_temp_path + item.fileName;
                                 filePath = string.Format("{0}{1}", attachment_path, saveFileName);
                                 if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
                                 System.IO.File.Move(tempFile, filePath);
                             }
-                            catch
+                            catch(Exception e)
                             {
+                                ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
                                 sbmsg.Append("文件【").Append(item.fileName).Append("】保存失败，请重新上传");
                                 continue;
                             }
                             Reimbursement_Attachment attachment = new Reimbursement_Attachment
                             {
-                                attachment_path = saveFileName,
+                                attachment_path = storeFileName,
                                 atta_detail_id = 0,
                                 atta_reimbursement_code = bill.reimbursement_code
                             };
@@ -523,6 +535,7 @@ namespace FundsManager.Controllers
                         }
                         catch (Exception e)
                         {
+                            ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
                             Delete(bill.reimbursement_code);
                             json.msg_code = "error";
                             json.msg_text = "报销单附件提交失败。";
@@ -531,11 +544,24 @@ namespace FundsManager.Controllers
                     }
                     //录入批复流程
                     db.Process_Respond.RemoveRange(db.Process_Respond.Where(x => x.pr_reimbursement_code == bill.reimbursement_code));
+                    //添加批复人
                     Process_Respond pr = new Process_Respond();
                     pr.pr_reimbursement_code = bill.reimbursement_code;
                     pr.pr_user_id = viewBill.next;
                     pr.pr_number = 1;
                     db.Process_Respond.Add(pr);
+                    try
+                    {
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
+                        Delete(bill.reimbursement_code);
+                        json.msg_code = "error";
+                        json.msg_text = "报销单提交失败。";
+                        goto next;
+                    }
                 }
                 json.state = 1;
                 json.msg_code = bill.reimbursement_code;
@@ -544,6 +570,7 @@ namespace FundsManager.Controllers
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
+        #region 删除操作
         /// <summary>
         /// 删除订单
         /// </summary>
@@ -571,6 +598,13 @@ namespace FundsManager.Controllers
             {
                 json.msg_code = "nodate";
                 json.msg_text = "报销单不存在或被删除。";
+                goto next;
+            }
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            if (user != bill.r_add_user_id)
+            {
+                json.msg_code = "forbidden";
+                json.msg_text = "没有权限操作他人申请的报销单。";
                 goto next;
             }
             if (bill.r_bill_state == 1)
@@ -622,16 +656,158 @@ namespace FundsManager.Controllers
         }
         public JsonResult DeleteContent(int id)
         {
-            throw new Exception();
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_code = "nologin";
+                goto next;
+            }
+            Reimbursement_Content content = db.Reimbursement_Content.Find(id);
+            if (content == null)
+            {
+                json.msg_code = "nodate";
+                json.msg_text = "报销内容不存在或被删除。";
+                goto next;
+            }
+            Reimbursement bill = db.Reimbursement.Find(content.c_reimbursement_code);
+            if (bill != null)
+            {
+                int user = Common.PageValidate.FilterParam(User.Identity.Name);
+                if (user != bill.r_add_user_id)
+                {
+                    json.msg_code = "forbidden";
+                    json.msg_text = "没有权限操作他人申请的报销单。";
+                    goto next;
+                }
+                if (bill.r_bill_state == 1)
+                {
+                    json.msg_code = "forbidden";
+                    json.msg_text = "已批复同意的报销单不允许删除。";
+                    goto next;
+                }
+            }
+            var details = db.Reimbursement_Detail.Where(x => x.detail_content_id == content.content_id);
+            foreach(var detail in details)
+                db.Reimbursement_Detail.Remove(detail);
+            db.Reimbursement_Content.Remove(content);
+            try
+            {
+                db.SaveChanges();
+            }catch(Exception e)
+            {
+                ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().Name);
+                json.msg_code = "error";
+                json.msg_text = "报销单删除失败。";
+                goto next;
+            }
+            json.state = 1;
+            json.msg_code = "success";
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
         }
         public JsonResult DeleteContentDetail(int id)
         {
-            throw new Exception();
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_code = "nologin";
+                goto next;
+            }
+            Reimbursement_Detail detail = db.Reimbursement_Detail.Find(id);
+            if (detail == null)
+            {
+                json.msg_code = "nodate";
+                json.msg_text = "报销内容明细不存在或被删除。";
+                goto next;
+            }
+            Reimbursement_Content content = db.Reimbursement_Content.Find(detail.detail_content_id);
+            if (content != null)
+            {
+                Reimbursement bill = db.Reimbursement.Find(content.c_reimbursement_code);
+                if (bill != null)
+                {
+                    int user = Common.PageValidate.FilterParam(User.Identity.Name);
+                    if (user != bill.r_add_user_id)
+                    {
+                        json.msg_code = "forbidden";
+                        json.msg_text = "没有权限操作他人申请的报销单。";
+                        goto next;
+                    }
+                    if (bill.r_bill_state == 1)
+                    {
+                        json.msg_code = "forbidden";
+                        json.msg_text = "已批复同意的报销单不允许删除任何信息。";
+                        goto next;
+                    }
+                }
+            }
+            db.Reimbursement_Detail.Remove(detail);
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().Name);
+                json.msg_code = "error";
+                json.msg_text = "报销内容明细删除失败。";
+                goto next;
+            }
+            json.state = 1;
+            json.msg_code = "success";
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
         }
         public JsonResult DeleteAttachment(int id)
         {
-            throw new Exception();
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_code = "nologin";
+                goto next;
+            }
+            Reimbursement_Attachment atta = db.Reimbursement_Attachment.Find(id);
+            if (atta == null)
+            {
+                json.msg_code = "nodate";
+                json.msg_text = "附件不存在或被删除。";
+                goto next;
+            }
+            Reimbursement bill = db.Reimbursement.Find(atta.atta_reimbursement_code);
+            if (bill != null)
+            {
+                int user = Common.PageValidate.FilterParam(User.Identity.Name);
+                if (user != bill.r_add_user_id)
+                {
+                    json.msg_code = "forbidden";
+                    json.msg_text = "没有权限操作他人申请的报销单。";
+                    goto next;
+                }
+                if (bill.r_bill_state == 1)
+                {
+                    json.msg_code = "forbidden";
+                    json.msg_text = "已批复同意的报销单不允许删除任何信息。";
+                    goto next;
+                }
+            }
+            db.Reimbursement_Attachment.Remove(atta);
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().Name);
+                json.msg_code = "error";
+                json.msg_text = "附件删除失败。";
+                goto next;
+            }
+            json.state = 1;
+            json.msg_code = "success";
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
         }
+        #endregion
         public ActionResult MyFunds(BillsSearchModel info)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
@@ -674,13 +850,13 @@ namespace FundsManager.Controllers
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
             if (number == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return RedirectToRoute(new {controller="Error",action= "Index",err="报销单号获取失败。" });
             }
             var cmList = (from bill in db.Reimbursement
                           join das in db.Dic_Respond_State
                           on bill.r_bill_state equals das.drs_state_id
                           join f in db.Funds on bill.r_funds_id equals f.f_id
-                          where bill.r_add_user_id == user// && apply.apply_state == 3
+                          where bill.reimbursement_code == number
                           select new ApplyListModel
                           {
                               amount = bill.r_bill_amount,
@@ -690,7 +866,7 @@ namespace FundsManager.Controllers
                               time = bill.r_add_date,
                               fundsCode = f.f_code,
                               fundsName = f.f_name,
-                              attachmentsCount = (from a in db.Reimbursement_Attachment where a.atta_reimbursement_code == bill.reimbursement_code select a.attachment_id).DefaultIfEmpty(0).Count(),
+                              attachmentsCount = (from a in db.Reimbursement_Attachment where a.atta_reimbursement_code == bill.reimbursement_code select a.attachment_id).Count(),
                               contents = (from c in db.Reimbursement_Content
                                           join Dic in db.Dic_Reimbursement_Content on c.c_dic_id equals Dic.content_id
                                           where c.c_reimbursement_code == bill.reimbursement_code
@@ -702,11 +878,25 @@ namespace FundsManager.Controllers
                                               contentTitle = Dic.content_title
 
                                           }
-                                            ).ToList()
+                                            ).ToList(),
+                              responds = (from r in db.Process_Respond
+                                          where r.pr_reimbursement_code == bill.reimbursement_code
+                                          join rs in db.Dic_Respond_State on r.pr_state equals rs.drs_state_id
+                                          join u in db.User_Info on r.pr_user_id equals u.user_id
+                                          select new Respond
+                                          {
+                                              id = r.pr_id,
+                                              next = r.next,
+                                              reason = r.pr_content,
+                                              state = r.pr_state,
+                                              strState = rs.drs_state_name,
+                                              respondUser=u.real_name
+                                          }).ToList()
                           }
                             ).ToList();
             return View(cmList);
         }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

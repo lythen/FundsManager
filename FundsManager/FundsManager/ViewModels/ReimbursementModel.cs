@@ -45,6 +45,7 @@ namespace FundsManager.ViewModels
         public int? attachmentsCount { get; set; }
         public List<ViewAttachment> attachments { get; set; }
         public List<ViewContentModel> contents { get; set; }
+        public List<Respond> responds { get; set; }
     }
     /// <summary>
     /// 附件内容
@@ -64,10 +65,9 @@ namespace FundsManager.ViewModels
     /// </summary>
     public class ViewContentModel
     {
-        private int _apply_state = 0;
         [StringLength(9), DisplayName("报销单编号")]
         public string reimbursementCode { get; set; }
-        [StringLength(13), DisplayName("报销内容ID")]
+        [DisplayName("报销内容ID")]
         public int? contentId { get; set; }//不是字典的报销内容的ID（select）
         [Required, DataType(DataType.Currency), DisplayName("金额")]
         public decimal amount { get; set; }
@@ -92,7 +92,7 @@ namespace FundsManager.ViewModels
     }
     public class ApplyFundsManager
     {
-        [StringLength(13), DisplayName("报销单编号")]
+        [StringLength(9), DisplayName("报销单编号")]
         public string reimbursementCode { get; set; }
         [DisplayName("管理员")]
         public string strManager { get; set; }
@@ -122,5 +122,6 @@ namespace FundsManager.ViewModels
         public int fid { get { return _fid; }set { _fid = value; } }
         public DateTime? beginDate { get; set; }
         public DateTime? endDate { get; set; }
+        public string reimbursementCode { get; set; }
     }
 }

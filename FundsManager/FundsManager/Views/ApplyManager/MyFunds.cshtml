@@ -92,8 +92,7 @@
                     @item.strState
                 </td>
                 <td>
-                    @Html.ActionLink("详细", "Details", new { id = item.reimbursementCode }, new { @class = "btn btn-info" })
-                  @Html.ActionLink("修改", "Edit", new { id = item.reimbursementCode }, new { @class = "btn btn-success" })
+                  @Html.ActionLink("查看", "Edit", new { id = item.reimbursementCode }, new { @class = "btn btn-success" })
                     @if (@canDel)
                     {
                         <a href="javascript:void(0);" class="btn btn-default" onclick="DelCApply('@item.reimbursementCode')">撤销</a>

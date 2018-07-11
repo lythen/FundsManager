@@ -142,7 +142,7 @@
             <label class="control-label col-md-2" for="amount">选择批复领导</label>
             <div class="col-md-10">
                 @Html.DropDownList("ddlUser", ViewData["ViewUsers"] as List<SelectListItem>, new { @class = "select form-control f-sel fl ddl-users" })
-                @Html.ValidationMessageFor(model => model.Fid, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.next, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="form-group btn-div">
@@ -203,7 +203,7 @@
     }
     function AddDetail(obj) {
         var div = $(obj).parent().parent().next().find('.col-md-10');
-        var detail = '<div class="detail-out"><input type="text" class="time form-control fl form_date" placeholder="请选择时间" /><input type="text" class="detail form-control fl" placeholder="请输入明细" /><input type="number" class="amount form-control fl txt-funds" onblur="ResetAmount();" placeholder="请输入金额" /><a href="javascript:void(0)" onclick="DeleteDetail(this)" class="btn btn-danger btn-sm">X</a></div>';
+        var detail = '<div class="detail-out"><input type="text" class="time form-control fl form_date" placeholder="请选择时间" /><input type="text" class="detail form-control fl" placeholder="请输入明细" /><input type="number" class="amount form-control fl" placeholder="请输入金额" /><a href="javascript:void(0)" onclick="DeleteDetail(this)" class="btn btn-danger btn-sm">X</a></div>';
         div.append(detail);
         $('.form_date').datetimepicker({
             language: 'zh-CN',
@@ -236,7 +236,8 @@
         //var $btn = $(obj).button('loading');
         $.post("@Url.RouteUrl(new {controller= "ApplyManager", action= "Create" })", formdata, function (data, status) {
             if (data.state == '1') {
-                //location.href = '@Url.RouteUrl(new { action = "ApplyNext", controller = "ApplyManager"})?number='+data.msg_text;
+                if (data.msg_text) $('#msg').text(data.msg_text);
+                else location.href = '@Url.RouteUrl(new { action = "ApplyNext", controller = "ApplyManager"})?number=' + data.msg_text;
             } else {
                 if (data.msg_code == 'nologin') location.href = '@Url.RouteUrl(new { action = "LogOut", controller = "Login"})';
                 $('#msg').removeClass();

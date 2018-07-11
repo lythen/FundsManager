@@ -26,8 +26,6 @@ namespace FundsManager.ViewModels
     {
         [DisplayName("经费编号")]
         public string fundsCode { get; set; }
-        [DisplayName("报销单号")]
-        public string reimbursementCode { get; set; }
         [DisplayName("申请名")]
         public string name { get; set; }
         [DisplayName("申请时间")]
@@ -44,5 +42,8 @@ namespace FundsManager.ViewModels
         public string reason { get; set; }
         public int? id { get; set; }
         public int? next { get; set; }
+        public int state { get; set; }
+        public string strState { get; set; }
+        public string respondUser { get; set; }
     }
 }
