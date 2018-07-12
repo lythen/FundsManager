@@ -20,7 +20,6 @@ namespace FundsManager.Controllers
         private static string cache_cardType = "cache_cardType";
         private static string cache_funds = "cache_funds_";
         private static string cache_process = "cache_process";
-        private static string cache_fundsYear = "cache_fundsYear";
         private static string cache_stat_detail = "cache_stat_detail";
         private static string cache_response_user = "cache_response_user_";
         private static string cache_authority = "cache_authority";

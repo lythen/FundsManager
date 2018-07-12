@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace FundsManager.ViewModels
 {
@@ -45,5 +46,9 @@ namespace FundsManager.ViewModels
         public int state { get; set; }
         public string strState { get; set; }
         public string respondUser { get; set; }
+        [DisplayFormat(DataFormatString = "{0:d}", NullDisplayText = "")]
+        public DateTime? respondDate { get; set; }
+        public int? num { get; set; }
+        public int? respondUserId { get; set; }
     }
 }

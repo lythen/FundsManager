@@ -98,7 +98,7 @@
             <label class="control-label col-md-2">报销事由</label>
             <div class="col-md-10">
                 @Html.EditorFor(model => model.info, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.amount, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.info, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="form-group">
@@ -237,7 +237,10 @@
         $.post("@Url.RouteUrl(new {controller= "ApplyManager", action= "Create" })", formdata, function (data, status) {
             if (data.state == '1') {
                 if (data.msg_text) $('#msg').text(data.msg_text);
-                else location.href = '@Url.RouteUrl(new { action = "ApplyNext", controller = "ApplyManager"})?number=' + data.msg_text;
+                else {
+                    alert("报销单添加成功！");
+                    location.href = './myFunds';
+                }
             } else {
                 if (data.msg_code == 'nologin') location.href = '@Url.RouteUrl(new { action = "LogOut", controller = "Login"})';
                 $('#msg').removeClass();

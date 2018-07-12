@@ -13,6 +13,7 @@ using System.Data.Entity.Validation;
 using System.Text;
 using System.Configuration;
 using System.IO;
+using FundsManager.Common.DEncrypt;
 
 namespace FundsManager.Controllers
 {
@@ -59,44 +60,80 @@ namespace FundsManager.Controllers
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return RedirectToRoute(new { controller = "Error", action = "Index", err = "报销单号获取失败。" });
             }
-            var cmList = (from bill in db.Reimbursement
-                          join respond in db.Process_Respond on bill.reimbursement_code equals respond.pr_reimbursement_code
-                          join u in db.User_Info on respond.pr_user_id equals u.user_id
-                          join r in db.Dic_Respond_State on respond.pr_state equals r.drs_state_id
+            List<SelectOption> options = DropDownList.RespondUserSelect();
+            ViewData["ViewUsers"] = DropDownList.SetDropDownList(options);
+
+            var detail = (from bill in db.Reimbursement
+                          join das in db.Dic_Respond_State
+                          on bill.r_bill_state equals das.drs_state_id
+                          join f in db.Funds on bill.r_funds_id equals f.f_id
+                          join u in db.User_Info on bill.r_add_user_id equals u.user_id
                           where bill.reimbursement_code == id
-                          select new ApplyFundsManager
+                          select new ApplyListModel
                           {
+                              amount = bill.r_bill_amount,
                               reimbursementCode = bill.reimbursement_code,
-                              strManager = u.real_name,
-                              strState = r.drs_state_name
+                              state = bill.r_bill_state,
+                              strState = das.drs_state_name,
+                              time = bill.r_add_date,
+                              fundsCode = f.f_code,
+                              fundsName = f.f_name,
+                              userName = u.real_name,
+                              info=bill.reimbursement_info,
+                              attachments = (from atta in db.Reimbursement_Attachment
+                                             where atta.atta_reimbursement_code == bill.reimbursement_code
+                                             select new ViewAttachment
+                                             {
+                                                 fileName = atta.attachment_path,
+                                                 id = atta.attachment_id,
+                                                 reimbursementCode = atta.atta_reimbursement_code
+                                             }).ToList(),
+                              contents = (from c in db.Reimbursement_Content
+                                          join Dic in db.Dic_Reimbursement_Content on c.c_dic_id equals Dic.content_id
+                                          where c.c_reimbursement_code == bill.reimbursement_code
+                                          select new ViewContentModel
+                                          {
+                                              amount = c.c_amount,
+                                              contentId = c.content_id,
+                                              reimbursementCode = c.c_reimbursement_code,
+                                              contentTitle = Dic.content_title,
+                                               details=(from d in db.Reimbursement_Detail where d.detail_content_id==c.content_id
+                                                        select new ViewDetailContent
+                                                        {
+                                                             amount=d.detail_amount,
+                                                              detailDate=d.detail_date,
+                                                               detailInfo=d.detail_info
+                                                        }).ToList()
+                                          }
+                                            ).ToList(),
+                              responds = (from r in db.Process_Respond
+                                          where r.pr_reimbursement_code == bill.reimbursement_code
+                                          join rs in db.Dic_Respond_State on r.pr_state equals rs.drs_state_id
+                                          join u in db.User_Info on r.pr_user_id equals u.user_id
+                                          orderby r.pr_number ascending
+                                          select new Respond
+                                          {
+                                              id = r.pr_id,
+                                              next = r.next,
+                                              reason = r.pr_content,
+                                              state = r.pr_state,
+                                              strState = rs.drs_state_name,
+                                              respondUser = u.real_name,
+                                              respondDate = r.pr_time,
+                                              num=r.pr_number,
+                                              respondUserId=r.pr_user_id
+                                          }).ToList()
                           }
-                          ).FirstOrDefault();
-            ViewBag.number = id;
-            var plist = (from p in db.Process_Respond
-                         join s in db.Dic_Respond_State
-                         on p.pr_state equals s.drs_state_id into T1
-                         from t1 in T1.DefaultIfEmpty()
-                         join u in db.User_Info
-                         on p.pr_user_id equals u.user_id into T2
-                         from t2 in T2.DefaultIfEmpty()
-                         where p.pr_reimbursement_code == cmList.reimbursementCode
-                         select new ListResponseModel
-                         {
-                             reimbursementCode = p.pr_reimbursement_code,
-                             content = p.pr_content,
-                             id = p.pr_id,
-                             number = p.pr_number,
-                             strState = t1.drs_state_name,
-                             state = p.pr_state,
-                             time = p.pr_time,
-                             user = t2.user_name
-                         }
-                         ).ToList();
-            cmList.processList = plist;
-            
-            return View(cmList);
+                            ).FirstOrDefault();
+            detail.userName= AESEncrypt.Decrypt(detail.userName);
+            if (detail.responds != null && detail.responds.Count() > 0)
+            {
+                foreach (var respond in detail.responds)
+                    respond.respondUser = AESEncrypt.Decrypt(respond.respondUser);
+            }
+            return View(detail);
         }
         // GET: ApplyManager/Create
         public ActionResult Create()
@@ -817,6 +854,7 @@ namespace FundsManager.Controllers
             info.PageSize = 0;
             var list = dal.GetApplyList(info);
             var waitList = (from bill in list
+                            orderby bill.time descending
                             select new ApplyListModel
                             {
                                 amount = bill.amount,

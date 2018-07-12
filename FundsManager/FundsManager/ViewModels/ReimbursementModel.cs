@@ -1,10 +1,7 @@
-﻿using FundsManager.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 
 namespace FundsManager.ViewModels
 {
@@ -46,6 +43,7 @@ namespace FundsManager.ViewModels
         public List<ViewAttachment> attachments { get; set; }
         public List<ViewContentModel> contents { get; set; }
         public List<Respond> responds { get; set; }
+        public string userName { get; set; }
     }
     /// <summary>
     /// 附件内容
@@ -86,7 +84,7 @@ namespace FundsManager.ViewModels
         public string detailInfo { get; set; }
         [DataType(DataType.Currency), DisplayName("明细金额")]
         public decimal amount { get; set; }
-        [DisplayName("日期")]
+        [DisplayName("日期"),DisplayFormat(DataFormatString = "{0:d}",NullDisplayText ="")]
         public DateTime? detailDate { get; set; }
         public string strDate { get; set; }
     }
