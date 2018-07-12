@@ -298,7 +298,6 @@
     <Content Include="Views\SystemSet\SiteInfo.cshtml" />
     <Content Include="Views\SystemSet\ContrlModule.cshtml" />
     <Content Include="Views\ApplyManager\MyFunds.cshtml" />
-    <Content Include="Views\ApplyManager\ApplyNext.cshtml" />
     <Content Include="Views\SystemSet\Post.cshtml" />
     <Content Include="Views\SystemSet\Department.cshtml" />
     <Content Include="Views\SystemSet\Role.cshtml" />

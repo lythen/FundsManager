@@ -16,6 +16,11 @@
     .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
         vertical-align: middle;
 }
+    .ddl-users{width:150px;}
+    
+    .fl {
+        display: inline-block;
+    }
 </style>
 
 <h4>@Model.reimbursementCode - 报帐单详细信息</h4>
@@ -140,7 +145,7 @@
                                <th>审批时间</th>
                                <th>备注</th>
                            </tr>
-                           @foreach(var ritem in Model.responds)
+                           @foreach (var ritem in Model.responds)
                            {
                                if (thisRespondUser == "")
                                {
@@ -148,6 +153,10 @@
                                    {
                                        thisRespondUser = ritem.respondUserId.ToString();
                                    }
+                               }
+                               if (ritem.respondUserId.ToString() == User.Identity.Name)
+                               {
+                                <input type="hidden" id="hidRespondId" value="@ritem.id" />
                                }
                                <tr>
                                    <td>@Html.DisplayFor(Ritem => ritem.respondUser, new { htmlAttributes = new { @class = "form-control" } })</td>
@@ -161,33 +170,68 @@
                 </div>
             </div>
 
-        @if (thisRespondUser == User.Identity.Name)
+        @if (thisRespondUser == User.Identity.Name&&Model.state!=1)
         {
         <div class="form-group">
             <label class="control-label col-md-2" for="amount">审批操作</label>
             <div class="col-md-10">
-                审核结果：
-                备注：
+                <table class="table main-table">
+                    <tr>
+                        <td width="120px" class="txt-bold">审批结果</td>
+                        <td><select id="ddlResult" class="form-control" style="width:120px;display:inline-block">
+    <option value="1">通过</option>
+    <option value="2">不通过</option>
+</select></td>
+                    </tr>
+                    <tr>
+                        <td class="txt-bold">备注</td>
+                        <td><input id="inpReason" class="form-control fl" type="text" /></td>
+                    </tr>
+                    <tr>
+                        <td class="txt-bold">下一步审批</td>
+                        <td>@Html.DropDownListFor(model => Model.next, Model.next, ViewData["ViewUsers"] as List<SelectListItem>, "请选择", new Dictionary<string, object> { { "class", "select form-control ddl-users" }, { "ID", "ddlUser" } })
+                        @Html.ValidationMessageFor(model => model.next, "", new { @class = "text-danger" })</td>
+                    </tr>
+                </table>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label col-md-2" for="amount">下一步审核批</label>
-            <div class="col-md-10">
-                @Html.DropDownListFor(model => Model.next, Model.next, ViewData["ViewUsers"] as List<SelectListItem>, null, new Dictionary<string, object> { { "class", "select form-control f-sel fl ddl-users" }, { "ID", "ddlUser" } })
-                @Html.ValidationMessageFor(model => model.next, "", new { @class = "text-danger" })
-            </div>
+           
         </div>
         }
         <div class="form-group btn-div">
             <div class="col-md-offset-2 col-md-10">
                 @if (thisRespondUser == User.Identity.Name)
                 {
-                    <button type="button" id="fat-btn" onclick="Add(this);" data-loading-text="加载中..." class="btn btn-primary" autocomplete="off">
+                    <button type="button" id="fat-btn" onclick="AddRespond(this);" data-loading-text="提交中..." class="btn btn-primary" autocomplete="off">
                         提 交
                     </button>
                 }
-                @Html.ActionLink("返 回", "myFunds", null, new { @class = "btn btn-warning" })
+                <a href="../../RespondManager" class="btn btn-warning">返 回</a>
             </div>
         </div>
     </div>
 }
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script src="~/scripts/extendindexof.js"></script>
+<script>
+    function AddRespond() {
+        var respond = new Object();
+        respond.id = $('#hidRespondId').val();
+        if (!respond.id) {
+            alert("非当前批复人，无法审批。");
+            return;
+        }
+        respond.reason = $('#inpReason').val();
+        try{
+            var next = parseInt($('#ddlUser').val());
+            if (next > 0) respond.next = next;
+        } catch (err) { }
+        respond.state = $('#ddlResult').val();
+        
+        $.post("../../RespondManager/SetAgree", respond, function (data) {
+            if (data.state == 1) {
+                alert("操作成功");
+                location.reload();
+            } else alert(data.msg_text);
+        });
+    }
+</script>
