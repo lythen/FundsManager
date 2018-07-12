@@ -27,12 +27,15 @@ namespace FundsManager.Controllers
             ViewData["Bills"] = list;
             return View(info);
         }
-        public ActionResult Responded()
+        public ActionResult Responded(BillsSearchModel info)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "Index" });
+            ApplyManager dal = new ApplyManager(db);
+            ViewData["ViewUsers"] = DropDownList.RespondUserSelect();
             int userId = PageValidate.FilterParam(User.Identity.Name);
             var list = getResponseDetail(userId, 1, 2, 3, 4);
-            return View(list);
+            ViewData["Bills"] = list;
+            return View(info);
         }
         List<ApplyListModel> getResponseDetail(int userId, params int[] state)
         {
@@ -66,49 +69,6 @@ namespace FundsManager.Controllers
                     item.userName = AESEncrypt.Decrypt(item.userName);
                 }
             return list;
-        }
-        // GET: RespondManager/Details/5
-        public JsonResult Details(int? id)
-        {
-            BaseJsonData json = new BaseJsonData();
-            if (!User.Identity.IsAuthenticated)
-            {
-                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
-                json.msg_code = "notLogin";
-                return Json(json, JsonRequestBehavior.AllowGet);
-            }
-            if (id == null || id == 0)
-            {
-                json.msg_text = "参数传递失败，请重试。";
-                json.msg_code = "paramErr";
-                return Json(json, JsonRequestBehavior.AllowGet);
-            }
-            var apply = (from r in db.Process_Respond
-                         join bill in db.Reimbursement on r.pr_reimbursement_code equals bill.reimbursement_code
-                         join f in db.Funds on bill.r_funds_id equals f.f_id
-                         join u in db.User_Info on bill.r_add_user_id equals u.user_id
-                         where r.pr_id == id
-                         select new ResponseDetail
-                         {
-                             applyUser = u.real_name,
-                             reimbursementCode = bill.reimbursement_code,
-                             fundsCode = f.f_code,
-                             content = bill.reimbursement_info,
-                             applyAmount = bill.r_bill_amount
-                         }
-                       ).FirstOrDefault();
-
-            if (apply == null)
-            {
-                json.msg_text = "没找到该流程，可能已经撤销，请重试。";
-                json.msg_code = "None";
-                return Json(json, JsonRequestBehavior.AllowGet);
-            }
-            apply.applyUser = AESEncrypt.Decrypt(apply.applyUser);
-            json.msg_code = "success";
-            json.state = 1;
-            json.data = apply;
-            return Json(json, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]

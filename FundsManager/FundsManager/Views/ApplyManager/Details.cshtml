@@ -205,7 +205,7 @@
                         提 交
                     </button>
                 }
-                <a href="../../RespondManager" class="btn btn-warning">返 回</a>
+                <a href="javascript:void(0)" onclick="GoBack();"  class="btn btn-warning">返 回</a>
             </div>
         </div>
     </div>
@@ -213,6 +213,9 @@
 <script src="~/scripts/jquery-1.10.2.min.js"></script>
 <script src="~/scripts/extendindexof.js"></script>
 <script>
+    function GoBack() {
+        history.go(-1);
+    }
     function AddRespond() {
         var respond = new Object();
         respond.id = $('#hidRespondId').val();
