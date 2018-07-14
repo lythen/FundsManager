@@ -44,6 +44,7 @@ namespace FundsManager.ViewModels
         public List<ViewContentModel> contents { get; set; }
         public List<Respond> responds { get; set; }
         public string userName { get; set; }
+        public int? manager { get; set; }
     }
     /// <summary>
     /// 附件内容
@@ -118,8 +119,20 @@ namespace FundsManager.ViewModels
         public string strEndDate { get; set; }
         public int userId { get { return _userId; } set { _userId = value; } }
         public int fid { get { return _fid; }set { _fid = value; } }
+        [DisplayFormat(DataFormatString =("{0:d}"),NullDisplayText ="")]
         public DateTime? beginDate { get; set; }
+        [DisplayFormat(DataFormatString = ("{0:d}"), NullDisplayText = "")]
         public DateTime? endDate { get; set; }
         public string reimbursementCode { get; set; }
+    }
+    public class StatisticsSearch : BasePagerModel
+    {
+        public int? fund { get; set; }
+        [DisplayFormat(DataFormatString = ("{0:d}"), NullDisplayText = "")]
+        public DateTime? beginDate { get; set; }
+        [DisplayFormat(DataFormatString = ("{0:d}"), NullDisplayText = "")]
+        public DateTime? endDate { get; set; }
+        public int? userId { get; set; }
+        public int? manager { get; set; }
     }
 }

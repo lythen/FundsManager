@@ -244,8 +244,8 @@ namespace FundsManager.Controllers
         public ActionResult Edit([Bind(Include = "id,name,realName,certificateType,certificateNo,mobile,email,password,password2,state,gender,postId,officePhone,picture,deptId,deptChild,roleId")]UserEditModel model)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
-            LoginRole role = (LoginRole)Session["LoginRole"];
-            if (role.roleName != "系统管理员" && User.Identity.Name != model.id.ToString())
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if(!RoleCheck.CheckHasAuthority(user,db, "用户管理"))
                 return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限!" });
             setSelect();
             if (ModelState.IsValid)

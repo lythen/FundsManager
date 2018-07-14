@@ -11,7 +11,8 @@ namespace FundsManager.DAL
     {
         private FundsContext db;
         public ApplyManager(FundsContext _db) {
-            db = _db;
+            if (_db == null) db = new FundsContext();
+            else db = _db;
         }
         /// <summary>
         /// 获取主报帐单列表
@@ -61,7 +62,9 @@ namespace FundsManager.DAL
                             fundsName = f.f_name,
                             userName = u.real_name,
                             info = bill.reimbursement_info,
-                             userId=bill.r_add_user_id
+                             userId=bill.r_add_user_id,
+                              manager=f.f_manager,
+                              factAmount=bill.r_fact_amount
                         };
             if (!string.IsNullOrEmpty(reimbursement_code)) query = query.Where(x => x.reimbursementCode == reimbursement_code);
             if (userId > 0)

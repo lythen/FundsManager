@@ -20,7 +20,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
+            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
 
             ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
             return View(info);
@@ -30,7 +30,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
             return View(info);
@@ -42,7 +42,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             Sys_SiteInfo model = db.Sys_SiteInfo.FirstOrDefault();
             if (model != null)
@@ -74,7 +74,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             List<ModuleInfo> models = DBCaches2.getModuleInfo();
             foreach (ModuleInfo model in models)
@@ -104,7 +104,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user))
+            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -154,7 +154,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             ViewData["PostList"] = DBCaches<Dic_Post>.getCache("cache_post"); ;
             return View(new Dic_Post());
@@ -165,7 +165,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             model.post_name = PageValidate.InputText(model.post_name, 50);
             if (db.Dic_Post.Where(x => x.post_name == model.post_name).Count() > 0) ViewBag.msg = "名称已存在";
@@ -197,7 +197,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user))
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -239,7 +239,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user))
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -284,7 +284,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             List<SelectOption> options = DropDownList.getDepartment();
             ViewBag.Dept = DropDownList.SetDropDownList(options);
@@ -297,7 +297,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             List<SelectOption> options = DropDownList.getDepartment();
             ViewBag.Dept = DropDownList.SetDropDownList(options);
@@ -333,7 +333,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user))
+            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -375,7 +375,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user))
+            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -443,7 +443,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user))
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -487,7 +487,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user))
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -527,6 +527,8 @@ namespace FundsManager.Controllers
                 json.msg_code = "error";
                 Common.ErrorUnit.WriteErrorLog(ex.ToString(), this.GetType().ToString());
             }
+            //重设置角色权限后，必需清除缓存
+            DataCache.RemoveCacheBySearch("user_vs_roles");
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
@@ -535,7 +537,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err="没有权限当前内容。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err="没有权限当前内容。" });
             ViewData["RoleList"] = DBCaches<Dic_Role>.getCache("cache_role"); ;
             return View(new Dic_Role());
         }
@@ -545,7 +547,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user)) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
 
             model.role_name = PageValidate.InputText(model.role_name, 50);
             if (db.Dic_Role.Where(x => x.role_name == model.role_name).Count() > 0) ViewBag.msg = "角色名称已存在";
@@ -577,7 +579,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user))
+            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -625,7 +627,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsAdmin(user))
+            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -669,7 +671,25 @@ namespace FundsManager.Controllers
             return Json(json, JsonRequestBehavior.AllowGet);
         }
         #endregion
-
+        public JsonResult DeleteAllCache()
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "NoPower";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            DataCache.RemoveAllCache();
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)

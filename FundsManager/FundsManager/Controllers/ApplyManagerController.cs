@@ -759,35 +759,8 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
             ApplyManager dal = new ApplyManager(db);
-            if (!RoleCheck.CheckIsAdmin(user)) info.userId = user;
-            //info.PageSize = 0;
-            //var list = dal.GetApplyList(info);
-            //var waitList = (from bill in list
-            //                orderby bill.time descending
-            //                select new ApplyListModel
-            //                {
-            //                    amount = bill.amount,
-            //                    reimbursementCode = bill.reimbursementCode,
-            //                    state = bill.state,
-            //                    strState = bill.strState,
-            //                    time = bill.time,
-            //                     fundsCode= bill.fundsCode,
-            //                     fundsName= bill.fundsName,
-            //                    attachmentsCount = (from a in db.Reimbursement_Attachment where a.atta_reimbursement_code == bill.reimbursementCode select a.attachment_id).Count(),
-            //                    contents = (from c in db.Reimbursement_Content
-            //                                join Dic in db.Dic_Reimbursement_Content on c.c_dic_id equals Dic.content_id
-            //                                where c.c_reimbursement_code == bill.reimbursementCode
-            //                                select new ViewContentModel
-            //                                {
-            //                                    amount = c.c_amount,
-            //                                    contentId = c.content_id,
-            //                                    reimbursementCode = c.c_reimbursement_code,
-            //                                    contentTitle = Dic.content_title
-
-            //                                }
-            //                                  ).ToList()
-            //                }
-            //                ).ToList();
+            if (!RoleCheck.CheckHasAuthority(user,db, "经费管理")) info.userId = user;
+           
             var bills = dal.GetReimbursement("", user).ToList();
             foreach(var bill in bills)
             {

@@ -66,5 +66,15 @@ namespace FundsManager.Common
                 objCache.Remove(enumCache.Key.ToString());
             }
         }
+        public static void RemoveCacheBySearch(string KeyWord)
+        {
+            System.Web.Caching.Cache objCache = HttpRuntime.Cache;
+            IDictionaryEnumerator enumCache = objCache.GetEnumerator();
+            while (enumCache.MoveNext())
+            {
+                if (enumCache.Key.ToString().Contains(KeyWord))
+                    objCache.Remove(enumCache.Key.ToString());
+            }
+        }
     }
 }

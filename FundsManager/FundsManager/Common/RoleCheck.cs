@@ -1,39 +1,22 @@
 ﻿using FundsManager.DAL;
 using System.Linq;
-using System.Web;
 
 namespace FundsManager.Common
 {
     public static class RoleCheck
     {
-        public static bool CheckIsAdmin(int userid)
+        public static bool CheckHasAuthority(int userid, FundsContext db,params string[] auths)
         {
-            string[] AuthRoles= { "系统管理员" };
+            if (CheckIsSuperAdmin(userid, db)) return true;
+            if (auths.Contains("系统管理员")) return false;
             #region 确定当前用户角色是否属于指定的角色
             //获取当前用户所在角色
-            string[] userRoles;
-            string cache_key = "user_vs_roles-" + userid;
-            object objUVR = DataCache.GetCache(cache_key);
-            if (objUVR == null)
-            {
-                FundsContext db = new FundsContext();
-                userRoles = (from u in db.User_Info
-                             join uvr in db.User_vs_Role
-                             on u.user_id equals uvr.uvr_user_id
-                             join r in db.Dic_Role
-                             on uvr.uvr_role_id equals r.role_id
-                             where u.user_id == userid
-                             select r.role_name
-                                 ).ToArray();
-                if (userRoles.Count() == 0) return false;
-                DataCache.SetCache(cache_key, userRoles);
-            }
-            else userRoles = (string[])objUVR;
-
+            string[] userRoles = GetUserAuthority(userid, db);
+            if (userRoles == null) return false;
             //验证是否属于对应角色
-            for (int i = 0; i < AuthRoles.Length; i++)
+            foreach (string auth in auths)
             {
-                if (userRoles.Contains(AuthRoles[i]))
+                if (userRoles.Contains(auth))
                 {
                     return true;
                 }
@@ -41,40 +24,33 @@ namespace FundsManager.Common
             #endregion
             return false;
         }
-        public static bool CheckIsRespond(int userid)
+        static string[] GetUserAuthority(int userId, FundsContext db)
         {
-            string[] AuthRoles = { "系统管理员","批复用户" };
-            #region 确定当前用户角色是否属于指定的角色
-            //获取当前用户所在角色
             string[] userRoles;
-            string cache_key = "user_vs_roles-" + userid;
+            string cache_key = "user_vs_roles-" + userId;
             object objUVR = DataCache.GetCache(cache_key);
             if (objUVR == null)
             {
-                FundsContext db = new FundsContext();
-                userRoles = (from u in db.User_Info
-                             join uvr in db.User_vs_Role
-                             on u.user_id equals uvr.uvr_user_id
-                             join r in db.Dic_Role
-                             on uvr.uvr_role_id equals r.role_id
-                             where u.user_id == userid
-                             select r.role_name
+                userRoles = (from user in db.User_Info
+                             join uvr in db.User_vs_Role on user.user_id equals uvr.uvr_user_id
+                             join rva in db.Role_vs_Authority on uvr.uvr_role_id equals rva.rva_role_id
+                             join auth in db.Sys_Authority on rva.rva_auth_id equals auth.auth_id
+                             where user.user_id == userId
+                             select auth.auth_name
                                  ).ToArray();
-                if (userRoles.Count() == 0) return false;
+                if (userRoles.Count() == 0) return null;
                 DataCache.SetCache(cache_key, userRoles);
             }
             else userRoles = (string[])objUVR;
-
-            //验证是否属于对应角色
-            for (int i = 0; i < AuthRoles.Length; i++)
-            {
-                if (userRoles.Contains(AuthRoles[i]))
-                {
-                    return true;
-                }
-            }
-            #endregion
-            return false;
+            return userRoles;
+        }
+        static bool CheckIsSuperAdmin(int userId, FundsContext db)
+        {
+            var query = from uvr in db.User_vs_Role
+                        where uvr.uvr_user_id == userId && uvr.uvr_role_id == 1
+                        select uvr.uvr_user_id;
+            if (query.Count() > 0) return true;
+            else return false;
         }
     }
 }

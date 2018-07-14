@@ -1,0 +1,90 @@
+﻿@model FundsManager.ViewModels.StatisticsSearch
+@{
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费使用区间统计";
+    List<FundsManager.ViewModels.FundsStat> StatData = (List<FundsManager.ViewModels.FundsStat>)ViewData["StatData"];
+    Layout = "~/Views/Shared/_statistics.cshtml";
+}
+<style>
+    .form-control {
+        width: 200px;
+        display: inline-block;
+    }
+</style>
+<h4>经费使用-区间统计</h4>
+<hr />
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                经费：@Html.DropDownListFor(model => model.fund, Model.fund, ViewData["Funds"] as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" } })
+                @Html.ValidationMessageFor(model => model.fund, "", new { @class = "text-danger" })
+                经费管理员：@Html.DropDownListFor(model => model.manager, Model.manager, ViewData["Managers"] as List<SelectListItem>, null, new Dictionary<string, object> { { "class", "select form-control" } })
+                @Html.ValidationMessageFor(model => model.manager, "", new { @class = "text-danger" })
+                使用用户：@Html.DropDownListFor(model => model.userId, Model.userId, ViewData["Users"] as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" } })
+                @Html.ValidationMessageFor(model => model.userId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-10">
+                起始时间：@Html.EditorFor(model => model.beginDate, new { htmlAttributes = new { @class = "form-control form_date" } })
+                @Html.ValidationMessageFor(model => model.beginDate, "", new { @class = "text-danger" })
+                结束时间：@Html.EditorFor(model => model.endDate, new { htmlAttributes = new { @class = "form-control form_date" } })
+                @Html.ValidationMessageFor(model => model.endDate, "", new { @class = "text-danger" })
+                <input type="submit" value="查询" class="btn btn-info" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10" style="color:red;width:100%;text-align:center;">
+        @ViewBag.msg
+    </div>
+    <div class="form-horizontal">
+        <table class="table table-bordered stat">
+            <tr>
+                <th>
+                    经费名称
+                </th>
+                <th>已使用（元）</th>
+                <th>申请数量（笔）</th>
+            </tr>
+            @foreach (var item in StatData)
+                {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(citem => item.name)
+                    </td>
+                    <td>@Html.DisplayFor(citem => item.hasUsed)</td>
+                    <td>@Html.DisplayFor(citem => item.applyNum)</td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script src="~/scripts/extendindexof.js"></script>
+<script>
+    $(function () {
+        $.ajaxSetup({
+            cache: true
+        });
+        $.getScript('../scripts/bootstrap.min.js').done(function () {
+            $.getScript('../Scripts/bootstrap-datetimepicker.js').done(function () {
+                $.getScript('../Scripts/locales/bootstrap-datetimepicker.zh-CN.js').done(function () {
+                    $('.form_date').datetimepicker({
+                        language: 'zh-CN',
+                        weekStart: 1,
+                        todayBtn: 1,
+                        autoclose: 1,
+                        todayHighlight: 1,
+                        startView: 2,
+                        minView: 2,
+                        forceParse: 0,
+                        format: 'yyyy/mm/dd'
+                    });
+                });
+            });
+        });
+
+    });
+</script>

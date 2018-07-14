@@ -1,0 +1,59 @@
+﻿@model FundsManager.ViewModels.StatisticsSearch
+@{
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费使用统计";
+    List<FundsManager.ViewModels.FundsStat> StatData = (List<FundsManager.ViewModels.FundsStat>)ViewData["StatData"];
+    Layout = "~/Views/Shared/_statistics.cshtml";
+}
+<style>
+    .form-control {
+        width: 200px;
+        display: inline-block;
+    }
+</style>
+<h4>经费使用统计</h4>
+<hr />
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                经费：@Html.DropDownListFor(model => model.fund, Model.fund, ViewData["Funds"] as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" } })
+                @Html.ValidationMessageFor(model => model.fund, "", new { @class = "text-danger" })
+                经费管理员：@Html.DropDownListFor(model => model.manager, Model.manager, ViewData["Managers"] as List<SelectListItem>, null, new Dictionary<string, object> { { "class", "select form-control" } })
+                @Html.ValidationMessageFor(model => model.manager, "", new { @class = "text-danger" })
+                <input type="submit" value="查询" class="btn btn-info" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10" style="color:red;width:100%;text-align:center;">
+        @ViewBag.msg
+    </div>
+    <div class="form-horizontal">
+            <table class="table table-bordered stat">
+                <tr>
+                    <th>
+                        经费名称
+                    </th>
+                    <th>经费总额（元）</th>
+                    <th>已使用（元）</th>
+                    <th>经费余额（元）</th>
+                    <th>申请数量（笔）</th>
+                    @*<th>最大申请（元）</th>*@
+                </tr>
+                @foreach (var item in StatData)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(citem => item.name)
+                        </td>
+                        <td>@Html.DisplayFor(citem => item.amount)</td>
+                        <td>@Html.DisplayFor(citem => item.hasUsed)</td>
+                        <td>@Html.DisplayFor(citem => item.balance)</td>
+                        <td>@Html.DisplayFor(citem => item.applyNum)</td>
+                        @*<td>@Html.DisplayFor(citem => item.maxUsed)</td>*@
+                    </tr>
+                }
+            </table>
+    </div>
+}

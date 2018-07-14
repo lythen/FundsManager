@@ -1,4 +1,8 @@
-﻿<header class="main-header" style="background-color:RGB(68,152,218)">
+﻿@{
+    int userId = FundsManager.Common.PageValidate.FilterParam(User.Identity.Name);
+    FundsManager.DAL.FundsContext db = new FundsManager.DAL.FundsContext();
+}
+<header class="main-header" style="background-color:RGB(68,152,218)">
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
@@ -22,28 +26,26 @@
                         <li role="presentation">
                             <a href="@Url.RouteUrl(new { controller = "Home",action="Index" })" title="首页">首页</a>
                         </li>
-                        @if(Session["ControlRoles"] != null){ 
-                        if(((string[])Session["ControlRoles"]).Contains("SystemSet"))
-                        {
-                            <li role="presentation">
-                                <a href="@Url.RouteUrl(new { controller = "SystemSet", action = "SiteInfo"})" title="系统设置" target="_top">系统设置</a>
-                            </li>
-                        }
-                        if (((string[])Session["ControlRoles"]).Contains("UserManager"))
-                        {
-                            <li role="presentation"><a href="@Url.RouteUrl(new { controller = "UserManager",action="Index" })" title="用户管理" target="_top">用户管理</a></li>
-                        }
-                        if (((string[])Session["ControlRoles"]).Contains("FundsManager"))
-                        {
-                        <li role="presentation"><a href="@Url.RouteUrl(new { controller = "FundsManager",action="Index" })" title="经费管理" target="_top">经费管理</a></li>
-                        }
-                        if (((string[])Session["ControlRoles"]).Contains("RespondManager"))
-                        {
-                        <li role="presentation"><a href="@Url.RouteUrl(new { controller = "RespondManager",action= "Index" })" title="批复管理" target="_top">批复管理</a></li>
-                            }
-                            if (((string[])Session["ControlRoles"]).Contains("ApplyManager"))
+                            @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId,db, "系统管理"))
                             {
-                                if (((string[])Session["ControlRoles"]).Contains("RespondManager"))
+                                <li role="presentation">
+                                    <a href="@Url.RouteUrl(new { controller = "SystemSet", action = "SiteInfo"})" title="系统设置" target="_top">系统设置</a>
+                                </li>
+                            }
+                            @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "用户管理"))
+                            {
+                                <li role="presentation"><a href="@Url.RouteUrl(new { controller = "UserManager",action="Index" })" title="用户管理" target="_top">用户管理</a></li>
+                            }
+                            @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "添加经费", "经费管理"))
+                            {
+                                <li role="presentation"><a href="@Url.RouteUrl(new { controller = "FundsManager",action="Index" })" title="经费管理" target="_top">经费管理</a></li>
+                            }
+                            @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "批复", "批复管理"))
+                            {
+                                <li role="presentation"><a href="@Url.RouteUrl(new { controller = "RespondManager",action= "Index" })" title="批复管理" target="_top">批复管理</a></li>
+                            }
+                            
+                                @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "申请管理"))
                                 {
                                     <li role="presentation"><a href="@Url.RouteUrl(new { controller = "ApplyManager",action= "Index" })" title="申请管理" target="_top">申请管理</a></li>
                                 }
@@ -51,8 +53,9 @@
                                 {
                                     <li role="presentation"><a href="@Url.RouteUrl(new { controller = "ApplyManager",action= "MyFunds" })" title="申请管理" target="_top">申请管理</a></li>
                                 }
-
-                            }
+                        @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "统计"))
+                        {
+                            <li role="presentation"><a href="@Url.RouteUrl(new { controller = "Statistics",action= "FundsStatistics" })" title="经费统计" target="_top">经费统计</a></li>
                         }
                     </ul>
                 </div>

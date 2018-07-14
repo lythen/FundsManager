@@ -100,13 +100,6 @@ namespace FundsManager.ViewModels
         public string strUser { get; set; }
         public int? pid { get; set; }
     }
-    public class FundsSearchModel : BasePagerModel
-    {
-        [DisplayName("经费")]
-        public int? fund { get; set; }
-        [DisplayName("统计或详细")]
-        public int statorDetail { get; set; }
-    }
         /// <summary>
          /// 经费统计
          /// </summary>
@@ -142,10 +135,8 @@ namespace FundsManager.ViewModels
         [DisplayName("经费已用（元）")]
         public decimal hasUsed { get; set; }
         [DisplayName("经费余额（元）")]
-        public decimal havntUsed { get; set; }
+        public decimal balance { get; set; }
         [DisplayName("申请数量（笔）")]
         public int applyNum { get; set; }
-        [DisplayName("最大申请（元）")]
-        public decimal maxUsed { get; set; }
     }
 }

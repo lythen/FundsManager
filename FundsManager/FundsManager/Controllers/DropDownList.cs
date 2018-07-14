@@ -5,6 +5,7 @@ using FundsManager.Models;
 using System.Linq;
 using FundsManager.Common;
 using FundsManager.ViewModels;
+using FundsManager.Common.DEncrypt;
 
 namespace FundsManager.Controllers
 {
@@ -24,6 +25,7 @@ namespace FundsManager.Controllers
         private static string cache_response_user = "cache_response_user_";
         private static string cache_authority = "cache_authority";
         private static string cache_content = "cache_content";
+        private static string cache_user = "cache_user";
         public static List<SelectListItem> SetDropDownList(List<Models.SelectOption> options)
         {
             List<SelectListItem> items = new List<SelectListItem>();
@@ -66,27 +68,34 @@ namespace FundsManager.Controllers
             }
             return options;
         }
-        public static List<SelectOption> FundsManagerSelect()
+        public static List<SelectOption> FundsManagerSelect(int userId)
         {
-            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_funds_manger);
+            string key;
+            bool isManager = RoleCheck.CheckHasAuthority(userId, db, "经费管理");
+            if (isManager) key = cache_response_user;
+            else key = cache_response_user + userId;
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(key);
             if (options == null)
             {
-                options = (from op in (from user in db.User_Info
-                                       join uvr in db.User_vs_Role
-                                       on user.user_id equals uvr.uvr_user_id into T1
-                                       from t1 in T1.DefaultIfEmpty()
-                                       where t1.uvr_role_id == 1 || t1.uvr_role_id == 2
-                                       select new
-                                       {
-                                           id = user.user_id,
-                                           text = user.real_name
-                                       }).ToList()
+                var query = (from funds in db.Funds
+                             join user in db.User_Info on funds.f_manager equals user.user_id
+                             group funds by new {funds.f_manager,user.user_name} into g
+                             select new
+                             {
+                                 userId = g.Key.f_manager,
+                                 userName=g.Key.user_name
+                             }
+                    ).ToList();
+                if (userId > 0 && !isManager)
+                    query = query.Where(x => x.userId == userId).ToList();
+                options = (from user in query
                            select new SelectOption
                            {
-                               id = op.id.ToString(),
-                               text = Common.DEncrypt.AESEncrypt.Decrypt(op.text)
+                               id = user.userId.ToString(),
+                               text = AESEncrypt.Decrypt(user.userName)
                            }).ToList();
-                if (options.Count() > 0) DataCache.SetCache(cache_funds_manger, options);
+                if (isManager) options.Insert(0,new SelectOption { id = "0", text = "全部" });
+                if (options.Count() > 0) DataCache.SetCache(key, options);
             }
             return options;
         }
@@ -111,6 +120,36 @@ namespace FundsManager.Controllers
                 options.Add(new SelectOption { text = "男", id = "男" });
                 options.Add(new SelectOption { text = "女", id = "女" });
                 DataCache.SetCache(cache_sex, options);
+            }
+            return options;
+        }
+        public static List<SelectOption> UserSelect(int userId)
+        {
+            string key = cache_user + userId;
+            bool isManager = RoleCheck.CheckHasAuthority(userId, db, "经费管理");
+            if (isManager) key = cache_user;
+            else key = cache_user + userId;
+            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(key);
+            if (options == null)
+            {
+                var query = (from user in db.User_Info
+                            where user.user_state == 1
+                            select new
+                            {
+                                userId=user.user_id,
+                                userName= user.real_name
+                            }).ToList();
+                if (userId > 0 && !isManager)
+                    query = query.Where(x => x.userId == userId).ToList();
+
+                options = (from user in query
+                           select new SelectOption
+                           {
+                               id = user.userId.ToString(),
+                               text = AESEncrypt.Decrypt(user.userName)
+                           }).ToList();
+                if (isManager) options.Insert(0,new SelectOption { id = "0", text = "全部" });
+                if (options.Count() > 0) DataCache.SetCache(key, options);
             }
             return options;
         }
@@ -157,12 +196,16 @@ namespace FundsManager.Controllers
             List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(key);
             if (options == null)
             {
-                options = (from fund in funds
-                                             where fund.f_state == 1 && fund.f_manager == (user == 0 ? fund.f_manager : user)
-                                             select new SelectOption
+                var query = from fund in funds
+                            where fund.f_state == 1
+                            select fund;
+                if(user>0&&!RoleCheck.CheckHasAuthority(user,db, "经费管理"))
+                    query = query.Where(x => x.f_manager == user);
+                options = (from fund in query
+                           select new SelectOption
                                              {
                                                  id = fund.f_id.ToString(),
-                                                 text = string.Format("{0}({1})", fund.f_name, fund.f_balance)
+                                                 text = string.Format("{0}({1})", fund.f_name, fund.f_code)
                                              }).ToList();
                 if (options.Count() > 0) DataCache.SetCache(key, options);
             }
@@ -178,24 +221,6 @@ namespace FundsManager.Controllers
                                              text = fund.process_name
                                          }).ToList();
             return option;
-        }
-        public static List<SelectOption> StatOrDetailSelect()
-        {
-            List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(cache_stat_detail);
-            if (options == null)
-            {
-                options = new List<SelectOption>();
-                SelectOption so = new SelectOption();
-                so.id = "0";
-                so.text = "统计";
-                options.Add(so);
-                so = new SelectOption();
-                so.id = "1";
-                so.text = "详细";
-                options.Add(so);
-                if (options.Count() > 0) DataCache.SetCache(cache_funds_manger, options);
-            }
-            return options;
         }
         public static List<SelectOption> RespondUserSelect()
         {

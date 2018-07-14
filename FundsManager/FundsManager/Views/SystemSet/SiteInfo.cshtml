@@ -92,4 +92,14 @@
             </td>
         </tr>
 </table>
+    <a href="javascript:void(0);" onclick="DeleteCache();" class="btn btn-danger">清除所有缓存</a>
 </div>
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script src="~/scripts/extendindexof.js"></script>
+<script>
+    function DeleteCache() {
+        $.get("./DeleteAllCache", function () {
+
+        });
+    }
+</script>

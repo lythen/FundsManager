@@ -83,7 +83,7 @@ namespace FundsManager.Controllers
                 return Json(json, JsonRequestBehavior.AllowGet);
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckIsRespond(user))
+            if (!RoleCheck.CheckHasAuthority(user, db, "批复管理", "批复"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "paramErr";
@@ -166,6 +166,7 @@ namespace FundsManager.Controllers
                         fmodel.f_balance = fmodel.f_balance - bill.r_bill_amount;
                         db.Entry(fmodel).State = System.Data.Entity.EntityState.Modified;
                         bill.r_bill_state = state;
+                        bill.r_fact_amount = bill.r_bill_amount;
                         db.Entry(bill).State = System.Data.Entity.EntityState.Modified;
                     }
                 }
