@@ -2,46 +2,40 @@
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName()+ "-首页";
 }
-<style>
-    .main-logmsg {
-        width: 100%;
-        padding: 0px 10% 0px 10%;
-    }
-</style>
-<div class="main-logmsg">
-    <h4 style="float:left;">登陆信息</h4>
-    <div class="form-group">
-        <div class="col-sm-10" style="width:100%;">
-            <table class="table">
-                <tr>
-                    <td style="text-align:left;">
-                        姓名：
-                    </td>
-                    <td style="text-align:right">
-                        @Model.name
-                    </td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;">
-                        角色：
-                    </td>
-                    <td style="text-align:right">
-                        @Model.roleName
-                    </td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;">上一次登陆：</td>
-                    <td style="text-align:right">@Model.lastTime</td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;">登陆IP：</td>
-                    <td style="text-align:right">@Model.lastIp</td>
-                </tr>
-                <tr>
-                    <td style="text-align:left;">登陆次数：</td>
-                    <td style="text-align:right">@Model.times</td>
-                </tr>
-            </table>
+    <h4>登陆信息</h4>
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10" style="margin-left:100px;width:80%;">
+                <table class="table">
+                    <tr>
+                        <td style="text-align:left;">
+                            姓名：
+                        </td>
+                        <td style="text-align:right">
+                            @Model.name
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            角色：
+                        </td>
+                        <td style="text-align:right">
+                            @Model.roleName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">上一次登陆：</td>
+                        <td style="text-align:right">@Model.lastTime</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">登陆IP：</td>
+                        <td style="text-align:right">@Model.lastIp</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">登陆次数：</td>
+                        <td style="text-align:right">@Model.times</td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
-</div>

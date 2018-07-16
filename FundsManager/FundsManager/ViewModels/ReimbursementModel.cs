@@ -88,6 +88,7 @@ namespace FundsManager.ViewModels
         [DisplayName("日期"),DisplayFormat(DataFormatString = "{0:d}",NullDisplayText ="")]
         public DateTime? detailDate { get; set; }
         public string strDate { get; set; }
+        public string contentTitle { get; set; }
     }
     public class ApplyFundsManager
     {

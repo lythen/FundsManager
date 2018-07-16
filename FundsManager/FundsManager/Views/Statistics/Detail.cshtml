@@ -3,7 +3,7 @@
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费使用明细";
     List<FundsManager.ViewModels.ApplyListModel> StatData = (List<FundsManager.ViewModels.ApplyListModel>)ViewData["Details"];
     Layout = "~/Views/Shared/_statistics.cshtml";
-    Model.PageSize = 2;
+    Model.PageSize = 10;
     int pagerLen = 20;
     int begini = 1;
     int endi = 1;
@@ -37,6 +37,46 @@
         width: 200px;
         display: inline-block;
     }
+        .detail-table > tbody > tr > td, .th-table > tbody > tr > th {
+        border: none;
+    }
+
+    .detail-table, .th-table, .content-table {
+        margin-bottom: 0px;
+    }
+
+        .th-table > tbody > tr > th {
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+
+    .txt-bold {
+        font-weight: bold;
+    }
+
+    .detail-table > tbody > tr > th, .content-table > tbody > tr > th, .th-table > tbody > tr > th, .respond-table > tbody > tr > th {
+        background: lightblue;
+    }
+
+    .detail-table > tbody > tr > td, .main-table td, .respond-table td, .content-table td {
+        background-color: aliceblue;
+    }
+
+    .main-table .txt-bold {
+        background: lightblue;
+    }
+
+    .detail-table td {
+        background-color: aquamarine;
+    }
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        vertical-align: middle;
+    }
+     .detail-table > tbody > tr > th{
+         background-color:yellowgreen;
+     }
+     .detail-table > tbody > tr > td{background-color:beige;}
 </style>
 <h4>经费使用-区间统计</h4>
 <hr />
@@ -70,7 +110,7 @@
         @ViewBag.msg
     </div>
     <div class="form-horizontal">
-        <table class="table table-bordered stat">
+        <table class="table content-table">
             <tr>
                 <th>
                     经费编号
@@ -79,12 +119,12 @@
                 <th>事由</th>
                 <th>填表人</th>
                 <th>时间</th>
-                <th>领用金额</th>
-                <th>附件数</th>
+                <th>领用金额（元）</th>
+                <th>业务数（笔）</th>
             </tr>
             @foreach (var item in StatData)
                 {
-                <tr>
+                <tr onclick="DisplayDetail('@item.reimbursementCode')" style="cursor:pointer">
                     <td>
                         @Html.DisplayFor(citem => item.fundsCode)
                     </td>
@@ -101,6 +141,11 @@
                     </td>
                     <td>
                         @Html.DisplayFor(citem => item.attachmentsCount)
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="7" id="td_@item.reimbursementCode" style="display:none;padding:0px;">
+
                     </td>
                 </tr>
             }
@@ -157,6 +202,7 @@
 }
 <script src="~/scripts/jquery-1.10.2.min.js"></script>
 <script src="~/scripts/extendindexof.js"></script>
+<script src="~/scripts/dateformat.js"></script>
 <script>
     $(function () {
         $.ajaxSetup({
@@ -203,5 +249,43 @@
         }
         pageindex--;
         goTo(pageindex);
+    }
+    function DisplayDetail(id){
+        //GetAllDetail
+        var td=$('#td_'+id);
+        if(td.find('table').length>0||td.find('div').length>0){
+            td.slideToggle('slow');
+            return;
+        }
+        $.getJSON("../Statistics/GetAllDetail?id="+id,function(data){
+            if(data.state==1){
+                var list =  data.data;
+                var len=list.length;
+                if(len>0){
+                    var table=$('<table class="table detail-table"></table>');
+                    var th=$('<tr><th>序号</th><th>报销内容</th><th>日期</th><th>事项</th><th>费用(元)</th></tr>');
+                    table.append(th);
+                    for(var i=0;i<len;i++){
+                        var tr=$('<tr></tr>');
+                        var tdc;
+                        tdc=$('<td>'+(i+1)+'</td>');
+                        tr.append(tdc);
+                        tdc=$('<td>'+list[i].contentTitle+'</td>');
+                        tr.append(tdc);
+                        var d=eval(list[i].detailDate.replace(/\/Date\((\d+)\)\//gi, "new Date($1)"));
+                        tdc=$('<td>'+d.Format('yyyy/MM/dd')+'</td>');
+                        tr.append(tdc);
+                        tdc=$('<td>'+list[i].detailInfo+'</td>');
+                        tr.append(tdc);
+                        tdc=$('<td>'+list[i].amount+'</td>');
+                        tr.append(tdc);
+                        table.append(tr);
+                    }
+                    td.append(table);
+                }else td.html('<div style="background-color:yellowgreen;">没有录入任何业务。</div>');
+            }else td.text(data.msg_text);
+        }).complete(function(){
+            td.slideToggle('slow');
+        });
     }
 </script>

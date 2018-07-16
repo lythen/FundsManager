@@ -43,7 +43,10 @@ namespace FundsManager.Controllers
             foreach(var item in list)
             {
                 item.userName = AESEncrypt.Decrypt(item.userName);
-                item.attachmentsCount= dal.getAttachments(item.reimbursementCode, 0).Count();
+                item.attachmentsCount = (from content in db.Reimbursement_Content
+                                         join detail in db.Reimbursement_Detail on content.content_id equals detail.detail_content_id
+                                         where content.c_reimbursement_code == item.reimbursementCode
+                                         select content.content_id).Count();
             }
             ViewData["Details"] = list;
             return View(search);
@@ -71,6 +74,40 @@ namespace FundsManager.Controllers
             var query = dal.GetTimesStatistics(search);
             ViewData["StatData"] = query;
             return View(search);
+        }
+        public JsonResult GetAllDetail(string id)
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_code = "nologin";
+                goto next;
+            }
+            if (id == null)
+            {
+                json.msg_code = "errorNumber";
+                json.msg_text = "报销单号获取失败。";
+                goto next;
+            }
+            //ViewDetailContent
+            var query = (from content in db.Reimbursement_Content
+                         join detail in db.Reimbursement_Detail on content.content_id equals detail.detail_content_id
+                         join dic in db.Dic_Reimbursement_Content on content.c_dic_id equals dic.content_id
+                         where content.c_reimbursement_code == id
+                         orderby detail.detail_content_id
+                         select new ViewDetailContent
+                         {
+                             contentTitle = dic.content_title,
+                             detailInfo = detail.detail_info,
+                             amount = detail.detail_amount,
+                             detailDate = detail.detail_date
+                         }
+                        ).ToList();
+            json.data = query;
+            json.state = 1;
+            json.msg_code = "success";
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
         }
         void setSearchSelect(int user)
         {

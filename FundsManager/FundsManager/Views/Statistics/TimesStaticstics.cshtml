@@ -5,9 +5,45 @@
     Layout = "~/Views/Shared/_statistics.cshtml";
 }
 <style>
-    .form-control {
+.form-control {
         width: 200px;
         display: inline-block;
+    }
+        .detail-table > tbody > tr > td, .th-table > tbody > tr > th {
+        border: none;
+    }
+
+    .detail-table, .th-table, .content-table {
+        margin-bottom: 0px;
+    }
+
+        .th-table > tbody > tr > th {
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+
+    .txt-bold {
+        font-weight: bold;
+    }
+
+    .detail-table > tbody > tr > th, .content-table > tbody > tr > th, .th-table > tbody > tr > th, .respond-table > tbody > tr > th {
+        background: lightblue;
+    }
+
+    .detail-table > tbody > tr > td, .main-table td, .respond-table td, .content-table td {
+        background-color: aliceblue;
+    }
+
+    .main-table .txt-bold {
+        background: lightblue;
+    }
+
+    .detail-table td {
+        background-color: aquamarine;
+    }
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        vertical-align: middle;
     }
 </style>
 <h4>经费使用-区间统计</h4>
@@ -40,7 +76,7 @@
         @ViewBag.msg
     </div>
     <div class="form-horizontal">
-        <table class="table table-bordered stat">
+        <table class="table content-table">
             <tr>
                 <th>
                     经费名称
