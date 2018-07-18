@@ -10,6 +10,7 @@ namespace FundsManager.Models
     {
         private DateTime _add_date = DateTime.Now;
         private int _apply_state = 0;
+        private bool _c_has_log=false;
         /// <summary>
         /// 报销单号
         /// </summary>
@@ -44,5 +45,9 @@ namespace FundsManager.Models
         /// 实际领取金额
         /// </summary>
         public decimal r_fact_amount { get; set; }
+        /// <summary>
+        /// 是否已录入实际信用金额
+        /// </summary>
+        public bool c_has_log { get { return _c_has_log; } set { _c_has_log = value; } }
     }
 }

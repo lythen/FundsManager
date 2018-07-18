@@ -1,6 +1,4 @@
-﻿using System;
-using System.Web.Security;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 namespace FundsManager.Common
 {
     public static class PasswordUnit

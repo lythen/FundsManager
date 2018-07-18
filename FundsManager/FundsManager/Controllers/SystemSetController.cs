@@ -15,7 +15,6 @@ namespace FundsManager.Controllers
         private FundsContext db = new FundsContext();
 
         #region 网站设置
-        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult SiteInfo()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
@@ -25,7 +24,6 @@ namespace FundsManager.Controllers
             ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
             return View(info);
         }
-        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult SiteSet()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
@@ -37,7 +35,6 @@ namespace FundsManager.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult SiteSet([Bind(Include = "name,company,introduce,companyAddress,companyPhone,companyEmail,managerName,managerPhone,managerEmail")]ViewModels.SiteInfo info)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
@@ -69,7 +66,6 @@ namespace FundsManager.Controllers
         }
         #endregion
         #region 模块设置
-        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult ContrlModule()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
@@ -93,7 +89,6 @@ namespace FundsManager.Controllers
             }
             return View(models);
         }
-        [HttpPost, wxAuthorize(Roles = "系统管理员")]
         public JsonResult ContrlModule(EditModules models)
         {
             BaseJsonData json = new BaseJsonData();
@@ -149,7 +144,6 @@ namespace FundsManager.Controllers
         }
         #endregion
         #region 职务设置
-        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult Post()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
@@ -159,7 +153,7 @@ namespace FundsManager.Controllers
             ViewData["PostList"] = DBCaches<Dic_Post>.getCache("cache_post"); ;
             return View(new Dic_Post());
         }
-        [HttpPost, wxAuthorize(Roles = "系统管理员")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Post(Dic_Post model)
         {
@@ -185,7 +179,6 @@ namespace FundsManager.Controllers
             ViewData["PostList"] = DBCaches<Dic_Post>.getCache("cache_post");// db.Dic_Post.ToList();
             return View(model);
         }
-        [wxAuthorize(Roles = "系统管理员")]
         public JsonResult DeletePost(string pid)
         {
             int id = PageValidate.FilterParam(pid);
@@ -228,7 +221,6 @@ namespace FundsManager.Controllers
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
-        [wxAuthorize(Roles = "系统管理员")]
         public JsonResult UpdatePost(Dic_Post post)
         {
             BaseJsonData json = new BaseJsonData();
@@ -279,7 +271,6 @@ namespace FundsManager.Controllers
         }
         #endregion
         #region 科室部门管理
-        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult Department()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
@@ -291,7 +282,7 @@ namespace FundsManager.Controllers
             ViewData["DeptList"] = DBCaches2.getDeptCache();
             return View(new DepartMentModel());
         }
-        [HttpPost, wxAuthorize(Roles = "系统管理员")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Department(DepartMentModel info)
         {
@@ -321,7 +312,6 @@ namespace FundsManager.Controllers
             ViewData["DeptList"] = DBCaches2.getDeptCache();
             return View(info);
         }
-        [wxAuthorize(Roles = "系统管理员")]
         public JsonResult DeleteDept(string pid)
         {
             int id = PageValidate.FilterParam(pid);
@@ -364,7 +354,6 @@ namespace FundsManager.Controllers
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
-        [wxAuthorize(Roles = "系统管理员")]
         public JsonResult UpdateDept(DepartMentModel dept)
         {
             BaseJsonData json = new BaseJsonData();
@@ -532,7 +521,6 @@ namespace FundsManager.Controllers
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
-        [wxAuthorize(Roles = "系统管理员")]
         public ActionResult Role()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
@@ -541,7 +529,7 @@ namespace FundsManager.Controllers
             ViewData["RoleList"] = DBCaches<Dic_Role>.getCache("cache_role"); ;
             return View(new Dic_Role());
         }
-        [HttpPost, wxAuthorize(Roles = "系统管理员")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Role(Dic_Role model)
         {
@@ -567,7 +555,6 @@ namespace FundsManager.Controllers
             ViewData["RoleList"] = DBCaches<Dic_Role>.getCache("cache_role");// db.Dic_Post.ToList();
             return View(model);
         }
-        [wxAuthorize(Roles = "系统管理员")]
         public JsonResult DeleteRole(string rid)
         {
             int id = PageValidate.FilterParam(rid);
@@ -616,7 +603,6 @@ namespace FundsManager.Controllers
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
-        [wxAuthorize(Roles = "系统管理员")]
         public JsonResult UpdateRole(Dic_Role model)
         {
             BaseJsonData json = new BaseJsonData();

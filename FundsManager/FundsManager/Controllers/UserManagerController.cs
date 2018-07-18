@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Net;
 using System.Web.Mvc;
 using FundsManager.DAL;
 using FundsManager.Models;
@@ -22,15 +21,19 @@ namespace FundsManager.Controllers
 
         public ActionResult Index()
         {
+            int uid = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(uid, db, "用户管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
             BasePagerModel pager = new BasePagerModel();
             return Index(pager);
         }
         // GET: UserManager
         [HttpPost]
-        [ValidateAntiForgeryToken, wxAuthorizeAttribute(Roles = "系统管理员")]
+        [ValidateAntiForgeryToken]
         public ActionResult Index(BasePagerModel pager)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int uid = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(uid, db, "用户管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
             if (pager == null) pager = new BasePagerModel();
             ViewData["search"] = pager;
             var list = (from user in db.User_Info
@@ -71,7 +74,6 @@ namespace FundsManager.Controllers
         }
 
         // GET: UserManager/Details/5
-        [wxAuthorizeAttribute(Roles = "系统管理员")]
         public ActionResult Details(int? id)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
@@ -88,10 +90,11 @@ namespace FundsManager.Controllers
         }
 
         // GET: UserManager/Create
-        [wxAuthorizeAttribute(Roles = "系统管理员")]
         public ActionResult Create()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(user, db, "用户管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
             setSelect();
             return View();
         }
@@ -100,10 +103,11 @@ namespace FundsManager.Controllers
         // 为了防止“过多发布”攻击，请启用要绑定到的特定属性，有关 
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
-        [ValidateAntiForgeryToken, wxAuthorizeAttribute(Roles = "系统管理员")]
         public ActionResult Create([Bind(Include = "name,realName,certificateType,certificateNo,mobile,email,password,password2,state,gender,postId,officePhone,picture,deptId,deptChild,roleId")]UserEditModel model)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(user, db, "用户管理")) return RedirectToRoute(new { controller = "Error", action = "Index",err="没有权限。" });
             setSelect();
             if (ModelState.IsValid)
             {
@@ -201,9 +205,9 @@ namespace FundsManager.Controllers
         public ActionResult Edit(int? id)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
-            LoginRole role = (LoginRole)Session["LoginRole"];
-            if (role.roleName != "系统管理员") id = PageValidate.FilterParam(User.Identity.Name);
-            if (id == null) id = PageValidate.FilterParam(User.Identity.Name);
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(user, db, "用户管理")) id = user;
+            if (id == null) id = user;
             setSelect();
             UserEditModel model = new UserEditModel();
             User_Info info = db.User_Info.Find(id);
@@ -240,12 +244,11 @@ namespace FundsManager.Controllers
         // 为了防止“过多发布”攻击，请启用要绑定到的特定属性，有关 
         // 详细信息，请参阅 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
-        [ValidateAntiForgeryToken, wxAuthorizeAttribute(Roles = "系统管理员")]
         public ActionResult Edit([Bind(Include = "id,name,realName,certificateType,certificateNo,mobile,email,password,password2,state,gender,postId,officePhone,picture,deptId,deptChild,roleId")]UserEditModel model)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if(!RoleCheck.CheckHasAuthority(user,db, "用户管理"))
+            if(!RoleCheck.CheckHasAuthority(user,db, "用户管理")&&user!=model.id)
                 return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限!" });
             setSelect();
             if (ModelState.IsValid)
@@ -302,6 +305,7 @@ namespace FundsManager.Controllers
                 {
                     edit = false;
                     extend = new User_Extend();
+                    extend.user_id = info.user_id;
                 }
                 if (!string.IsNullOrEmpty(model.picture) &&model.picture != extend.user_picture)
                 {
@@ -365,11 +369,18 @@ namespace FundsManager.Controllers
         }
 
         // GET: UserManager/Delete/5
-        [wxAuthorizeAttribute(Roles = "系统管理员"), HttpPost]
+        [HttpPost]
         public JsonResult Delete(int? id)
         {
             BaseJsonData json = new BaseJsonData();
-            if(id==1) goto next;
+            int uid = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(uid, db, "用户管理"))
+            {
+                json.state = 0;
+                json.msg_text = "没有权限。";
+                goto next;
+            }
+            if (id==1) goto next;
             if (!User.Identity.IsAuthenticated) goto next;
             if (id == null) goto next;
             if (id == 1)

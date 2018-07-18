@@ -23,12 +23,15 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
-            bool isAdmin = RoleCheck.CheckHasAuthority(user,db, "系统管理员");
+            bool isAdmin = RoleCheck.CheckHasAuthority(user,db, "经费管理", "添加经费");
+            if (!isAdmin) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
+            if (RoleCheck.CheckHasAuthority(user, db, "经费管理")) user = 0;
             //管理的经费
-            var mfunds = (from funds in db.Funds
+            var mfunds = from funds in db.Funds
                           where funds.f_manager == (isAdmin? funds.f_manager: user)
                           select new mFundsListModel
                           {
+                              manager=funds.f_manager,
                               code=funds.f_code,
                               amount = funds.f_amount,
                               balance = funds.f_balance,
@@ -44,10 +47,10 @@ namespace FundsManager.Controllers
                                 where bill.r_funds_id == funds.f_id && bill.r_bill_state == 1
                                 select bill.r_fact_amount
                                 ).DefaultIfEmpty(0).Sum()
-                          }
-                          ).ToList();
+                          };
+            if (user > 0) mfunds = mfunds.Where(x => x.manager == user);
             //使用的经费
-            var ufunds = (from funds in db.Funds
+            var ufunds = from funds in db.Funds
                           join bill in db.Reimbursement
                           on funds.f_id equals bill.r_funds_id
                           join u in db.User_Info
@@ -59,12 +62,13 @@ namespace FundsManager.Controllers
                               code=funds.f_code,
                               amount = bill.r_fact_amount,
                               managerName = t1.user_name,
-                              name = funds.f_name
-                          }
-                          ).ToList();
+                              name = funds.f_name,
+                              manager=funds.f_manager
+                          };
+            if (user > 0) ufunds = ufunds.Where(x => x.manager == user);
             FundsListView list = new FundsListView();
-            list.managerFunds = mfunds;
-            list.useFunds = ufunds;
+            list.managerFunds = mfunds.ToList();
+            list.useFunds = ufunds.ToList();
             return View(list);
         }
 
@@ -87,10 +91,11 @@ namespace FundsManager.Controllers
         public ActionResult Create()
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(user, db, "添加经费", "经费管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
             SetSelect();
             return View(new FundsModel());
         }
-        [NonAction]
         void SetSelect()
         {
             List<SelectOption> options = DropDownList.UserStateSelect();
@@ -110,6 +115,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            if(!RoleCheck.CheckHasAuthority(user, db, "添加经费", "经费管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
             SetSelect();
             if (ModelState.IsValid)
             {
@@ -152,8 +158,8 @@ namespace FundsManager.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(user, db, "添加经费", "经费管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
             SetSelect();
             FundsModel funds = (from f in db.Funds
                                 where f.f_id == (int)id
@@ -173,7 +179,7 @@ namespace FundsManager.Controllers
             {
                 return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有找到该经费。" });
             }
-            if (user != funds.manager) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有对该经费的管理权限。" });
+            if (user != funds.manager&& !RoleCheck.CheckHasAuthority(user, db, "经费管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有对该经费的管理权限。" });
             return View(funds);
         }
 
@@ -186,6 +192,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(user, db, "添加经费", "经费管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
             SetSelect();
             if (ModelState.IsValid)
             {
@@ -195,7 +202,7 @@ namespace FundsManager.Controllers
                     ViewBag.msg = "没有找到该经费。";
                     return View(funds);
                 }
-                if (user != model.f_manager)
+                if (user != model.f_manager && !RoleCheck.CheckHasAuthority(user, db, "经费管理"))
                 {
                     ViewBag.msg = "您不是该经费的管理员，没有更改权限。";
                     return View(funds);
@@ -287,7 +294,13 @@ namespace FundsManager.Controllers
                 return Json(json, JsonRequestBehavior.AllowGet);
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (id == 0)
+            if (!RoleCheck.CheckHasAuthority(user, db, "添加经费", "经费管理"))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "paramErr";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+                if (id == 0)
             {
                 json.msg_text = "参数传递失败，请重试。";
                 json.msg_code = "paramErr";
@@ -300,6 +313,12 @@ namespace FundsManager.Controllers
                 json.msg_code = "noThis";
                 return Json(json, JsonRequestBehavior.AllowGet);
             }
+            if(user!=funds.f_manager&& !RoleCheck.CheckHasAuthority(user, db, "经费管理"))
+            {
+                json.msg_text = "非经费管理员不能操作他们经费。";
+                json.msg_code = "paramErr";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
             var used = (from bill in db.Reimbursement
                         where bill.r_funds_id == funds.f_id && bill.r_bill_state == 1
                         select 1).Count();
@@ -307,15 +326,6 @@ namespace FundsManager.Controllers
             {
                 json.msg_text = "该经费已在使用中，无法删除。";
                 json.msg_code = "inUsed";
-                return Json(json, JsonRequestBehavior.AllowGet);
-            }
-            try
-            {
-                db.SaveChanges();
-            }catch(Exception e)
-            {
-                json.msg_text = "删除失败，请重新操作。";
-                json.msg_code = "recyErr";
                 return Json(json, JsonRequestBehavior.AllowGet);
             }
             db.Funds.Remove(funds);

@@ -30,7 +30,7 @@ namespace FundsManager.DAL
             sql.Append(" where 1=1");
             if (search.fid != 0) sql.Append(" and r_funds_id=").Append(search.fid);
             if (search.userId != 0) sql.Append(" and r_add_user_id=").Append(search.userId);
-            if (search.state != -1) sql.Append(" and r_bill_state=").Append(search.state);
+            if (search.state != null) sql.Append(" and r_bill_state=").Append(search.state);
             if (!string.IsNullOrEmpty(search.reimbursementCode)) sql.Append(" and reimbursement_code='").Append(search.reimbursementCode).Append("'");
             if (search.beginDate != null) sql.Append(" and r_add_date>'").Append(((DateTime)search.beginDate).ToString()).Append("'");
             if (search.endDate != null) sql.Append(" and r_add_date<'").Append(((DateTime)search.endDate).ToString()).Append("'");

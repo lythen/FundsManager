@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using FundsManager.Common;
-using FundsManager.ViewModels;
 namespace FundsManager.Controllers
 {
     public static class SiteInfo

@@ -45,6 +45,7 @@ namespace FundsManager.ViewModels
         public List<Respond> responds { get; set; }
         public string userName { get; set; }
         public int? manager { get; set; }
+        public int? detailsCount { get; set; }
     }
     /// <summary>
     /// 附件内容
@@ -109,11 +110,10 @@ namespace FundsManager.ViewModels
     }
     public class BillsSearchModel : BasePagerModel
     {
-        private int _state = -1;
         private int _userId = 0;
         private int _fid = 0;
         [DisplayName("状态")]
-        public int state { get { return _state; } set { _state = value; } }
+        public int? state { get ; set;  }
         [DisplayName("开始时间")]
         public string strBeginDate { get; set; }
         [DisplayName("结束时间")]

@@ -177,6 +177,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Properties\PublishProfiles\166f.pubxml" />
     <None Include="Properties\PublishProfiles\166funds.pubxml" />
     <None Include="Properties\PublishProfiles\fds166.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -205,6 +206,8 @@
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <Content Include="Scripts\jquery.md5.js" />
+    <Content Include="Scripts\jQuery.print.js" />
+    <Content Include="Scripts\jQuery.print.min.js" />
     <Content Include="Scripts\locales\bootstrap-datetimepicker.ar.js" />
     <Content Include="Scripts\locales\bootstrap-datetimepicker.az.js" />
     <Content Include="Scripts\locales\bootstrap-datetimepicker.bg.js" />
@@ -311,7 +314,6 @@
     <Content Include="Views\Statistics\TimesStaticstics.cshtml" />
     <Content Include="Views\Statistics\Detail.cshtml" />
     <Content Include="Views\Shared\_statistics.cshtml" />
-    <Content Include="Views\Statistics\test.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -443,6 +445,10 @@
     <Compile Include="Migrations\201807060804586_update0706_1.Designer.cs">
       <DependentUpon>201807060804586_update0706_1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807170250214_updaet0717haslog.cs" />
+    <Compile Include="Migrations\201807170250214_updaet0717haslog.Designer.cs">
+      <DependentUpon>201807170250214_updaet0717haslog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Dic_Reimbursement_Content.cs" />
     <Compile Include="Models\Process_Info.cs" />
@@ -539,6 +545,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807060804586_update0706_1.resx">
       <DependentUpon>201807060804586_update0706_1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807170250214_updaet0717haslog.resx">
+      <DependentUpon>201807170250214_updaet0717haslog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

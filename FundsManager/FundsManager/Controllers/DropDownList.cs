@@ -14,14 +14,13 @@ namespace FundsManager.Controllers
         private static FundsContext db = new FundsContext();
         private static string cache_week = "cache_week";
         private static string cache_post = "cache_post";
-        private static string cache_funds_manger = "funds_manger";
         private static string cache_sex = "cache_sex";
         private static string cache_user_state = "cache_user_state";
         private static string cache_role = "cache_role";
         private static string cache_cardType = "cache_cardType";
         private static string cache_funds = "cache_funds_";
         private static string cache_process = "cache_process";
-        private static string cache_stat_detail = "cache_stat_detail";
+        private static string respond_state = "respond_state";
         private static string cache_response_user = "cache_response_user_";
         private static string cache_authority = "cache_authority";
         private static string cache_content = "cache_content";
@@ -244,6 +243,17 @@ namespace FundsManager.Controllers
                 if (options.Count() > 0) DataCache.SetCache(key, options);
             }
             return options;
+        }
+        public static List<SelectOption> RespondStateSelect()
+        {
+            List<Dic_Respond_State> depts = DBCaches<Dic_Respond_State>.getCache(respond_state);
+            List<SelectOption> option = (from ct in depts
+                                         select new SelectOption
+                                         {
+                                             id = ct.drs_state_id.ToString(),
+                                             text = ct.drs_state_name
+                                         }).ToList();
+            return option;
         }
         public static List<AuthInfo> AuthoritySelect()
         {

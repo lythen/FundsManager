@@ -11,7 +11,6 @@ using FundsManager.ViewModels;
 using FundsManager.Common;
 using System.Data.Entity.Validation;
 using System.Text;
-using System.Configuration;
 using System.IO;
 using FundsManager.Common.DEncrypt;
 
@@ -723,7 +722,7 @@ namespace FundsManager.Controllers
             if (bill != null)
             {
                 int user = Common.PageValidate.FilterParam(User.Identity.Name);
-                if (user != bill.r_add_user_id)
+                if (user != bill.r_add_user_id&&!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
                 {
                     json.msg_code = "forbidden";
                     json.msg_text = "没有权限操作他人申请的报销单。";
@@ -760,17 +759,123 @@ namespace FundsManager.Controllers
             int user = PageValidate.FilterParam(User.Identity.Name);
             ApplyManager dal = new ApplyManager(db);
             if (!RoleCheck.CheckHasAuthority(user,db, "经费管理")) info.userId = user;
-           
-            var bills = dal.GetReimbursement("", user).ToList();
+            info.PageSize = 0;
+            info.userId = user;
+            var bills = dal.GetApplyList(info).ToList();
             foreach(var bill in bills)
             {
                 bill.contents = dal.getContents(bill.reimbursementCode, 0).ToList();
                 bill.attachmentsCount = dal.getAttachments(bill.reimbursementCode, 0).Count();
             }
             ViewData["Bills"] = bills;
+            List<SelectOption> options = DropDownList.RespondStateSelect();
+            ViewData["RState"] = DropDownList.SetDropDownList(options);
             return View(info);
         }
+        public JsonResult GetRespondResult(string id)
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_code = "nologin";
+                goto next;
+            }
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            ApplyManager dal = new ApplyManager(db);
+            var bill = dal.GetReimbursement(id, 0).FirstOrDefault();
+            if (bill == null)
+            {
+                json.msg_text = "没有找到该报销单。";
+                json.msg_code = "noData";
+                goto next;
+            }
+            if (bill.state != 1)
+            {
+                json.msg_text = "不能打印未批复报销单。";
+                json.msg_code = "noData";
+                goto next;
+            }
+            if (user != bill.userId)
+            {
+                json.msg_text = "不能操作他人报销单。";
+                json.msg_code = "noData";
+                goto next;
+            }
+            bill.userName = AESEncrypt.Decrypt(bill.userName);
+            bill.contents = dal.getContents(bill.reimbursementCode, 0).ToList();
+            bill.attachmentsCount = dal.getAttachments(bill.reimbursementCode, 0).Count();
+            bill.detailsCount= (from content in db.Reimbursement_Content
+                                join detail in db.Reimbursement_Detail on content.content_id equals detail.detail_content_id
+                                where content.c_reimbursement_code == bill.reimbursementCode
+                                select content.content_id).Count();
 
+            json.state = 1;
+            json.msg_code = "success";
+            json.data = bill;
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult LogReceive(string id,decimal amount)
+        {
+            BaseJsonData json = new BaseJsonData();
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_code = "nologin";
+                goto next;
+            }
+            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            var bill = db.Reimbursement.Find(id);
+            if (bill == null)
+            {
+                json.msg_text = "没有找到该报销单。";
+                json.msg_code = "noData";
+                goto next;
+            }
+            if (bill.r_bill_state != 1)
+            {
+                json.msg_text = "不能操作未批复报销单。";
+                json.msg_code = "noData";
+                goto next;
+            }
+            bool isManager = RoleCheck.CheckHasAuthority(user, db, "系统管理");
+            if (!isManager && bill.c_has_log)
+            {
+                json.msg_text = "已操作录入实际信用金额。";
+                json.msg_code = "noData";
+                goto next;
+            }
+            if (user != bill.r_add_user_id&&!isManager)
+            {
+                json.msg_text = "不能操作他人报销单。";
+                json.msg_code = "noData";
+                goto next;
+            }
+            bill.r_fact_amount = amount;
+            bill.c_has_log = true;
+            db.Entry(bill).State = EntityState.Modified;
+            Funds funds = db.Funds.Find(bill.r_funds_id);
+            if (funds != null)
+            {
+                decimal m = bill.r_bill_amount-bill.r_fact_amount;
+                funds.f_balance = funds.f_balance + m;
+                db.Entry(funds).State = EntityState.Modified;
+            }
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().Name);
+                json.msg_code = "error";
+                json.msg_text = "录入失败。";
+                goto next;
+            }
+            json.state = 1;
+            json.msg_code = "success";
+            next:
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
