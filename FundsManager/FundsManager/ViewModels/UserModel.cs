@@ -83,7 +83,7 @@ namespace FundsManager.ViewModels
         }
         public void toUserExtendDB(User_Extend model)
         {
-            model.user_dept_id = deptId==null?0:(deptChild==null?(int)deptId: (int)deptChild);
+            model.user_dept_id = (deptId==null|| deptId==0) ?0:((deptChild==null|| deptChild == 0)?(int)deptId: (int)deptChild);
             model.user_gender = PageValidate.InputText(gender, 2);
             model.user_office_phone = officePhone!=null?PageValidate.InputText(officePhone, 20):"";
             model.user_picture = picture!=null?PageValidate.InputText(picture, 50).Replace("_temp",""):"";

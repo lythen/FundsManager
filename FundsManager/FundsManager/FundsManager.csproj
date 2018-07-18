@@ -180,6 +180,7 @@
     <None Include="Properties\PublishProfiles\166f.pubxml" />
     <None Include="Properties\PublishProfiles\166funds.pubxml" />
     <None Include="Properties\PublishProfiles\fds166.pubxml" />
+    <None Include="Properties\PublishProfiles\local.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\Alert.js" />
     <Content Include="Scripts\extendIndexOf.js" />

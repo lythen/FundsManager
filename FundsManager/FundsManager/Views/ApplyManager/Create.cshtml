@@ -248,6 +248,8 @@
                 $('#msg').text(data.msg_text);
             }
             $('#msg').slideDown("slow");
+        }).fail(function (e) {
+            alert('服务器拒绝数据，提交失败。');
         });
     }
     function GetContents() {

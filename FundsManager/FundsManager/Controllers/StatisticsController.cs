@@ -25,7 +25,7 @@ namespace FundsManager.Controllers
             }
             if (search.userId == null) search.userId = 0;
             ApplyManager dal = new ApplyManager(db);
-            var query = dal.GetReimbursement("", (int)search.userId);
+            var query = dal.GetReimbursement("", (int)search.userId).Where(x=>x.state==1);
             if (search.manager > 0) query = query.Where(x => x.manager == search.manager);
             if (search.beginDate != null)
             {

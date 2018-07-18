@@ -2,10 +2,13 @@
 
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "待批复列表";
-    List<FundsManager.Models.SelectOption> users = (List<FundsManager.Models.SelectOption>)ViewData["ViewUsers"];
     List<FundsManager.ViewModels.ApplyListModel> Bills = (List<FundsManager.ViewModels.ApplyListModel>)ViewData["Bills"];
 }
 <style>
+    .form-control {
+        width: 200px;
+        display: inline-block;
+    }
     .detail-table>tbody>tr>td,.th-table>tbody>tr>th{border:none;}
      .detail-table,.th-table,.content-table{margin-bottom:0px;}
     .th-table>tbody>tr>th{padding-top:0px;padding-bottom:0px;}
@@ -14,95 +17,123 @@
     .detail-table>tbody>tr>td,.main-table td,.respond-table td,.content-table td{background-color: aliceblue;}
     .main-table .txt-bold{background: lightblue;}
     .detail-table td{background-color: aquamarine;}
-    .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
         vertical-align: middle;
+    }
 </style>
 <h2>待批复列表</h2>
+<hr />
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                用户：@Html.DropDownListFor(model => model.userId, Model.userId, ViewData["ViewUsers"] as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" }, { "onchange", "SearchSumbmit();" } })
+                @Html.ValidationMessageFor(model => model.userId, "", new { @class = "text-danger" })
+                <input type="submit" value="查询" class="btn btn-info" />
+            </div>
+        </div>
+    </div>
 <div class="col-md-10 err" style="color:red;width:100%;text-align:center;">
     @ViewBag.msg
 </div>
-<table class="table detail-table">
-    <tr>
-        <th>
-            编号
-        </th>
-        <th>填表人</th>
-        <th>使用经费</th>
-        <th>报销金额</th>
-        <th>
-            填表时间
-        </th>
-        <th>
-            <table class="table th-table">
-                <tr>
-                    <th colspan="3" style="text-align:center;border-bottom:1px solid #ddd;">报销项目</th>
-                </tr>
-                <tr>
-                    <th width="50%">报销内容</th>
-                    <th width="50%">金额</th>
-                </tr>
-            </table>
-        </th>
-        <th>
-            附件数
-        </th>
-        <th>
-            状态
-        </th>
-        <th class="th-no">操作</th>
-    </tr>
-    @if (Bills != null && Bills.Count() > 0)
-    {
-        foreach (var item in Bills)
+<div class="form-horizontal">
+    <table class="table detail-table">
+        <tr>
+            <th>
+                编号
+            </th>
+            <th>填表人</th>
+            <th>使用经费</th>
+            <th>报销金额</th>
+            <th>
+                填表时间
+            </th>
+            <th>
+                <table class="table th-table">
+                    <tr>
+                        <th colspan="3" style="text-align:center;border-bottom:1px solid #ddd;">报销项目</th>
+                    </tr>
+                    <tr>
+                        <th width="50%">报销内容</th>
+                        <th width="50%">金额</th>
+                    </tr>
+                </table>
+            </th>
+            <th>
+                附件数
+            </th>
+            <th>
+                状态
+            </th>
+            <th>我的批复</th>
+            <th class="th-no">操作</th>
+        </tr>
+        @if (Bills != null && Bills.Count() > 0)
         {
-            <tr id="tr_@item.reimbursementCode">
-                <td>
-                    @Html.DisplayFor(modelItem => item.reimbursementCode)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.userName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.fundsName) (@Html.DisplayFor(modelItem => item.fundsCode))
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.amount) 元
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.time)
-                </td>
-                <td>
-                    <table class="table content-table">
-                        @if (item.contents != null && item.contents.Count() > 0)
+            foreach (var item in Bills)
+            {
+                <tr id="tr_@item.reimbursementCode">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.reimbursementCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.userName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.fundsName) (@Html.DisplayFor(modelItem => item.fundsCode))
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.amount) 元
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.time)
+                    </td>
+                    <td>
+                        <table class="table content-table">
+                            @if (item.contents != null && item.contents.Count() > 0)
                         {
                             foreach (var citem in item.contents)
                             {
-                                <tr>
-                                    <td width="50%">
-                                        @citem.contentTitle
-                                    </td>
-                                    <td width="50%">
-                                        @Html.DisplayFor(@Citem => @citem.amount) 元
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td width="50%">
+                                            @citem.contentTitle
+                                        </td>
+                                        <td width="50%">
+                                            @Html.DisplayFor(@Citem => @citem.amount) 元
+                                        </td>
+                                    </tr>
+                                }
                             }
-                        }
-                    </table>
-                </td>
-                <td>
-                    @item.attachmentsCount
-                </td>
-                <td>
-                    @item.strState
-                </td>
-                <td>
-                    @Html.RouteLink("查看", new {controller= "ApplyManager", action= "Details", id = item.reimbursementCode }, new { @class = "btn btn-success" })
-                </td>
-            </tr>
+                        </table>
+                    </td>
+                    <td>
+                        @item.attachmentsCount
+                    </td>
+                    <td>
+                        @item.strState
+                    </td>
+                   <td>
+                       @item.myRespond
+                   </td>
+                    <td>
+                        @Html.RouteLink("查看", new { controller = "ApplyManager", action = "Details", id = item.reimbursementCode }, new { @class = "btn btn-success" })
+                    </td>
+                </tr>
+            }
         }
+        else
+        {
+            <tr><td colspan="9" align="center">当前没有需要审批的经费</td></tr>
+        }
+    </table>
+    </div>
     }
-    else
-    {
-        <tr><td colspan="9" align="center">当前没有需要审批的经费</td></tr>
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script src="~/scripts/extendindexof.js"></script>
+<script>
+    function SearchSumbmit() {
+        $('form').submit();
     }
-</table>
+</script>

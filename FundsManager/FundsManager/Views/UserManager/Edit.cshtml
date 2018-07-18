@@ -9,7 +9,7 @@
     FundsManager.ViewModels.LoginRole role = (FundsManager.ViewModels.LoginRole)Session["LoginRole"];
 }
 <style>
-
+    .dep{width:40%;display:inline-block;}
 </style>
 
 <h4>录入用户信息</h4>
@@ -98,9 +98,9 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.deptId, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.DropDownListFor(model => model.deptId, ViewBag.Department as List<SelectListItem>, "----请选择----", new { @class = "select form-control" })
+                    @Html.DropDownListFor(model => model.deptId, Model.deptId, ViewBag.Department as List<SelectListItem>, "----请选择----", new Dictionary<string, object> { { "class" , "select form-control dep" } })
                     @Html.ValidationMessageFor(model => model.deptId, "", new { @class = "text-danger" })
-                    @Html.DropDownListFor(model => model.deptChild, Model.deptChild, @cDept, "请选择", new Dictionary<string, object> { { "class", "select form-control" }})
+                    @Html.DropDownListFor(model => model.deptChild, Model.deptChild, @cDept, "----请选择----", new Dictionary<string, object> { { "class", "select form-control dep" } })
                     @Html.ValidationMessageFor(model => model.deptChild, "", new { @class = "text-danger" })
                 </div>
             </div>

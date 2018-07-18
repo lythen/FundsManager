@@ -64,7 +64,8 @@ namespace FundsManager.DAL
                             info = bill.reimbursement_info,
                              userId=bill.r_add_user_id,
                               manager=f.f_manager,
-                              factAmount=bill.r_fact_amount
+                              factAmount=bill.r_fact_amount,
+                              Fid=bill.r_funds_id
                         };
             if (!string.IsNullOrEmpty(reimbursement_code)) query = query.Where(x => x.reimbursementCode == reimbursement_code);
             if (userId > 0)
@@ -93,7 +94,8 @@ namespace FundsManager.DAL
                             respondDate = respond.pr_time,
                             respondUser = user.real_name,
                             respondUserId = user.user_id,
-                            strState = state.drs_state_name
+                            strState = state.drs_state_name,
+                            thisRespondUser=respond.pr_user_id
                         };
             if (respondId > 0)
                 query = query.Where(x => x.id == respondId);

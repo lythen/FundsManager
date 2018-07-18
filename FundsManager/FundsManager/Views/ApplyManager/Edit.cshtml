@@ -363,6 +363,8 @@
                 $('#msg').text(data.msg_text);
             }
             $('#msg').slideDown("slow");
+        }).fail(function (e) {
+            alert('服务器拒绝数据，提交失败。');
         });
     }
     function GetContents() {
@@ -467,7 +469,7 @@
                 if(aid>0)
                     link.id=aid;
             }catch(err){}
-            link.fileName = $(items[i]).attr('file');
+            link.fileName =$(items[i]).attr('file');
             alist.push(link);
         }
         return alist;

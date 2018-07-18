@@ -310,7 +310,7 @@ namespace FundsManager.Controllers
             }
             bill.attachments = dal.getAttachments(bill.reimbursementCode, 0).ToList();
             var responds = dal.getResponds(bill.reimbursementCode, 0).OrderBy(x => x.num).FirstOrDefault();
-            if (responds != null) bill.next = (int)responds.id;
+            if (responds != null) bill.next = (int)responds.thisRespondUser;
             return View(bill);
         }
 

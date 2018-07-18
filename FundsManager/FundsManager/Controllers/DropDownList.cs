@@ -227,13 +227,17 @@ namespace FundsManager.Controllers
             List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(key);
             if (options == null)
             {
+                string[] auths = { "批复管理", "批复","系统管理" };
                 options = (from op in (from user in db.User_Info
                                        join uvr in db.User_vs_Role on user.user_id equals uvr.uvr_user_id
-                                       where user.user_state == 1 && uvr.uvr_role_id <=2
+                                       join rva in db.Role_vs_Authority on uvr.uvr_role_id equals rva.rva_role_id
+                                       join auth in db.Sys_Authority on rva.rva_auth_id equals auth.auth_id
+                                       where user.user_state == 1 && auths.Contains(auth.auth_name)
+                                       group user by new {user.user_id,user.real_name } into p
                                        select new
                                        {
-                                           id = user.user_id,
-                                           text = user.real_name
+                                           id = p.Key.user_id,
+                                           text = p.Key.real_name
                                        }).ToList()
                            select new SelectOption
                            {

@@ -96,7 +96,7 @@ namespace FundsManager.Controllers
                             roleId = r.role_id,
                             roleName = r.role_name
                         }).FirstOrDefault();
-            if (role == null || role.roleId == 0 || role.roleId > 5)
+            if (role == null || role.roleId == 0)
             {
                 ViewBag.msg = "没有权限登陆所选角色。";
                 return View(model);

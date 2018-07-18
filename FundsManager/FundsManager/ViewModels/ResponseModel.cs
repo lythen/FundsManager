@@ -50,5 +50,6 @@ namespace FundsManager.ViewModels
         public DateTime? respondDate { get; set; }
         public int? num { get; set; }
         public int? respondUserId { get; set; }
+        public int? thisRespondUser { get; set; }
     }
 }

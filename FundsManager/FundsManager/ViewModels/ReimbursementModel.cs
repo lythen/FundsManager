@@ -46,6 +46,7 @@ namespace FundsManager.ViewModels
         public string userName { get; set; }
         public int? manager { get; set; }
         public int? detailsCount { get; set; }
+        public string myRespond { get; set; }
     }
     /// <summary>
     /// 附件内容
@@ -110,16 +111,16 @@ namespace FundsManager.ViewModels
     }
     public class BillsSearchModel : BasePagerModel
     {
-        private int _userId = 0;
-        private int _fid = 0;
+        private int? _userId = 0;
+        private int? _fid = 0;
         [DisplayName("状态")]
         public int? state { get ; set;  }
         [DisplayName("开始时间")]
         public string strBeginDate { get; set; }
         [DisplayName("结束时间")]
         public string strEndDate { get; set; }
-        public int userId { get { return _userId; } set { _userId = value; } }
-        public int fid { get { return _fid; }set { _fid = value; } }
+        public int? userId { get { return _userId; } set { _userId = value; } }
+        public int? fid { get { return _fid; }set { _fid = value; } }
         [DisplayFormat(DataFormatString =("{0:d}"),NullDisplayText ="")]
         public DateTime? beginDate { get; set; }
         [DisplayFormat(DataFormatString = ("{0:d}"), NullDisplayText = "")]

@@ -1,106 +1,294 @@
-﻿@model IEnumerable<FundsManager.ViewModels.ApplyListModel>
-
+﻿@model FundsManager.ViewModels.BillsSearchModel
 @{
-    ViewBag.Title  = FundsManager.Controllers.SiteInfo.getSiteName() + "我的经费列表";
-}
-<style>
-    #msg{display:none;}
-    .table .table tbody tr td, .table .table tbody tr th, .table .table tfoot tr td, .table .table tfoot tr th, .table .table thead tr td, .table .table thead tr th{border-top:none;}
-</style>
-<h4>我的经费列表</h4>
-<div class="col-md-10" id="msg">
-    @ViewBag.msg
-</div>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model=>model.number)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.time)
-        </th>
-        <th>订单状态</th>
-        <th class="th-no">
-            子申请单号
-        </th>
-        <th class="th-co">经费代码</th>
-        <th class="th-am">
-            金额
-        </th>
-        <th class="th-st">
-            状态
-        </th>
-        <th class="th-do">子操作</th>
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "我的经费列表";
+    List<FundsManager.ViewModels.ApplyListModel> Bills = (List<FundsManager.ViewModels.ApplyListModel>)ViewData["Bills"];
 
-        <th>操作</th>
-    </tr>
-@if (Model != null && Model.Count() > 0)
+}
+
+<hr />
+<style>
+    .table .table tbody tr td, .table .table tbody tr th, .table .table tfoot tr td, .table .table tfoot tr th, .table .table thead tr td, .table .table thead tr th {
+        border-top: none;
+    }
+
+    .displayN {
+        display: none;
+    }
+
+    .form-control {
+        width: 200px;
+        display: inline-block;
+    }
+
+    .print-table > tbody > tr > td {
+        vertical-align: middle;
+        text-align: center;
+    }
+</style>
+
+@using (Html.BeginForm())
 {
-foreach (var item in Model)
-{
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.number)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.time)
-        </td>
-        <td>
-            @item.strState
-        </td>
-        <td colspan="5">
-            <table class="table">
-                @if (item.child != null && item.child.Count() > 0)
-                {
-                    foreach (var citem in item.child)
-                    {
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                @*经费：@Html.DropDownListFor(model => model.fund, Model.fund, ViewBag.Funds as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" } })
+                    @Html.ValidationMessageFor(model => model.fund, "", new { @class = "text-danger" })
+                    统计选项：@Html.DropDownListFor(model => model.statorDetail, Model.statorDetail, ViewBag.StatorDetail as List<SelectListItem>, "", new Dictionary<string, object> { { "class", "select form-control" } })
+                    @Html.ValidationMessageFor(model => model.statorDetail, "", new { @class = "text-danger" })*@
+                经费：@Html.DropDownListFor(model => model.state, Model.state, ViewData["RState"] as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" }, { "onchange", "SearchSumbmit();" } })
+                @Html.ValidationMessageFor(model => model.state, "", new { @class = "text-danger" })
+                <input type="submit" value="刷新" class="btn btn-info" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10" id="msg">
+        @ViewBag.msg
+    </div>
+    <table class="table">
+        <tr>
+            <th>
+                编号
+            </th>
+            <th>使用经费</th>
+            <th>报销金额</th>
+            <th>
+                填表时间
+            </th>
+            <th>报销项目</th>
+            <th>
+                附件数
+            </th>
+            <th>
+                状态
+            </th>
+            <th class="th-no">操作</th>
+        </tr>
+        @if (Bills != null && Bills.Count() > 0)
+        {
+            var canDel = true;
+            foreach (var item in Bills)
+            {
+
+                if (item.state == 1) { canDel = false; }
+                <tr id="tr_@item.reimbursementCode">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.reimbursementCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.fundsName) (@Html.DisplayFor(modelItem => item.fundsCode))
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.amount) 元
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.time)
+                    </td>
+                    <td>
+                        <table class="table">
+                            @if (item.contents != null && item.contents.Count() > 0)
+                        {
+                            foreach (var citem in item.contents)
+                            {
+                                    <tr>
+                                        <td class="td-no">
+                                            @citem.contentTitle
+                                        </td>
+                                        <td class="td-co">
+                                            @Html.DisplayFor(@Citem => @citem.amount) 元
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </table>
+                    </td>
+                    <td>
+                        @item.attachmentsCount
+                    </td>
+                    <td>
+                        @item.strState
+                    </td>
+                    <td>
+                        @Html.ActionLink("查看", "Edit", new { id = item.reimbursementCode }, new { @class = "btn btn-primary" })
+                        @if (@canDel)
+                        {
+                            <a href="javascript:void(0);" class="btn btn-default" onclick="DelCApply('@item.reimbursementCode')">撤销</a>
+                        }
+                        @if (@item.state == 1)
+                        {
+                            <input type="button" data-toggle="modal" data-target="#modal-print" class="btn btn-success" value="打印" onclick="OpenPrint('@item.reimbursementCode')" />
+                            <input type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-log" value="录入金额" onclick="OpenLogReceive('@item.reimbursementCode')" />
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="8" align="center">当前没有申请的经费</td></tr>
+        }
+    </table>
+}
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-print">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">打印结果</h4>
+            </div>
+            <div class="modal-body">
+                <div id="print-div">
+                    <table class="table table-bordered print-table">
                         <tr>
-                            <td class="td-no">
-                                @citem.Cnumber
-                            </td>
-                            <td class="td-co">
-                                @citem.fundsCode
-                            </td>
-                            <td class="td-am">
-                                @citem.amount
-                            </td>
-                            <td class="td-st">
-                                @citem.strState
-                            </td>
-                            <td class="td-do">
-                                <a href="javascript:void(0);" onclick="DelCApply('@citem.Cnumber')">撤销</a>
-                            </td>
+                            <td>单据编号</td>
+                            <td id="tdCode"></td>
+                            <td></td>
+                            <td>填表日期</td>
+                            <td id="tdDate"></td>
                         </tr>
-                    }
-                }
-            </table>
-           
-        </td>
-        <td>
-            @Html.ActionLink("详细", "Details", new { id = item.number })
-        </td>
-    </tr>
-}
-}else
-{
-    <tr><td colspan="5" align="center">当前没有待批复的申请</td></tr>
-}
-</table>
+                        <tr id="tr-info">
+                            <td>报销事由</td>
+                            <td colspan="4" id="tdInfo" style="text-align:left;"></td>
+                        </tr>
+                        <tr class="tr-content"></tr>
+                        <tr>
+                            <td rowspan="2"> 报销金额<br />合&nbsp;&nbsp;&nbsp;&nbsp;计</td>
+                            <td rowspan="2" id="tdAmount"></td>
+                            <td>开支项目代码</td>
+                            <td>业务数</td>
+                            <td>附件数</td>
+                        </tr>
+                        <tr>
+                            <td id="tdFund"></td>
+                            <td id="tdDetails"></td>
+                            <td id="tdAttachments"></td>
+                        </tr>
+                        <tr>
+                            <td>经办人</td>
+                            <td id="tdUser"></td>
+                            <td></td>
+                            <td>批复结果</td>
+                            <td id="tdState"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary btn-print">打印</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal-log">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">录入实际信用金额</h4>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <input type="hidden" id="hidCode" value="" />
+                实际信用金额&nbsp;<input type="number" id="txtFact" class="form-control" style="text-align:left;" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="btnClose">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="LogReceive();">录入</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script src="~/scripts/extendindexof.js"></script>
+<script src="~/scripts/bootstrap.min.js"></script>
+<script src="~/scripts/jquery.print.js"></script>
+<script src="~/scripts/dateformat.js"></script>
 <script>
-    function DelCApply(cnumber) {
+    function DelCApply(number) {
         var obj = new Object();
-        obj.cnumber = cnumber;
+        obj.number = number;
         $.post("@Url.RouteUrl(new {controller= "ApplyManager", action= "Delete" })", obj, function (data) {
             if (data.state == '1') {
-                location.reload();
+                $('#msg').removeClass();
+                $('#msg').addClass('alert alert alert-success');
+                $('#msg').text("申请单撤销成功。");
+                $('#tr_' + number).remove();
+                removeAlert();
+
             } else {
                 if (data.msg_code == 'nologin') location.href = '@Url.RouteUrl(new { action = "LogOut", controller = "Login"})';
                 $('#msg').removeClass();
                 $('#msg').addClass('alert alert alert-danger');
                 $('#msg').text(data.msg_text);
+                removeAlert();
             }
         });
+    }
+    function OpenPrint(id) {
+        $('#tdDate').text(''); $('#tdInfo').text(''); $('#tdAmount').text(''); $('#tdUser').text(''); $('#tdState').text('');
+        var trs = $('.tr-content');
+        trs.remove();
+        $.getJSON('../ApplyManager/GetRespondResult?id=' + id, function (data) {
+            if (data && data.state == 1) {
+                var bill = data.data;
+                var d = eval(bill.time.replace(/\/Date\((\d+)\)\//gi, "new Date($1)"));
+                $('#tdCode').text(bill.reimbursementCode);
+                $('#tdDate').text(d.Format('yyyy/MM/dd HH:mm')); $('#tdInfo').text(bill.info); $('#tdAmount').text(bill.amount); $('#tdUser').text(bill.userName); $('#tdState').text(bill.strState);
+                $('#tdFund').text(bill.fundsCode); $('#tdDetails').text(bill.detailsCount); $('#tdAttachments').text(bill.attachmentsCount);
+                //tr-info
+                var tr1;
+                var tr2;
+                var thisTr = $('#tr-info');
+                var len = bill.contents.length;
+                if (len > 0) {
+                    var _i;
+                    for (var i = 0; i < len; i++) {
+                        var item = bill.contents[i];
+                        _i = i%4;
+                        if (_i == 0) {
+                            if (i > 0) {
+                                tr1.insertAfter(thisTr);
+                                tr2.insertAfter(tr1);
+                                thisTr = tr2;
+                            }
+                            tr1 = $('<tr class="tr-content"><td>报销内容</td></tr>');
+                            tr2 = $('<tr class="tr-content"><td>报销金额</td></tr>');
+                        }
+                        tr1.append('<td>' + item.contentTitle + '</td>');
+                        tr2.append('<td>' + item.amount + '</td>');
+                    }
+                        for (var j = _i; j < 3; j++) {
+                            tr1.append('<td></td>');
+                            tr2.append('<td></td>');
+                        }
+                    tr1.insertAfter(thisTr);
+                    tr2.insertAfter(tr1);
+                }
+            } else $('#tdInfo').text(data.msg_text);
+        });
+    }
+    function OpenLogReceive(id) {
+        $('#hidCode').val(id);
+        $('#txtFact').val('');
+    }
+    function LogReceive() {
+        $.getJSON('../ApplyManager/LogReceive?id=' + $('#hidCode').val() + '&amount=' + $('#txtFact').val(), function (data) {
+            if (data && data.state == 1) {
+                alert("录入成功。");
+                $('#btnClose').click();
+            }
+            else alert(data.msg_text);
+        });
+    }
+    function SearchSumbmit() {
+        $('form').submit();
+    }
+    function removeAlert() {
+        setTimeout(function () {
+            $('#msg').removeClass();
+            $('#msg').addClass('displayN');
+        }, 3000);
     }
     $(function () {
         var w = $('.th-no').width();
@@ -111,7 +299,16 @@ foreach (var item in Model)
         $('.td-am').width(w);
         var w = $('.th-st').width();
         $('.td-st').width(w);
-        var w = $('.th-do').width();
-        $('.td-do').width(w);
+        //$('.btn-print').click(function () {
+        //    $.print("#print-div");
+        //});
+    });
+    jQuery(function ($) {
+        'use strict';
+        $(".btn-print").on('click', function () {
+            //Print ele2 with default options
+            $.print("#print-div");
+        });
+        // Fork https://github.com/sathvikp/jQuery.print for the full list of options
     });
 </script>

@@ -22,10 +22,14 @@ namespace FundsManager.Controllers
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "Index" });
             int userId = PageValidate.FilterParam(User.Identity.Name);
             if (!RoleCheck.CheckHasAuthority(userId, db, "批复管理", "批复")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
-            if (RoleCheck.CheckHasAuthority(userId, db, "批复管理")) userId = 0;
+            if (RoleCheck.CheckHasAuthority(userId, db, "批复管理"))
+            {
+                if (info.userId == null) info.userId = 0;
+            }
+            else info.userId = userId;
             ApplyManager dal = new ApplyManager(db);
-            ViewData["ViewUsers"] = DropDownList.RespondUserSelect();
-            var list = getResponseDetail(userId, 0);
+            SetSelect();
+            var list = getResponseDetail((int)info.userId, 0);
             ViewData["Bills"] = list;
             return View(info);
         }
@@ -35,17 +39,32 @@ namespace FundsManager.Controllers
             ApplyManager dal = new ApplyManager(db);
             int userId = PageValidate.FilterParam(User.Identity.Name);
             if (!RoleCheck.CheckHasAuthority(userId, db, "批复管理", "批复")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
-            if (RoleCheck.CheckHasAuthority(userId, db, "批复管理")) userId = 0;
-            ViewData["ViewUsers"] = DropDownList.RespondUserSelect();
-            var list = getResponseDetail(userId, 1, 2, 3, 4);
+            if (RoleCheck.CheckHasAuthority(userId, db, "批复管理"))
+            {
+                if (info.userId == null) info.userId = 0;
+            }
+            else info.userId = userId;
+            SetSelect();
+            var list = getResponseDetail((int)info.userId, 1, 2, 3, 4);
             ViewData["Bills"] = list;
             return View(info);
         }
+        void SetSelect()
+        {
+
+            List<SelectOption> options = DropDownList.RespondUserSelect();
+            ViewData["ViewUsers"] = DropDownList.SetDropDownList(options);
+        }
         List<ApplyListModel> getResponseDetail(int userId, params int[] state)
         {
+            if (!User.Identity.IsAuthenticated) return new List<ApplyListModel>();
+            int uid = PageValidate.FilterParam(User.Identity.Name);
             ApplyManager dal = new ApplyManager(db);
-            var query = from pr in db.Process_Respond
-                        join bill in db.Reimbursement on pr.pr_reimbursement_code equals bill.reimbursement_code
+            var query = from bill in db.Reimbursement
+                        join pr in db.Process_Respond on new { code = bill.reimbursement_code,id=uid } equals new{code= pr.pr_reimbursement_code,id=pr.pr_user_id} into T1
+                        from respond in T1.DefaultIfEmpty()
+                        join res in db.Dic_Respond_State on respond.pr_state equals res.drs_state_id into T2
+                        from resSt in T2.DefaultIfEmpty()
                         join user in db.User_Info on bill.r_add_user_id equals user.user_id
                         join s in db.Dic_Respond_State on bill.r_bill_state equals s.drs_state_id
                         join f in db.Funds on bill.r_funds_id equals f.f_id
@@ -63,7 +82,8 @@ namespace FundsManager.Controllers
                             userName = user.real_name,
                             info = bill.reimbursement_info,
                             userId = bill.r_add_user_id,
-                            manager = pr.pr_user_id
+                            manager = respond.pr_user_id,
+                            myRespond= resSt.drs_state_name
                         };
             if (userId > 0) query = query.Where(x => x.manager == userId);
             var list = query.ToList();
