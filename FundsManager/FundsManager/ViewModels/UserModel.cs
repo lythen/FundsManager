@@ -41,15 +41,15 @@ namespace FundsManager.ViewModels
     }
     public class UserEditModel: UserModel
     {
-        [StringLength(20),DisplayName("真实姓名"),Required]
+        [StringLength(20),DisplayName("真实姓名"),Required(ErrorMessage ="请输入真实姓名")]
         public string realName { get; set; }
         [StringLength(50), DisplayName("证件类别")]
         public string certificateType { get; set; }
         [StringLength(20), DisplayName("证件号码")]
         public string certificateNo { get; set; }
-        [StringLength(20), DisplayName("手机号码"), Required]
+        [StringLength(20), DisplayName("手机号码"), Required(ErrorMessage ="请输入手机号码")]
         public string mobile { get; set; }
-        [StringLength(200), DisplayName("电子邮箱"), Required]
+        [StringLength(200), DisplayName("电子邮箱"), Required(ErrorMessage ="请输入电子邮箱")]
         public string email { get; set; }
         [StringLength(32), DisplayName("登陆密码")]
         public string password { get; set; }
