@@ -47,7 +47,7 @@
                             
                                 @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "申请管理"))
                                 {
-                                    <li role="presentation"><a href="@Url.RouteUrl(new { controller = "ApplyManager",action= "Index" })" title="申请管理" target="_top">申请管理</a></li>
+                                    <li role="presentation"><a href="@Url.RouteUrl(new { controller = "ApplyManager",action= "MyFunds" })" title="申请管理" target="_top">申请管理</a></li>
                                 }
                                 else
                                 {

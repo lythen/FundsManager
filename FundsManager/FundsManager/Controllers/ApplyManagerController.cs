@@ -115,12 +115,12 @@ namespace FundsManager.Controllers
                     json.msg_text = string.Format("报销单提交失败,id为{0}的经费没有设置总额。", _sbill.Fid);
                     goto next;
                 }
-                if (funds.f_manager == user)
-                {
-                    json.msg_code = "forbidden";
-                    json.msg_text = "不允许申请自己的经费。";
-                    goto next;
-                }
+                //if (funds.f_manager == user)
+                //{
+                //    json.msg_code = "forbidden";
+                //    json.msg_text = "不允许申请自己的经费。";
+                //    goto next;
+                //}
                 if (funds.f_balance < _sbill.amount)
                 {
                     json.msg_code = "error";

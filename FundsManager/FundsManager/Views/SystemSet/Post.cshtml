@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-职务设置";
     List<FundsManager.Models.Dic_Post> list = ViewData["PostList"] as List<FundsManager.Models.Dic_Post>;
+    Layout = "~/Views/Shared/_systemset.cshtml";
 }
 <style>
     .form-control{width:200px;display:inline-block;}

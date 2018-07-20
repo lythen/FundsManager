@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-用户列表";
     FundsManager.ViewModels.BasePagerModel pageinfo = (FundsManager.ViewModels.BasePagerModel)ViewData["search"];
+    Layout = "~/Views/Shared/_usermanager.cshtml";
 }
 <style>
     .table > tbody > tr > td {

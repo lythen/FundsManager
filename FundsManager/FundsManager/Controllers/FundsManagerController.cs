@@ -19,13 +19,18 @@ namespace FundsManager.Controllers
         private FundsContext db = new FundsContext();
 
         // GET: FundsManager
-        public ActionResult Index()
+        public ActionResult Index(BillsSearchModel info)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
-            int user = Common.PageValidate.FilterParam(User.Identity.Name);
+            int user = PageValidate.FilterParam(User.Identity.Name);
             bool isAdmin = RoleCheck.CheckHasAuthority(user,db, "经费管理", "添加经费");
             if (!isAdmin) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限。" });
-            if (RoleCheck.CheckHasAuthority(user, db, "经费管理")) user = 0;
+            ApplyManager dal = new ApplyManager(db);
+            if (info.userId != 0)
+            {
+                if (!RoleCheck.CheckHasAuthority(user, db, "经费管理")) info.userId = user;
+            }
+            info.PageSize = 0;
             //管理的经费
             var mfunds = from funds in db.Funds
                           where funds.f_manager == (isAdmin? funds.f_manager: user)
@@ -48,28 +53,11 @@ namespace FundsManager.Controllers
                                 select bill.r_fact_amount
                                 ).DefaultIfEmpty(0).Sum()
                           };
-            if (user > 0) mfunds = mfunds.Where(x => x.manager == user);
-            //使用的经费
-            var ufunds = from funds in db.Funds
-                          join bill in db.Reimbursement
-                          on funds.f_id equals bill.r_funds_id
-                          join u in db.User_Info
-                          on funds.f_manager equals u.user_id into T1
-                          from t1 in T1.DefaultIfEmpty()
-                          where bill.r_add_user_id == user && bill.r_bill_state == 1
-                          select new uFundsListModel
-                          {
-                              code=funds.f_code,
-                              amount = bill.r_fact_amount,
-                              managerName = t1.user_name,
-                              name = funds.f_name,
-                              manager=funds.f_manager
-                          };
-            if (user > 0) ufunds = ufunds.Where(x => x.manager == user);
-            FundsListView list = new FundsListView();
-            list.managerFunds = mfunds.ToList();
-            list.useFunds = ufunds.ToList();
-            return View(list);
+            if (info.userId > 0) mfunds = mfunds.Where(x => x.manager == user);
+            ViewData["Funds"] = mfunds.ToList();
+            List<SelectOption> options = DropDownList.FundsManagerSelect((int)info.userId);
+            ViewData["ViewUsers"] = DropDownList.SetDropDownList(options);
+            return View(info);
         }
 
         // GET: FundsManager/Details/5

@@ -7,6 +7,7 @@
         cDept = ViewBag.DeptChild as List<SelectListItem>;
     }
     FundsManager.ViewModels.LoginRole role = (FundsManager.ViewModels.LoginRole)Session["LoginRole"];
+    Layout = "~/Views/Shared/_usermanager.cshtml";
 }
 <style>
     .dep{width:40%;display:inline-block;}

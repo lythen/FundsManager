@@ -2,6 +2,7 @@
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "权限设置";
     List<SelectListItem> roleInfo = ViewData["Roles"] as List<SelectListItem>;
     List<FundsManager.ViewModels.AuthInfo> auths = ViewData["Auths"] as List<FundsManager.ViewModels.AuthInfo>;
+    Layout = "~/Views/Shared/_systemset.cshtml";
 }
 <style>
     .in-lab {

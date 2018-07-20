@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "已审批的帐单列表";
     List<FundsManager.ViewModels.ApplyListModel> Bills = (List<FundsManager.ViewModels.ApplyListModel>)ViewData["Bills"];
+    Layout = "~/Views/Shared/_respondmanager.cshtml";
 }
 <style>
     .form-control {

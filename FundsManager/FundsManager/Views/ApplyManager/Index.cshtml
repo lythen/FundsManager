@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "我的经费列表";
     List<FundsManager.ViewModels.ApplyListModel> Bills = (List<FundsManager.ViewModels.ApplyListModel>)ViewData["Bills"];
-
+    Layout = "~/Views/Shared/_applymanager.cshtml";
 }
 
 <hr />

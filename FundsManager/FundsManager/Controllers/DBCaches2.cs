@@ -14,8 +14,6 @@ namespace FundsManager.Controllers
         private static string cache_depts = "cache_depts";
         private static string dic_module = "dic-module";
         private static string cache_role = "cache_role";
-        private static string cache_process_list = "cache_process_list";
-        private static string cache_process_detail = "cache_process_detail";
         public static List<DepartMentModel> getDeptCache()
         {
             List<DepartMentModel> list = (List<DepartMentModel>)DataCache.GetCache(cache_depts);

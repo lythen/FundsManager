@@ -1,116 +1,89 @@
-﻿@model FundsManager.ViewModels.FundsListView
+﻿@model FundsManager.ViewModels.BillsSearchModel
 
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费列表";
-    List<FundsManager.ViewModels.mFundsListModel> mFunds = Model.managerFunds;
-    List<FundsManager.ViewModels.uFundsListModel> uFunds = Model.useFunds;
+    List<FundsManager.ViewModels.mFundsListModel> mFunds = (List<FundsManager.ViewModels.mFundsListModel>)ViewData["Funds"];
+    Layout = "~/Views/Shared/_fundsmanager.cshtml";
 }
-
-<div class="col-md-10 err" style="color:red;width:100%;text-align:center;">
-    @ViewBag.msg
-</div>
-@if (mFunds != null)
+<style>
+    .form-control {
+        width: 200px;
+        display: inline-block;
+    }
+</style>
+@using (Html.BeginForm())
 {
-    <h4>管理的经费列表</h4>
-<table class="table">
-    <tr>
-        <th>
-           经费代码
-        </th>
-        <th>
-            经费名称
-        </th>
-        <th>
-            经费总额
-        </th>
-        <th>
-            经费余额
-        </th>
-        <th>
-            状态
-        </th>
-        <th>
-            已申请数
-        </th>
-        <th>申请总额</th>
-        <th>操作</th>
-    </tr>
-
-@foreach (var item in mFunds)
-{
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.code)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.amount)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.balance)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.strState)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.userCount)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.applyamount)
-            
-        </td>
-        <td>
-            @Html.ActionLink("详细", "Edit", new { id = item.id }, new { @class = "btn btn-info" })
-            <a href="javascript:void(0);" class="btn btn-default" onclick="DelFunds(@item.id)">删除</a>
-        </td>
-    </tr>
-}
-
-</table>
-}
-
-@if (uFunds != null && uFunds.Count() > 0)
-{
-    <hr />
-    <h4>使用的经费列表</h4>
-
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                用户：@Html.DropDownListFor(model => model.userId, Model.userId, ViewData["ViewUsers"] as List<SelectListItem>, null, new Dictionary<string, object> { { "class", "select form-control" }, { "onchange", "SearchSumbmit();" } })
+                @Html.ValidationMessageFor(model => model.userId, "", new { @class = "text-danger" })
+                <input type="submit" value="查询" class="btn btn-info" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10 err" style="color:red;width:100%;text-align:center;">
+        @ViewBag.msg
+    </div>
+    <h4>经费列表</h4>
     <table class="table">
         <tr>
-            <th>经费代码</th>
             <th>
-                经费名称
+                经费代码
             </th>
             <th>
-                管理员
+                经费名称
             </th>
             <th>
                 经费总额
             </th>
             <th>
-                结算时间
+                经费余额
             </th>
+            <th>
+                状态
+            </th>
+            <th>
+                已申请数
+            </th>
+            <th>申请总额</th>
+            <th>操作</th>
         </tr>
-
-        @foreach (var item in uFunds)
+        @if (mFunds != null)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.code)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.managerName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.amount)
-                </td>
-            </tr>
-        }
+            foreach (var item in mFunds)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.code)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.balance)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.strState)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.userCount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.applyamount)
 
+                    </td>
+                    <td>
+                        @Html.ActionLink("详细", "Edit", new { id = item.id }, new { @class = "btn btn-info" })
+                        <a href="javascript:void(0);" class="btn btn-default" onclick="DelFunds(@item.id)">删除</a>
+                    </td>
+                </tr>
+            }
+        }
     </table>
 }
 <script src="~/scripts/jquery-1.10.2.min.js"></script>
@@ -121,12 +94,14 @@
             if (data.state == 1) {
                 alert('删除成功。');
                 window.location.reload();
-            }else
-            {
+            } else {
                 $('.err').text(data.msg_text);
             }
         }).fail(function (err) {
-            alert(err.status+':'+err.statusText);
+            alert(err.status + ':' + err.statusText);
         });
+    }
+    function SearchSumbmit() {
+        $('form').submit();
     }
 </script>

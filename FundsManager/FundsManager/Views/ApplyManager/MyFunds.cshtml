@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "我的经费列表";
     List <FundsManager.ViewModels.ApplyListModel> Bills = (List<FundsManager.ViewModels.ApplyListModel>)ViewData["Bills"];
+    Layout = "~/Views/Shared/_applymanager.cshtml";
 
 }
 
@@ -24,11 +25,7 @@
     <div class="form-horizontal">
         <div class="form-group">
             <div class="col-md-10">
-                @*经费：@Html.DropDownListFor(model => model.fund, Model.fund, ViewBag.Funds as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" } })
-                @Html.ValidationMessageFor(model => model.fund, "", new { @class = "text-danger" })
-                统计选项：@Html.DropDownListFor(model => model.statorDetail, Model.statorDetail, ViewBag.StatorDetail as List<SelectListItem>, "", new Dictionary<string, object> { { "class", "select form-control" } })
-                @Html.ValidationMessageFor(model => model.statorDetail, "", new { @class = "text-danger" })*@
-                经费：@Html.DropDownListFor(model => model.state, Model.state, ViewData["RState"] as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" }, { "onchange", "SearchSumbmit();" } })
+                经费：@Html.DropDownListFor(model => model.state, Model.state, ViewData["RState"] as List<SelectListItem>, null, new Dictionary<string, object> { { "class", "select form-control" }, { "onchange", "SearchSumbmit();" } })
                 @Html.ValidationMessageFor(model => model.state, "", new { @class = "text-danger" })
                 <input type="submit" value="刷新" class="btn btn-info" />
             </div>

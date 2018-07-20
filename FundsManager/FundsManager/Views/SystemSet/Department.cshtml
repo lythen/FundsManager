@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-部门科室设置";
     List<FundsManager.ViewModels.DepartMentModel> list = ViewData["DeptList"] as List<FundsManager.ViewModels.DepartMentModel>;
+    Layout = "~/Views/Shared/_systemset.cshtml";
 }
 <style>
     .form-control{width:200px;display:inline-block;}

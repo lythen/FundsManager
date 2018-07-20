@@ -279,11 +279,9 @@
     <Content Include="Views\Shared\_top.cshtml" />
     <Content Include="Views\Shared\_home.cshtml" />
     <Content Include="Views\UserManager\Create.cshtml" />
-    <Content Include="Views\UserManager\Details.cshtml" />
     <Content Include="Views\UserManager\Edit.cshtml" />
     <Content Include="Views\UserManager\Index.cshtml" />
     <Content Include="Views\FundsManager\Create.cshtml" />
-    <Content Include="Views\FundsManager\Delete.cshtml" />
     <Content Include="Views\FundsManager\Edit.cshtml" />
     <Content Include="Views\FundsManager\Index.cshtml" />
     <Content Include="Views\RespondManager\Index.cshtml" />
@@ -294,7 +292,6 @@
     <Content Include="Views\Shared\_error.cshtml" />
     <Content Include="Views\Shared\_login.cshtml" />
     <Content Include="Views\ApplyManager\Create.cshtml" />
-    <Content Include="Views\ApplyManager\Delete.cshtml" />
     <Content Include="Views\ApplyManager\Details.cshtml" />
     <Content Include="Views\ApplyManager\Index.cshtml" />
     <Content Include="Views\Shared\_applymanager.cshtml" />
@@ -305,7 +302,6 @@
     <Content Include="Views\SystemSet\Post.cshtml" />
     <Content Include="Views\SystemSet\Department.cshtml" />
     <Content Include="Views\SystemSet\Role.cshtml" />
-    <Content Include="Views\FundsManager\Detail.cshtml" />
     <Content Include="Views\RespondManager\Responded.cshtml" />
     <Content Include="Views\ApplyManager\Edit.cshtml" />
     <Content Include="Views\SystemSet\RoleAuthSet.cshtml" />
