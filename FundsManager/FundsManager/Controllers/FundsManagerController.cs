@@ -11,6 +11,7 @@ using FundsManager.ViewModels;
 using System.Data.Entity.Validation;
 using System.Text;
 using FundsManager.Common;
+using io = System.IO;
 
 namespace FundsManager.Controllers
 {
@@ -33,7 +34,6 @@ namespace FundsManager.Controllers
             info.PageSize = 0;
             //管理的经费
             var mfunds = from funds in db.Funds
-                          where funds.f_manager == (isAdmin? funds.f_manager: user)
                           select new mFundsListModel
                           {
                               manager=funds.f_manager,
@@ -53,9 +53,9 @@ namespace FundsManager.Controllers
                                 select bill.r_fact_amount
                                 ).DefaultIfEmpty(0).Sum()
                           };
-            if (info.userId > 0) mfunds = mfunds.Where(x => x.manager == user);
+            if (info.userId > 0) mfunds = mfunds.Where(x => x.manager == info.userId);
             ViewData["Funds"] = mfunds.ToList();
-            List<SelectOption> options = DropDownList.FundsManagerSelect((int)info.userId);
+            List<SelectOption> options = DropDownList.FundsManagerSelect(user);
             ViewData["ViewUsers"] = DropDownList.SetDropDownList(options);
             return View(info);
         }
@@ -328,6 +328,121 @@ namespace FundsManager.Controllers
                 return Json(json, JsonRequestBehavior.AllowGet);
             }
             json.msg_text = "删除成功。";
+            json.msg_code = "success";
+            json.state = 1;
+            return Json(json, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult AddFromExcel(string file)
+        {
+            BaseJsonData json = new BaseJsonData();
+            
+        
+            if (!User.Identity.IsAuthenticated)
+            {
+                json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
+                json.msg_code = "notLogin";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            if (!RoleCheck.CheckHasAuthority(user, db, "添加经费", "经费管理"))
+            {
+                json.msg_text = "没有权限。";
+                json.msg_code = "noPower";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            string attachmentTempPath = MyConfiguration.GetAttachmentTempPath();//上传附件的暂存地址
+            string filePath = attachmentTempPath + file;
+            if (!io.File.Exists(filePath))
+            {
+                json.msg_text = "没有找到上传的文件。";
+                json.msg_code = "noFile";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            OpenXMLHelper excel = new OpenXMLHelper();
+            DataTable dtExcel = excel.ExcelToDataTable("Sheet1", filePath);
+            if (dtExcel == null|| dtExcel.Rows.Count==0)
+            {
+                json.msg_text = "表格里没有行。";
+                json.msg_code = "noThis";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            string code, name, manager;
+            decimal amount, balance;
+            int i=1,mid;
+            StringBuilder sbMsg = new StringBuilder();
+            List<SelectOption> managers = DropDownList.UserSelect(1);
+            foreach(DataRow dr in dtExcel.Rows)
+            {
+                code = dr["项目编号"].ToString().Trim();
+                if (string.IsNullOrEmpty(code))
+                {
+                    sbMsg.Append("行").Append(i).Append("没有项目编号。\r\n");
+                    continue;
+                }
+                if (db.Funds.Where(x=>x.f_code==code).Count()>0)
+                {
+                    sbMsg.Append("行").Append(i).Append("经费").Append(code).Append("经费已存在，勿重复录入。\r\n");
+                    continue;
+                }
+                name = dr["项目名称"].ToString().Trim();
+                manager = dr["负责人"].ToString().Trim();
+                if (string.IsNullOrEmpty(manager))
+                {
+                    sbMsg.Append("行").Append(i).Append("经费").Append(code).Append("没有项目负责人。\r\n");
+                    continue;
+                }
+                try
+                {
+                    mid = int.Parse(
+                        (from m in managers where m.text == manager select m.id).FirstOrDefault());
+                }
+                catch
+                {
+                    sbMsg.Append("行").Append(i).Append("经费").Append(code).Append("项目负责人未录入。\r\n");
+                    continue;
+                }
+                try
+                {
+                    balance = decimal.Parse(dr["本年余额"].ToString().Trim().Replace(",",""));
+                }
+                catch
+                {
+                    sbMsg.Append("行").Append(i).Append("经费").Append(code).Append("经费余额读取失败。\r\n");
+                    continue;
+                }
+                try
+                {
+                    amount = decimal.Parse(dr["年初数"].ToString().Trim().Replace(",", ""));
+                }
+                catch { amount = balance; }
+                Funds funds = new Funds
+                {
+                    f_add_Time = DateTime.Now,
+                    f_amount = amount,
+                    f_balance = balance,
+                    f_code = code,
+                    f_info = name,
+                    f_manager = mid,
+                    f_name = name,
+                    f_source = name,
+                    f_state = 1
+                };
+                db.Funds.Add(funds);
+            }
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (Exception)
+            {
+                json.msg_text = "添加失败，请检查excel后重新操作。";
+                json.msg_code = "delErr";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
+            DataCache.RemoveCacheBySearch("cache_user");
+            DataCache.RemoveCacheBySearch("cache_response_user");
+            DataCache.RemoveCacheBySearch("cache_funds");
+            json.msg_text = sbMsg.ToString();
             json.msg_code = "success";
             json.state = 1;
             return Json(json, JsonRequestBehavior.AllowGet);

@@ -125,7 +125,7 @@ namespace FundsManager.Controllers
         public static List<SelectOption> UserSelect(int userId)
         {
             string key = cache_user + userId;
-            bool isManager = RoleCheck.CheckHasAuthority(userId, db, "经费管理");
+            bool isManager = RoleCheck.CheckHasAuthority(userId, db, "经费管理","用户管理");
             if (isManager) key = cache_user;
             else key = cache_user + userId;
             List<SelectOption> options = (List<SelectOption>)DataCache.GetCache(key);

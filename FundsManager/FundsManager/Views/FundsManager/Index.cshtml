@@ -20,6 +20,8 @@
                 用户：@Html.DropDownListFor(model => model.userId, Model.userId, ViewData["ViewUsers"] as List<SelectListItem>, null, new Dictionary<string, object> { { "class", "select form-control" }, { "onchange", "SearchSumbmit();" } })
                 @Html.ValidationMessageFor(model => model.userId, "", new { @class = "text-danger" })
                 <input type="submit" value="查询" class="btn btn-info" />
+                <a href="javascript:void(0);" onclick="UploadAttachment();">通过excel添加</a>
+                <input type="file" id="upAttachment" name="upAttachment" style="display:none;" onchange="FileChange(this);" />
             </div>
         </div>
     </div>
@@ -87,6 +89,7 @@
     </table>
 }
 <script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script src="~/scripts/extendindexof.js"></script>
 <script>
     function DelFunds(id) {
         if (!confirm("是否删除该经费？删除后将无法恢复。")) return;
@@ -104,4 +107,92 @@
     function SearchSumbmit() {
         $('form').submit();
     }
+    //文件上传部份-----------------------------
+    var fl = 0;
+    function UploadAttachment() {
+        if (fl > 0) {
+            alert("请等待当前操作完成。");
+            return;
+        }
+        document.getElementById('upAttachment').files == null;
+        $('#upAttachment').click();
+    }
+    function FileChange(obj) {
+        if (!CheckFiles(obj.files)) return;
+        $('#flist').children().remove();
+        var len = obj.files.length;
+        fl = len;
+        if (len == 0) {
+            fl = 0;
+            alert("没有选择任何文件。");
+            return;
+        }
+        ReadFile(obj.files);
+    }
+    var sindex = 0;
+    var sizestr = new Array("B", "KB", "MB", "GB", "TB");
+    var zipType = /.xlsx/;
+    function GetSizeStr(size) {
+        if (size > 1024) {
+            size = size / 1024;
+            sindex++;
+            return GetSizeStr(size);
+        }
+        var re = Math.ceil(size) + sizestr[sindex];
+        sindex = 0;
+        return re;
+    }
+    function CheckFiles(files) {
+        var len = files.length;
+        for (var file_index = 0; file_index < len; file_index++) {
+            if (!files[file_index].name.match(zipType)) {
+                fl = 0;
+                alert("上传文件类型不符合要求。");
+                return false;
+            }
+        }
+        return true;
+    }
+    var fileList = new Array();
+    function ReadFile(files) {
+        $.each(files,function(file_index,file){
+            var formdata = new FormData();
+            formdata.append("data", file);
+            $.ajax({
+                url: "@Url.RouteUrl(new { controller = "FileUpload", action = "FileUpload" })",
+                type: "post",
+            data: formdata,
+            async: true,
+            processData: false, //不对form进行处理
+            contentType: false, //指定为false才能形成正确的Content-Type
+            success: function (data, textStatus) {
+                if (data.state == 1) {
+                    var file = data.data.split(',')[1];
+                    $.getJSON('./FundsManager/AddFromExcel?file=' + file, function (data) {
+                        if (data.state == 1) {
+                            if (data.msg_text) {
+                                alert("部份添加失败，请查看页面提示。");
+                                $('err').html(data.msg_text);
+                            } else {
+                                alert("添加成功。");
+                                location.reload();
+                            }
+                        } alert(data.msg_text);
+                    });
+                }
+                else{
+                    //发生错误，重新上传
+                    alert(data.msg_text);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                //发生错误，重新上传
+                alert("上传发生错误。");
+            }
+        }).complete(function () {
+            fl = 0;
+        });
+    });
+    }
+    //----文件上传结束
 </script>
