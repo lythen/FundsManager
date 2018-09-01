@@ -36,10 +36,11 @@ namespace FundsManager.Migrations
             //    );
             //context.Dic_Log_Type.AddOrUpdate(x => x.dlt_log_name,
             //    new Dic_Log_Type() { dlt_log_name = "用户登陆" },
-            //    new Dic_Log_Type() { dlt_log_name = "添加或更新用户信息" },
-            //    new Dic_Log_Type() { dlt_log_name = "批复" },
-            //    new Dic_Log_Type() { dlt_log_name = "提交申请" },
+            //    new Dic_Log_Type() { dlt_log_name = "用户操作" },
+            //    new Dic_Log_Type() { dlt_log_name = "批复操作" },
+            //    new Dic_Log_Type() { dlt_log_name = "申请操作" },
             //    new Dic_Log_Type() { dlt_log_name = "系统配置" },
+            //    new Dic_Log_Type() { dlt_log_name = "经费操作" },
             //    new Dic_Log_Type() { dlt_log_name = "其他" }
             //    );
             //context.Dic_Apply_State.AddOrUpdate(x => x.das_state_name,

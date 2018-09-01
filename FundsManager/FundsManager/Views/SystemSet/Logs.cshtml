@@ -1,0 +1,250 @@
+﻿
+@{
+    @model FundsManager.ViewModels.StatisticsSearch
+    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "日志查询";
+    Layout = "~/Views/Shared/_systemset.cshtml";
+    List<FundsManager.ViewModels.ViewLogsModel> Logs = (List<FundsManager.ViewModels.ViewLogsModel>)ViewData["Logs"];
+    Model.PageSize = 20;
+    int pagerLen = 20;
+    int begini = 1;
+    int endi = 1;
+    if (Model.Pages > 1)
+    {
+        if (Model.Pages <= pagerLen) { endi = Model.Pages; }
+        else
+        {
+            var mid = pagerLen / 2;
+            if (Model.PageIndex + mid >= Model.Pages)
+            {
+                endi = Model.Pages;
+                mid = endi - Model.PageIndex;
+                begini = Model.PageIndex - (pagerLen - mid) + 1;
+            }
+            else
+            {
+                if (Model.PageIndex - mid <= 0)
+                {
+                    begini = 1;
+                    mid = pagerLen - (Model.PageIndex - begini);
+                }
+                else { begini = Model.PageIndex - mid; }
+                endi = Model.PageIndex + mid - 1;
+            }
+        }
+    }
+}
+<style>
+    .form-control {
+        width: 200px;
+        display: inline-block;
+    }
+
+    .detail-table > tbody > tr > td, .th-table > tbody > tr > th {
+        border: none;
+    }
+
+    .detail-table, .th-table, .content-table {
+        margin-bottom: 0px;
+    }
+
+        .th-table > tbody > tr > th {
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+
+    .txt-bold {
+        font-weight: bold;
+    }
+
+    .detail-table > tbody > tr > th, .content-table > tbody > tr > th, .th-table > tbody > tr > th, .respond-table > tbody > tr > th {
+        background: lightblue;
+    }
+
+    .detail-table > tbody > tr > td, .main-table td, .respond-table td, .content-table td {
+        background-color: aliceblue;
+    }
+
+    .main-table .txt-bold {
+        background: lightblue;
+    }
+
+    .detail-table td {
+        background-color: aquamarine;
+    }
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        vertical-align: middle;
+    }
+
+    .detail-table > tbody > tr > th {
+        background-color: yellowgreen;
+    }
+
+    .detail-table > tbody > tr > td {
+        background-color: beige;
+    }
+</style>
+<h4>日志查询</h4>
+<hr />
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                @Html.HiddenFor(model => model.PageSize)
+                @Html.HiddenFor(model => model.PageIndex)
+                用户：@Html.DropDownListFor(model => model.userId, Model.userId, ViewData["Users"] as List<SelectListItem>, "---全部---", new Dictionary<string, object> { { "class", "select form-control" } })
+                @Html.ValidationMessageFor(model => model.userId, "", new { @class = "text-danger" })
+                关键字：@Html.EditorFor(model => model.KeyWord, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.KeyWord, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-10">
+                起始时间：@Html.EditorFor(model => model.beginDate, new { htmlAttributes = new { @class = "form-control form_date" } })
+                @Html.ValidationMessageFor(model => model.beginDate, "", new { @class = "text-danger" })
+                结束时间：@Html.EditorFor(model => model.endDate, new { htmlAttributes = new { @class = "form-control form_date" } })
+                @Html.ValidationMessageFor(model => model.endDate, "", new { @class = "text-danger" })
+                <input type="button" onclick="goTo('1');" value="查询" class="btn btn-info" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10" style="color:red;width:100%;text-align:center;">
+        @ViewBag.msg
+    </div>
+    <div class="form-horizontal">
+        <table class="table content-table">
+            <tr>
+                <th>
+                    日志ID
+                </th>
+                <th>操作人</th>
+                <th>IP</th>
+                <th>时间</th>
+                <th>事项</th>
+                <th>操作对象</th>
+            </tr>
+            @foreach (var item in Logs)
+                {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(citem => item.id)
+                    </td>
+                    <td>@Html.DisplayFor(citem => item.user)</td>
+                    <td>@Html.DisplayFor(citem => item.ip)</td>
+                    <td>
+                        @Html.DisplayFor(citem => item.time)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(citem => item.info)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(citem => item.targetStr)
+                    </td>
+                </tr>
+            }
+        </table>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if (Model.PageIndex == 1)
+                {
+                    <li class="disabled">
+                        <span>
+                            <span aria-hidden="true">&laquo;</span>
+                        </span>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="javascript:void(0);" onclick="Previous();" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+                @for (var i = begini; i <= endi; i++)
+                {
+                    if (i == Model.PageIndex)
+                    {
+                        <li class="active"><a href="#">@i<span class="sr-only">(current)</span></a></li>
+                    }
+                    else
+                    {
+                        <li><a href="javascript:void(0);" onclick="goTo(@i);">@i</a></li>
+                    }
+
+                }
+                @if (Model.PageIndex == Model.Pages)
+                {
+                    <li class="disabled">
+                        <span>
+                            <span aria-hidden="true">&raquo;</span>
+                        </span>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="javascript:void(0);" aria-label="Next" onclick="Next();">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
+<script src="~/scripts/jquery-1.10.2.min.js"></script>
+<script src="~/scripts/extendindexof.js"></script>
+<script src="~/scripts/dateformat.js"></script>
+<script>
+    $(function () {
+        $.ajaxSetup({
+            cache: true
+        });
+        $.getScript('../scripts/bootstrap.min.js').done(function () {
+            $.getScript('../Scripts/bootstrap-datetimepicker.js').done(function () {
+                $.getScript('../Scripts/locales/bootstrap-datetimepicker.zh-CN.js').done(function () {
+                    $('.form_date').datetimepicker({
+                        language: 'zh-CN',
+                        weekStart: 1,
+                        todayBtn: 1,
+                        autoclose: 1,
+                        todayHighlight: 1,
+                        startView: 2,
+                        minView: 2,
+                        forceParse: 0,
+                        format: 'yyyy/mm/dd'
+                    });
+                });
+            });
+        });
+
+    });
+    var pagesize = @Model.PageSize;
+    function goTo(pageindex) {
+        $('#PageIndex').val(pageindex);
+        $('#PageSize').val(pagesize);
+        $('form').submit();
+    }
+    function Next(){
+        var pageindex=$('#PageIndex').val();
+        if(pageindex==(@Model.Pages)){
+            alert('已是最后一页。');
+            return;
+        }
+        pageindex++;
+        goTo(pageindex);
+    }
+    function Previous() {
+        var pageindex=$('#PageIndex').val();
+        if(pageindex==1){
+            alert('已是第一页。');
+            return;
+        }
+        pageindex--;
+        goTo(pageindex);
+    }
+</script>
+

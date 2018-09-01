@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 using FundsManager.Models;
 using FundsManager.Common;
 using System.Collections.Generic;
+using System;
+
 namespace FundsManager.ViewModels
 {
     public class SystemSetModel
@@ -87,5 +89,20 @@ namespace FundsManager.ViewModels
     {
         public int roleId { get; set; }
         public int authId { get; set; }
+    }
+    public class ViewLogsModel
+    {
+        public int uid { get; set; }
+        public string user { get; set; }
+        public string info { get; set; }
+        public string ip { get; set; }
+        public int id { get; set; }
+        [DisplayFormat(DataFormatString = ("{0:d}"), NullDisplayText = "")]
+        public DateTime time { get; set; }
+        public string device { get; set; }
+        public string target { get; set; }
+        public string targetStr { get; set; }
+        public int type { get; set; }
+        public string typeStr { get; set; }
     }
 }

@@ -132,6 +132,7 @@ namespace FundsManager.Controllers
                 model.f_manager = user;
                 db.Funds.Add(model);
                 db.SaveChanges();
+                SysLog.WriteLog(user, string.Format("经费添加[{0}]", model.f_code), IpHelper.GetIP(), model.f_id.ToString(), 6, "", db);
                 ViewBag.msg = "经费添加成功。";
             }
 
@@ -237,6 +238,7 @@ namespace FundsManager.Controllers
                 try
                 {
                     db.SaveChanges();
+                    SysLog.WriteLog(user, string.Format("经费修改[{0}]", model.f_code), IpHelper.GetIP(), model.f_id.ToString(), 6, "", db);
                 }
                 catch (DbEntityValidationException ex)
                 {
@@ -255,18 +257,6 @@ namespace FundsManager.Controllers
                     return View(funds);
                 }
                 ViewBag.msg = "经费信息修改成功。";
-                Sys_Log log = new Sys_Log()
-                {
-                    log_content = "修改经费信息" + model.f_name,
-                    log_ip = Common.IpHelper.GetIP(),
-                    log_target = funds.id.ToString(),
-                    log_time = DateTime.Now,
-                    log_type = 7,
-                    log_user_id = user,
-                    log_device = ""
-                };
-                db.Sys_Log.Add(log);
-                db.SaveChanges();
             }
             return View(funds);
         }
@@ -320,6 +310,7 @@ namespace FundsManager.Controllers
             try
             {
                 db.SaveChanges();
+                SysLog.WriteLog(user, string.Format("经费删除[{0}]", funds.f_code), IpHelper.GetIP(), funds.f_id.ToString(), 6, "", db);
             }
             catch (Exception)
             {
@@ -432,6 +423,7 @@ namespace FundsManager.Controllers
             try
             {
                 db.SaveChanges();
+                SysLog.WriteLog(user, "经费批量录入[{0}]", IpHelper.GetIP(), "", 6, "", db);
             }
             catch (Exception)
             {

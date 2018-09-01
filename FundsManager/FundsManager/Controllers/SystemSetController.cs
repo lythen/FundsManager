@@ -19,7 +19,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
 
             ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
             return View(info);
@@ -61,6 +61,7 @@ namespace FundsManager.Controllers
             {
                 @ViewBag.msg = "修改失败。";
             }
+            SysLog.WriteLog(user, "修改网站信息", IpHelper.GetIP(), "", 5, "", db);
             @ViewBag.msg = "修改成功。";
             return View(info);
         }
@@ -70,7 +71,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             List<ModuleInfo> models = DBCaches2.getModuleInfo();
             foreach (ModuleInfo model in models)
@@ -99,7 +100,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -129,6 +130,7 @@ namespace FundsManager.Controllers
                     }
                 }
                 db.SaveChanges();
+                SysLog.WriteLog(user, "修改系统模块", IpHelper.GetIP(), "", 5, "", db);
                 json.state = 1;
                 json.msg_code = "success";
                 json.msg_text = "数据更新成功。";
@@ -175,6 +177,7 @@ namespace FundsManager.Controllers
                 {
                     ViewBag.msg = "职务添加失败，请重试。";
                 }
+                SysLog.WriteLog(user, string.Format("添加职务[{0}]",model.post_name), IpHelper.GetIP(), "", 5, "", db);
             }
             ViewData["PostList"] = DBCaches<Dic_Post>.getCache("cache_post");// db.Dic_Post.ToList();
             return View(model);
@@ -215,6 +218,7 @@ namespace FundsManager.Controllers
                 json.msg_code = "recyErr";
                 goto next;
             }
+            SysLog.WriteLog(user, string.Format("删除职务[{0}]", model.post_name), IpHelper.GetIP(), "", 5, "", db);
             json.state = 1;
             json.msg_code = "success";
             json.msg_text = "删除成功！";
@@ -243,7 +247,7 @@ namespace FundsManager.Controllers
                 json.msg_code = "IDError";
                 goto next;
             }
-            
+
             var same = db.Dic_Post.Where(x => x.post_name == post.post_name && x.post_id != post.post_id);
             if (same.Count() > 0)
             {
@@ -263,6 +267,7 @@ namespace FundsManager.Controllers
                 json.msg_code = "UpdateErr";
                 goto next;
             }
+            SysLog.WriteLog(user, string.Format("更新职务[{0}]", post.post_name), IpHelper.GetIP(), "", 5, "", db);
             json.state = 1;
             json.msg_code = "success";
             json.msg_text = "更新成功！";
@@ -275,7 +280,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             List<SelectOption> options = DropDownList.getDepartment();
             ViewBag.Dept = DropDownList.SetDropDownList(options);
@@ -288,7 +293,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
             List<SelectOption> options = DropDownList.getDepartment();
             ViewBag.Dept = DropDownList.SetDropDownList(options);
@@ -309,6 +314,7 @@ namespace FundsManager.Controllers
                     ViewBag.msg = "部门添加失败，请重试。";
                 }
             }
+            SysLog.WriteLog(user, string.Format("添加部门[{0}]", model.dept_name), IpHelper.GetIP(), "", 5, "", db);
             ViewData["DeptList"] = DBCaches2.getDeptCache();
             return View(info);
         }
@@ -323,7 +329,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -348,6 +354,7 @@ namespace FundsManager.Controllers
                 json.msg_code = "recyErr";
                 goto next;
             }
+            SysLog.WriteLog(user, string.Format("删除部门[{0}]", model.dept_name), IpHelper.GetIP(), "", 5, "", db);
             json.state = 1;
             json.msg_code = "success";
             json.msg_text = "删除成功！";
@@ -364,7 +371,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -406,6 +413,7 @@ namespace FundsManager.Controllers
                 json.msg_code = "UpdateErr";
                 goto next;
             }
+            SysLog.WriteLog(user, string.Format("更新部门[{0}]", model.dept_name), IpHelper.GetIP(), "", 5, "", db);
             json.state = 1;
             json.msg_code = "success";
             json.msg_text = "更新成功！";
@@ -510,12 +518,13 @@ namespace FundsManager.Controllers
                 json.msg_text = "角色的权限修改成功。";
                 json.msg_code = "success";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 json.msg_text = "角色权限修改出错。";
                 json.msg_code = "error";
                 Common.ErrorUnit.WriteErrorLog(ex.ToString(), this.GetType().ToString());
             }
+            SysLog.WriteLog(user, "重置角色的权限", IpHelper.GetIP(), "", 5, "", db);
             //重设置角色权限后，必需清除缓存
             DataCache.RemoveCacheBySearch("user_vs_roles");
             next:
@@ -525,7 +534,7 @@ namespace FundsManager.Controllers
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err="没有权限当前内容。" });
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
             ViewData["RoleList"] = DBCaches<Dic_Role>.getCache("cache_role"); ;
             return View(new Dic_Role());
         }
@@ -552,6 +561,8 @@ namespace FundsManager.Controllers
                     ViewBag.msg = "角色添加失败，请重试。";
                 }
             }
+
+            SysLog.WriteLog(user, string.Format("添加角色[{0}]", model.role_name), IpHelper.GetIP(), "", 5, "", db);
             ViewData["RoleList"] = DBCaches<Dic_Role>.getCache("cache_role");// db.Dic_Post.ToList();
             return View(model);
         }
@@ -566,7 +577,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -600,6 +611,7 @@ namespace FundsManager.Controllers
             json.state = 1;
             json.msg_code = "success";
             json.msg_text = "删除成功！";
+            SysLog.WriteLog(user, string.Format("删除角色[{0}]", model.role_name), IpHelper.GetIP(), "", 5, "", db);
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
@@ -613,7 +625,7 @@ namespace FundsManager.Controllers
                 goto next;
             }
             int user = PageValidate.FilterParam(User.Identity.Name);
-            if (!RoleCheck.CheckHasAuthority(user,db, "系统管理"))
+            if (!RoleCheck.CheckHasAuthority(user, db, "系统管理"))
             {
                 json.msg_text = "没有权限。";
                 json.msg_code = "NoPower";
@@ -653,10 +665,78 @@ namespace FundsManager.Controllers
             json.state = 1;
             json.msg_code = "success";
             json.msg_text = "更新成功！";
+            SysLog.WriteLog(user, string.Format("更新角色[{0}]名称", model.role_name), IpHelper.GetIP(), "", 5, "", db);
             next:
             return Json(json, JsonRequestBehavior.AllowGet);
         }
         #endregion
+        #region 日志查询
+        public ActionResult Logs(StatisticsSearch search)
+        {
+            if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });
+            int user = PageValidate.FilterParam(User.Identity.Name);
+            List<SelectOption> options = DropDownList.UserSelect(user);
+            ViewData["Users"] = DropDownList.SetDropDownList(options);
+            var query = from log in db.Sys_Log
+                        join t in db.Dic_Log_Type on log.log_type equals t.dlt_log_id into T
+                        from t1 in T.DefaultIfEmpty()
+                        join u in db.User_Info on log.log_user_id equals u.user_id into U
+                        from u1 in U.DefaultIfEmpty()
+                        select new ViewLogsModel
+                        {
+                            uid = log.log_user_id,
+                            user = u1.real_name,
+                            info = log.log_content,
+                            ip = log.log_ip,
+                            id = log.log_id,
+                            time = log.log_time,
+                            device = log.log_device,
+                            target = log.log_target,
+                            targetStr = log.log_target,
+                            type = log.log_type,
+                            typeStr = t1.dlt_log_name
+                        };
+            if (!RoleCheck.CheckHasAuthority(user, db, "经费管理"))
+                query = query.Where(x => x.uid == user);
+            if (search.beginDate != null)
+            {
+                search.beginDate = DateTime.Parse(((DateTime)search.beginDate).ToString("yyyy-MM-dd 00:00:00.000"));
+                query = query.Where(x => x.time >= search.beginDate);
+            }
+            if (search.endDate != null)
+            {
+                search.endDate = DateTime.Parse(((DateTime)search.endDate).ToString("yyyy-MM-dd 23:59:59.999"));
+                query = query.Where(x => x.time <= search.endDate);
+            }
+            if (search.userId != null && search.userId != 0)
+                query = query.Where(x => x.uid == search.userId);
+            string keyword= PageValidate.InputText(search.KeyWord, 100);
+            if (!string.IsNullOrEmpty(keyword))
+                query = query.Where(x => x.info.Contains(keyword));
+            //统计总条目
+            search.Amount = query.Count();
+            //分页
+            query = query.OrderByDescending(x => x.time).Skip(search.PageSize * (search.PageIndex - 1)).Take(search.PageSize);
+            var list = query.ToList();
+            foreach (var item in list)
+            {
+                if (item.type == 2)
+                {
+                    int uid = PageValidate.FilterParam(item.target);
+                    var t = (from u in db.User_Info
+                             where u.user_id == item.uid
+                             select u.real_name).FirstOrDefault();
+                    if(!string.IsNullOrEmpty(t))
+                    item.targetStr = Common.DEncrypt.AESEncrypt.Decrypt(t);
+                }
+                item.user = Common.DEncrypt.AESEncrypt.Decrypt(item.user);
+            }
+            ViewData["Logs"] = list;
+            
+            return View(search);
+        }
+        #endregion
+
         public JsonResult DeleteAllCache()
         {
             BaseJsonData json = new BaseJsonData();

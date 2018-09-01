@@ -179,6 +179,7 @@ namespace FundsManager.Controllers
                     db.User_vs_Role.Add(uvr);
                 }
                 db.SaveChanges();
+                SysLog.WriteLog(user, string.Format("添加用户[{0}]", model.realName), IpHelper.GetIP(), info.user_id.ToString(), 2, "", db);
                 ViewBag.msg = " 用户创建成功。";
             }
             else
@@ -347,6 +348,7 @@ namespace FundsManager.Controllers
                 {
                     db.SaveChanges();
                     ViewBag.msg = " 更新成功。";
+                    SysLog.WriteLog(user, string.Format("修改用户[{0}]信息", model.realName), IpHelper.GetIP(), info.user_id.ToString(), 2, "", db);
                 }
                 catch(DbEntityValidationException ex)
                 {
@@ -405,6 +407,7 @@ namespace FundsManager.Controllers
                 json.state = 1;
                 json.msg_code = "success";
                 json.msg_text = "删除成功。";
+                SysLog.WriteLog(uid, string.Format("删除用户[{0}]信息", Common.DEncrypt.AESEncrypt.Decrypt(user_Info.real_name)), IpHelper.GetIP(), id.ToString(), 2, "", db);
             }
             catch(Exception ex)
             {
@@ -437,7 +440,7 @@ namespace FundsManager.Controllers
             file.SaveAs(file_name);
             ImageFun.MakeThumbnail(file_name, file_name_temp, 200, 0, "W");
             json.state = 1;
-            json.data = Path.GetFileName(file_name_temp); ;
+            json.data = Path.GetFileName(file_name_temp);
             return Json(json);
         }
         public void setSelect()
