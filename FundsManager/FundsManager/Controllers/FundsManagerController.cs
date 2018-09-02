@@ -34,6 +34,7 @@ namespace FundsManager.Controllers
             info.PageSize = 0;
             //管理的经费
             var mfunds = from funds in db.Funds
+                         join u in db.User_Info on funds.f_manager equals u.user_id
                           select new mFundsListModel
                           {
                               manager=funds.f_manager,
@@ -42,6 +43,7 @@ namespace FundsManager.Controllers
                               balance = funds.f_balance,
                               id = funds.f_id,
                               name = funds.f_name,
+                               managerName=u.real_name,
                               strState = funds.f_state == 0 ? "未启用" : (funds.f_state == 1 ? "正常" : "锁定"),
                               userCount = (from bill in db.Reimbursement
                                            where bill.r_funds_id == funds.f_id && bill.r_bill_state == 1
@@ -54,7 +56,12 @@ namespace FundsManager.Controllers
                                 ).DefaultIfEmpty(0).Sum()
                           };
             if (info.userId > 0) mfunds = mfunds.Where(x => x.manager == info.userId);
-            ViewData["Funds"] = mfunds.ToList();
+            var list = mfunds.ToList();
+            foreach(var item in list)
+            {
+                item.managerName = Common.DEncrypt.AESEncrypt.Decrypt(item.managerName);
+            }
+            ViewData["Funds"] = list;
             List<SelectOption> options = DropDownList.FundsManagerSelect(user);
             ViewData["ViewUsers"] = DropDownList.SetDropDownList(options);
             return View(info);

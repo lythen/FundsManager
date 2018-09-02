@@ -258,6 +258,7 @@ namespace FundsManager.Controllers
                 try
                 {
                     db.SaveChanges();
+                    SysLog.WriteLog(user, string.Format("添加报帐单[{0}]", bill.reimbursement_code), IpHelper.GetIP(), bill.reimbursement_code, 4, "", db);
                 }
                 catch (Exception e)
                 {
@@ -498,6 +499,7 @@ namespace FundsManager.Controllers
                     try
                     {
                         db.SaveChanges();
+                        SysLog.WriteLog(user, string.Format("修改报帐单[{0}]", bill.reimbursement_code), IpHelper.GetIP(), bill.reimbursement_code, 4, "", db);
                     }
                     catch (Exception e)
                     {
@@ -576,6 +578,7 @@ namespace FundsManager.Controllers
             try
             {
                 db.SaveChanges();
+                SysLog.WriteLog(user, string.Format("删除报帐单[{0}]", bill.reimbursement_code), IpHelper.GetIP(), bill.reimbursement_code, 4, "", db);
             }
             catch (DbEntityValidationException ex)
             {
@@ -863,6 +866,7 @@ namespace FundsManager.Controllers
             try
             {
                 db.SaveChanges();
+                SysLog.WriteLog(user, string.Format("录入报销单[{0}]实领金额{1}元", bill.reimbursement_code, amount), IpHelper.GetIP(), bill.reimbursement_code, 4, "", db);
             }
             catch (Exception e)
             {

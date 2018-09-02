@@ -206,6 +206,7 @@ namespace FundsManager.Controllers
             try
             {
                 db.SaveChanges();
+                SysLog.WriteLog(user, string.Format("批复报帐单[{0}]，结果为[{1}]", bill.reimbursement_code,state), IpHelper.GetIP(), bill.reimbursement_code, 3, "", db);
             }
             catch (DbEntityValidationException et)
             {
