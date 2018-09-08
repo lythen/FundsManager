@@ -3,7 +3,7 @@ using System.Configuration;
 using System.IO;
 using System.Text;
 
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     public static class ErrorUnit
     {

@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace FundsManager.App_Start
+namespace Lythen.App_Start
 {
     public class RouteConfig
     {

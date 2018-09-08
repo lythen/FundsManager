@@ -2,7 +2,7 @@
 using System.Text;
 using System.Web.Security;
 
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     public class TokenProccessor
     {

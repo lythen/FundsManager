@@ -1,8 +1,8 @@
-﻿@model FundsManager.ViewModels.BillsSearchModel
+﻿@model Lythen.ViewModels.BillsSearchModel
 
 @{
-    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费列表";
-    List<FundsManager.ViewModels.mFundsListModel> mFunds = (List<FundsManager.ViewModels.mFundsListModel>)ViewData["Funds"];
+    ViewBag.Title = Lythen.Controllers.SiteInfo.getSiteName() + "经费列表";
+    List<Lythen.ViewModels.mFundsListModel> mFunds = (List<Lythen.ViewModels.mFundsListModel>)ViewData["Funds"];
     Layout = "~/Views/Shared/_fundsmanager.cshtml";
 }
 <style>

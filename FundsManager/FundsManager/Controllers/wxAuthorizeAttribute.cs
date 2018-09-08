@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using FundsManager.DAL;
-using FundsManager.Common;
-namespace FundsManager.Controllers
+using Lythen.DAL;
+using Lythen.Common;
+namespace Lythen.Controllers
 {
     public class wxAuthorizeAttribute: AuthorizeAttribute
     {

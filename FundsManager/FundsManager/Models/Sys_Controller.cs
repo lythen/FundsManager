@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FundsManager.Models
+namespace Lythen.Models
 {
     public class Sys_Controller
     {

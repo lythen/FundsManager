@@ -1,4 +1,4 @@
-﻿namespace FundsManager.Models
+﻿namespace Lythen.Models
 {
     public struct SelectOption
     {

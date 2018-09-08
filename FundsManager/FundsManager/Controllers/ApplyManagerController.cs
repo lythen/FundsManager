@@ -5,16 +5,16 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
-using FundsManager.DAL;
-using FundsManager.Models;
-using FundsManager.ViewModels;
-using FundsManager.Common;
+using Lythen.DAL;
+using Lythen.Models;
+using Lythen.ViewModels;
+using Lythen.Common;
 using System.Data.Entity.Validation;
 using System.Text;
 using System.IO;
-using FundsManager.Common.DEncrypt;
+using Lythen.Common.DEncrypt;
 
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public class ApplyManagerController : Controller
     {

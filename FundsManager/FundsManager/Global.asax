@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="FundsManager.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Lythen.Global" Language="C#" %>

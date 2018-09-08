@@ -4,16 +4,16 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
-using FundsManager.DAL;
-using FundsManager.Models;
+using Lythen.DAL;
+using Lythen.Models;
 using System.IO;
-using FundsManager.Common;
+using Lythen.Common;
 using System.Configuration;
-using FundsManager.ViewModels;
+using Lythen.ViewModels;
 using System.Text;
 using System.Data.Entity.Validation;
 
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public class UserManagerController : Controller
     {

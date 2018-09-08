@@ -1,10 +1,10 @@
-﻿using FundsManager.Common;
+﻿using Lythen.Common;
 using System;
 using System.Diagnostics;
 using System.Text;
 using System.Web.Mvc;
 
-namespace FundsManager.Infrastructure
+namespace Lythen.Infrastructure
 {
     /// <summary>
     /// Apply this attribute to controller actions to log the exception via Trace.

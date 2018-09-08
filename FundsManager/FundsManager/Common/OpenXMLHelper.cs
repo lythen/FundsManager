@@ -10,7 +10,7 @@ using System.Xml;
 using DocumentFormat.OpenXml;
 using System.Xml.Linq;
 
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     public class OpenXMLHelper
     {

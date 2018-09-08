@@ -1,9 +1,9 @@
 ﻿
 @{
-    @model FundsManager.ViewModels.StatisticsSearch
-    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "日志查询";
+    @model Lythen.ViewModels.StatisticsSearch
+    ViewBag.Title = Lythen.Controllers.SiteInfo.getSiteName() + "日志查询";
     Layout = "~/Views/Shared/_systemset.cshtml";
-    List<FundsManager.ViewModels.ViewLogsModel> Logs = (List<FundsManager.ViewModels.ViewLogsModel>)ViewData["Logs"];
+    List<Lythen.ViewModels.ViewLogsModel> Logs = (List<Lythen.ViewModels.ViewLogsModel>)ViewData["Logs"];
     Model.PageSize = 20;
     int pagerLen = 20;
     int begini = 1;

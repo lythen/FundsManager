@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Security.Cryptography;
-namespace FundsManager.Common.DEncrypt
+namespace Lythen.Common.DEncrypt
 {
     /// <summary>
     /// 得到随机安全码（哈希加密）。

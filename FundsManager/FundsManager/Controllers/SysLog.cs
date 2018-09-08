@@ -1,12 +1,12 @@
-﻿using FundsManager.Common;
-using FundsManager.DAL;
-using FundsManager.Models;
+﻿using Lythen.Common;
+using Lythen.DAL;
+using Lythen.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Text;
 
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public static class SysLog
     {

@@ -1,4 +1,4 @@
-namespace FundsManager.Migrations
+namespace Lythen.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;

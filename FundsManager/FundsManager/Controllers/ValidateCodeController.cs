@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Web.Mvc;
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public class ValidateCodeController : Controller
     {

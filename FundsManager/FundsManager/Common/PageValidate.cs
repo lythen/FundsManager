@@ -4,7 +4,7 @@ using System.Web;
 using System.Web.UI.WebControls;
 using System.Text.RegularExpressions;
 
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     /// <summary>
     /// 页面数据校验类

@@ -1,8 +1,8 @@
-﻿@model IEnumerable<FundsManager.ViewModels.UserListModel>
+﻿@model IEnumerable<Lythen.ViewModels.UserListModel>
 
 @{
-    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-用户列表";
-    FundsManager.ViewModels.BasePagerModel pageinfo = (FundsManager.ViewModels.BasePagerModel)ViewData["search"];
+    ViewBag.Title = Lythen.Controllers.SiteInfo.getSiteName() + "-用户列表";
+    Lythen.ViewModels.BasePagerModel pageinfo = (Lythen.ViewModels.BasePagerModel)ViewData["search"];
     Layout = "~/Views/Shared/_usermanager.cshtml";
 }
 <style>

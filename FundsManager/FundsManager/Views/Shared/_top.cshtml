@@ -1,12 +1,12 @@
 ﻿@{
-    int userId = FundsManager.Common.PageValidate.FilterParam(User.Identity.Name);
-    FundsManager.DAL.FundsContext db = new FundsManager.DAL.FundsContext();
+    int userId = Lythen.Common.PageValidate.FilterParam(User.Identity.Name);
+    Lythen.DAL.FundsContext db = new Lythen.DAL.FundsContext();
 }
 <header class="main-header" style="background-color:RGB(68,152,218)">
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
-                <h1>@FundsManager.Controllers.SiteInfo.getSiteName()</h1>
+                <h1>@Lythen.Controllers.SiteInfo.getSiteName()</h1>
             </div>
         </div>
     </div>
@@ -26,26 +26,26 @@
                         <li role="presentation">
                             <a href="@Url.RouteUrl(new { controller = "Home",action="Index" })" title="首页">首页</a>
                         </li>
-                            @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId,db, "系统管理"))
+                            @if (Lythen.Common.RoleCheck.CheckHasAuthority(userId,db, "系统管理"))
                             {
                                 <li role="presentation">
                                     <a href="@Url.RouteUrl(new { controller = "SystemSet", action = "SiteInfo"})" title="系统设置" target="_top">系统设置</a>
                                 </li>
                             }
-                            @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "用户管理"))
+                            @if (Lythen.Common.RoleCheck.CheckHasAuthority(userId, db, "用户管理"))
                             {
                                 <li role="presentation"><a href="@Url.RouteUrl(new { controller = "UserManager",action="Index" })" title="用户管理" target="_top">用户管理</a></li>
                             }
-                            @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "添加经费", "经费管理"))
+                            @if (Lythen.Common.RoleCheck.CheckHasAuthority(userId, db, "添加经费", "经费管理"))
                             {
                                 <li role="presentation"><a href="@Url.RouteUrl(new { controller = "FundsManager",action="Index" })" title="经费管理" target="_top">经费管理</a></li>
                             }
-                            @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "批复", "批复管理"))
+                            @if (Lythen.Common.RoleCheck.CheckHasAuthority(userId, db, "批复", "批复管理"))
                             {
                                 <li role="presentation"><a href="@Url.RouteUrl(new { controller = "RespondManager",action= "Index" })" title="批复管理" target="_top">批复管理</a></li>
                             }
                             
-                                @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "申请管理"))
+                                @if (Lythen.Common.RoleCheck.CheckHasAuthority(userId, db, "申请管理"))
                                 {
                                     <li role="presentation"><a href="@Url.RouteUrl(new { controller = "ApplyManager",action= "MyFunds" })" title="申请管理" target="_top">申请管理</a></li>
                                 }
@@ -53,7 +53,7 @@
                                 {
                                     <li role="presentation"><a href="@Url.RouteUrl(new { controller = "ApplyManager",action= "MyFunds" })" title="申请管理" target="_top">申请管理</a></li>
                                 }
-                        @if (FundsManager.Common.RoleCheck.CheckHasAuthority(userId, db, "统计"))
+                        @if (Lythen.Common.RoleCheck.CheckHasAuthority(userId, db, "统计"))
                         {
                             <li role="presentation"><a href="@Url.RouteUrl(new { controller = "Statistics",action= "FundsStatistics" })" title="经费统计" target="_top">经费统计</a></li>
                         }

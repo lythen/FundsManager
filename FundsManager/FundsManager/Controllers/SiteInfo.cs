@@ -1,8 +1,8 @@
-﻿using FundsManager.DAL;
+﻿using Lythen.DAL;
 using System;
 using System.Linq;
-using FundsManager.Common;
-namespace FundsManager.Controllers
+using Lythen.Common;
+namespace Lythen.Controllers
 {
     public static class SiteInfo
     {

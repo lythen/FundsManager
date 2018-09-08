@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace FundsManager.Common.DEncrypt
+namespace Lythen.Common.DEncrypt
 {
     public static class AESEncrypt
     {

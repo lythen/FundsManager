@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     public static class PasswordUnit
     {

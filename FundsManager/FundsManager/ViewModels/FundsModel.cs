@@ -1,11 +1,11 @@
-﻿using FundsManager.Models;
+﻿using Lythen.Models;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using FundsManager.Common;
+using Lythen.Common;
 using System.Collections.Generic;
 
-namespace FundsManager.ViewModels
+namespace Lythen.ViewModels
 {
     public class FundsModel : FundsBaseModel
     {

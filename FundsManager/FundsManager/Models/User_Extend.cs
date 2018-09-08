@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System;
-namespace FundsManager.Models
+namespace Lythen.Models
 {
     /// <summary>
     /// 人员副表

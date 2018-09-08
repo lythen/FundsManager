@@ -1,12 +1,12 @@
-﻿using FundsManager.Common;
-using FundsManager.DAL;
-using FundsManager.Models;
-using FundsManager.ViewModels;
+﻿using Lythen.Common;
+using Lythen.DAL;
+using Lythen.Models;
+using Lythen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public class DBCaches2
     {

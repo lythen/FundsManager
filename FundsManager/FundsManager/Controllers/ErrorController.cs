@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
-using FundsManager.DAL;
+using Lythen.DAL;
 
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public class ErrorController : Controller
     {

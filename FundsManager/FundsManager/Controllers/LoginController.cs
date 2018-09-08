@@ -1,17 +1,17 @@
 ﻿using System.Data;
 using System.Linq;
 using System.Web.Mvc;
-using FundsManager.DAL;
-using FundsManager.Models;
+using Lythen.DAL;
+using Lythen.Models;
 using System.Web.Security;
 using System;
 using System.Web;
-using FundsManager.ViewModels;
-using FundsManager.Common;
+using Lythen.ViewModels;
+using Lythen.Common;
 using System.Data.Entity;
-using FundsManager.Common.DEncrypt;
+using Lythen.Common.DEncrypt;
 
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public class LoginController : Controller
     {

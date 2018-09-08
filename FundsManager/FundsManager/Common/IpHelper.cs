@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Web;
 
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     public static class IpHelper
     {

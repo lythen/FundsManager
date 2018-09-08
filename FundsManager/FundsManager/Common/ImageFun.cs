@@ -1,6 +1,6 @@
 ﻿using System.Drawing.Drawing2D;
 using System.Drawing;
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     /// <summary>
     ///ImageFun 的摘要说明

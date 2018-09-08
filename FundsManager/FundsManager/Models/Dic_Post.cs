@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace FundsManager.Models
+namespace Lythen.Models
 {
     public class Dic_Post
     {

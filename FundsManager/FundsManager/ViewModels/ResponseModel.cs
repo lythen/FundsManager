@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace FundsManager.ViewModels
+namespace Lythen.ViewModels
 {
     public class ListResponseModel
     {

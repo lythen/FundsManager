@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using System.Security.Cryptography;
-namespace FundsManager.Common.DEncrypt
+namespace Lythen.Common.DEncrypt
 {
     /// <summary> 
     /// RSA加密解密及RSA签名和验证

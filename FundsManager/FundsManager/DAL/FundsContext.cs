@@ -1,7 +1,7 @@
 ﻿using System.Data.Entity;
-using FundsManager.Models;
+using Lythen.Models;
 using System.Linq;
-namespace FundsManager.DAL
+namespace Lythen.DAL
 {
     public class FundsContext: DbContext
     {

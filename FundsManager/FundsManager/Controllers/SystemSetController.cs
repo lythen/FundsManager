@@ -4,11 +4,11 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
-using FundsManager.DAL;
-using FundsManager.Models;
-using FundsManager.ViewModels;
-using FundsManager.Common;
-namespace FundsManager.Controllers
+using Lythen.DAL;
+using Lythen.Models;
+using Lythen.ViewModels;
+using Lythen.Common;
+namespace Lythen.Controllers
 {
     public class SystemSetController : Controller
     {
@@ -21,7 +21,7 @@ namespace FundsManager.Controllers
             int user = PageValidate.FilterParam(User.Identity.Name);
             if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限当前内容。" });
 
-            ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
+            ViewModels.SiteInfo info = Lythen.Controllers.SiteInfo.getSiteInfo();
             return View(info);
         }
         public ActionResult SiteSet()
@@ -30,7 +30,7 @@ namespace FundsManager.Controllers
             int user = PageValidate.FilterParam(User.Identity.Name);
             if (!RoleCheck.CheckHasAuthority(user, db, "系统管理")) return RedirectToRoute(new { controller = "Error", action = "Index", err = "没有权限执行当前操作。" });
 
-            ViewModels.SiteInfo info = FundsManager.Controllers.SiteInfo.getSiteInfo();
+            ViewModels.SiteInfo info = Lythen.Controllers.SiteInfo.getSiteInfo();
             return View(info);
         }
         [HttpPost]

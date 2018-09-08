@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Configuration;
 
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     public static class MyConfiguration
     {

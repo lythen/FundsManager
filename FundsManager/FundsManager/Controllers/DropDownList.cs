@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
-using FundsManager.DAL;
-using FundsManager.Models;
+using Lythen.DAL;
+using Lythen.Models;
 using System.Linq;
-using FundsManager.Common;
-using FundsManager.ViewModels;
-using FundsManager.Common.DEncrypt;
+using Lythen.Common;
+using Lythen.ViewModels;
+using Lythen.Common.DEncrypt;
 
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public static class DropDownList
     {

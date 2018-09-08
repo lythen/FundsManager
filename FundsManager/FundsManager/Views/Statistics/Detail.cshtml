@@ -1,7 +1,7 @@
-﻿@model FundsManager.ViewModels.StatisticsSearch
+﻿@model Lythen.ViewModels.StatisticsSearch
 @{
-    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费使用明细";
-    List<FundsManager.ViewModels.ApplyListModel> StatData = (List<FundsManager.ViewModels.ApplyListModel>)ViewData["Details"];
+    ViewBag.Title = Lythen.Controllers.SiteInfo.getSiteName() + "经费使用明细";
+    List<Lythen.ViewModels.ApplyListModel> StatData = (List<Lythen.ViewModels.ApplyListModel>)ViewData["Details"];
     Layout = "~/Views/Shared/_statistics.cshtml";
     Model.PageSize = 10;
     int pagerLen = 20;

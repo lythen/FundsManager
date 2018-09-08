@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace FundsManager.Models
+namespace Lythen.Models
 {
     /// <summary>
     /// 批复流程 -废弃，不用！

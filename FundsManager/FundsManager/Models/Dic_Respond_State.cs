@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FundsManager.Models
+namespace Lythen.Models
 {
     public class Dic_Respond_State
     {

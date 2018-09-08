@@ -2,7 +2,7 @@
 using System.Text;
 using System.Security.Cryptography;
 
-namespace FundsManager.Common.DEncrypt
+namespace Lythen.Common.DEncrypt
 {
     /// <summary>
     /// MD5加密/解密类

@@ -1,10 +1,10 @@
-﻿using FundsManager.ViewModels;
+﻿using Lythen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FundsManager.DAL
+namespace Lythen.DAL
 {
     public class Statistics
     {

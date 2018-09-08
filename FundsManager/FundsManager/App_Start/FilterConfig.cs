@@ -1,6 +1,6 @@
-﻿using FundsManager.Infrastructure;
+﻿using Lythen.Infrastructure;
 
-namespace FundsManager.App_Start
+namespace Lythen.App_Start
 {
     public class FilterConfig
     {

@@ -1,4 +1,4 @@
-namespace FundsManager.Migrations
+namespace Lythen.Migrations
 {
     using System.Data.Entity.Migrations;
     using Models;
@@ -6,7 +6,7 @@ namespace FundsManager.Migrations
     using System.Configuration;
     using System.IO;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<FundsManager.DAL.FundsContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<Lythen.DAL.FundsContext>
     {
         public Configuration()
         {

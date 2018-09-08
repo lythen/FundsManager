@@ -2,7 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace FundsManager.Common.DEncrypt
+namespace Lythen.Common.DEncrypt
 {
     /// <summary>
     /// DESº”√‹/Ω‚√‹¿‡

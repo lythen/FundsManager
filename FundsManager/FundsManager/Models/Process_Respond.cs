@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace FundsManager.Models
+namespace Lythen.Models
 {
     /// <summary>
     /// 流程批复表

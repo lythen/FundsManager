@@ -1,16 +1,16 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
-using FundsManager.DAL;
-using FundsManager.Models;
-using FundsManager.Common;
-using FundsManager.ViewModels;
-using FundsManager.Common.DEncrypt;
+using Lythen.DAL;
+using Lythen.Models;
+using Lythen.Common;
+using Lythen.ViewModels;
+using Lythen.Common.DEncrypt;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Data.Entity.Validation;
 
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public class RespondManagerController : Controller
     {

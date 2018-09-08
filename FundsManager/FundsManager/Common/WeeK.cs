@@ -1,4 +1,4 @@
-﻿namespace FundsManager.Common
+﻿namespace Lythen.Common
 {
     public static class WeeK
     {

@@ -1,7 +1,7 @@
-﻿@model FundsManager.ViewModels.StatisticsSearch
+﻿@model Lythen.ViewModels.StatisticsSearch
 @{
-    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "经费使用区间统计";
-    List<FundsManager.ViewModels.FundsStat> StatData = (List<FundsManager.ViewModels.FundsStat>)ViewData["StatData"];
+    ViewBag.Title = Lythen.Controllers.SiteInfo.getSiteName() + "经费使用区间统计";
+    List<Lythen.ViewModels.FundsStat> StatData = (List<Lythen.ViewModels.FundsStat>)ViewData["StatData"];
     Layout = "~/Views/Shared/_statistics.cshtml";
 }
 <style>

@@ -2,7 +2,7 @@ using System;
 using System.Web;
 using System.Collections;
 using System.Configuration;
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     /// <summary>
     /// 缓存相关的操作类，仅适合缓存只读的数据

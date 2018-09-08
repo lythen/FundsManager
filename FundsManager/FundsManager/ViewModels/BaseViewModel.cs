@@ -1,5 +1,5 @@
 ﻿using System;
-namespace FundsManager.ViewModels
+namespace Lythen.ViewModels
 {
     public class BaseViewModel
     {

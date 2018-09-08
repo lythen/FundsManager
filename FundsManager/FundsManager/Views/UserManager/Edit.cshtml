@@ -1,12 +1,14 @@
-﻿@model FundsManager.ViewModels.UserEditModel
+﻿@model Lythen.ViewModels.UserEditModel
 @{
-    ViewBag.Title = FundsManager.Controllers.SiteInfo.getSiteName() + "-修改用户信息";
+    ViewBag.Title = Lythen.Controllers.SiteInfo.getSiteName() + "-修改用户信息";
     List<SelectListItem> cDept = new List<SelectListItem>();
     if (Model.deptChild != null)
     {
         cDept = ViewBag.DeptChild as List<SelectListItem>;
     }
-    FundsManager.ViewModels.LoginRole role = (FundsManager.ViewModels.LoginRole)Session["LoginRole"];
+    Lythen.ViewModels.LoginRole role = (Lythen.ViewModels.LoginRole)Session["LoginRole"];
+    int userId = Lythen.Common.PageValidate.FilterParam(User.Identity.Name);
+    Lythen.DAL.FundsContext db = new Lythen.DAL.FundsContext();
     Layout = "~/Views/Shared/_usermanager.cshtml";
 }
 <style>
@@ -112,7 +114,7 @@
                     @Html.ValidationMessageFor(model => model.postId, "", new { @class = "text-danger" })
                 </div>
             </div>
-            @if (role.roleName == "系统管理员")
+            @if (Lythen.Common.RoleCheck.CheckHasAuthority(userId, db, "用户管理"))
             {
             <div class="form-group">
                 @Html.LabelFor(model => model.roleId, htmlAttributes: new { @class = "control-label col-md-2" })

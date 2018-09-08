@@ -1,9 +1,9 @@
-﻿using FundsManager.App_Start;
+﻿using Lythen.App_Start;
 using System;
 using System.Diagnostics;
 using System.Web.Mvc;
 using System.Web.Routing;
-using FundsManager.Common;
+using Lythen.Common;
 namespace FundsManager
 {
     public class Global : System.Web.HttpApplication

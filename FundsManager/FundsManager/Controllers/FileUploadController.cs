@@ -1,10 +1,10 @@
-﻿using FundsManager.Common;
+﻿using Lythen.Common;
 using System;
 using io = System.IO;
 using System.Linq;
 using System.Web.Mvc;
 
-namespace FundsManager.Controllers
+namespace Lythen.Controllers
 {
     public class FileUploadController : Controller
     {

@@ -1,9 +1,9 @@
-﻿using FundsManager.Models;
+﻿using Lythen.Models;
 using System.ComponentModel.DataAnnotations;
-using FundsManager.Common;
+using Lythen.Common;
 using System.ComponentModel;
 
-namespace FundsManager.ViewModels
+namespace Lythen.ViewModels
 {
     public class UserModel
     {

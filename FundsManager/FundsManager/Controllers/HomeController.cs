@@ -1,10 +1,10 @@
-﻿using FundsManager.DAL;
-using FundsManager.Models;
-using FundsManager.ViewModels;
+﻿using Lythen.DAL;
+using Lythen.Models;
+using Lythen.ViewModels;
 using System.Web.Mvc;
 using System.Linq;
-using FundsManager.Common.DEncrypt;
-namespace FundsManager.Controllers
+using Lythen.Common.DEncrypt;
+namespace Lythen.Controllers
 {
     public class HomeController : Controller
     {

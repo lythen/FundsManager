@@ -1,11 +1,11 @@
-﻿using FundsManager.ViewModels;
+﻿using Lythen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data;
 
-namespace FundsManager.DAL
+namespace Lythen.DAL
 {
     public class ApplyManager
     {

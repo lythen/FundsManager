@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using FundsManager.Common.DEncrypt;
+using Lythen.Common.DEncrypt;
 using System;
 
-namespace FundsManager.Models
+namespace Lythen.Models
 {
     /// <summary>
     /// 用户表

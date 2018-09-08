@@ -1,7 +1,7 @@
-﻿using FundsManager.DAL;
+﻿using Lythen.DAL;
 using System.Linq;
 
-namespace FundsManager.Common
+namespace Lythen.Common
 {
     public static class RoleCheck
     {
