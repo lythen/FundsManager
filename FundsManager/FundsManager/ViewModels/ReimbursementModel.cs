@@ -75,6 +75,7 @@ namespace Lythen.ViewModels
         public List<ViewDetailContent> details { get; set; }
         public int selectId { get; set; }//传入的select的value
         public string contentTitle { get; set; }
+        public List<ViewAttachment> attachments { get; set; }
     }
     /// <summary>
     /// 明细

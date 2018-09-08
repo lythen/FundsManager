@@ -8,7 +8,7 @@
     }
     Lythen.ViewModels.LoginRole role = (Lythen.ViewModels.LoginRole)Session["LoginRole"];
     int userId = Lythen.Common.PageValidate.FilterParam(User.Identity.Name);
-    Lythen.DAL.FundsContext db = new Lythen.DAL.FundsContext();
+    Lythen.DAL.LythenContext db = new Lythen.DAL.LythenContext();
     Layout = "~/Views/Shared/_usermanager.cshtml";
 }
 <style>

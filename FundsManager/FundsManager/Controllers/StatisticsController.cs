@@ -12,7 +12,7 @@ namespace Lythen.Controllers
 {
     public class StatisticsController : Controller
     {
-        private FundsContext db = new FundsContext();
+        private LythenContext db = new LythenContext();
         public ActionResult Detail(StatisticsSearch search)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToRoute(new { controller = "Login", action = "LogOut" });

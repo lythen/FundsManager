@@ -3,9 +3,9 @@ using Lythen.Models;
 using System.Linq;
 namespace Lythen.DAL
 {
-    public class FundsContext: DbContext
+    public class LythenContext: DbContext
     {
-        public FundsContext() : base("FundsDBContext")
+        public LythenContext() : base("FundsDBContext")
         {
         }
         public DbSet<Dic_Department> Dic_Department { get; set; }

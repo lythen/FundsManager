@@ -8,7 +8,7 @@ namespace Lythen.Controllers
 {
     public class HomeController : Controller
     {
-        private FundsContext db = new FundsContext();
+        private LythenContext db = new LythenContext();
         // GET: Home
         public ActionResult Index()
         {

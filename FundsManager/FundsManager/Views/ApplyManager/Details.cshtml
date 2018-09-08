@@ -79,6 +79,7 @@
                             </tr>
                         </table>
                         </th>
+                        <th>附件</th>
                     </tr>
                     @foreach (var item in Model.contents)
                     {
@@ -111,6 +112,19 @@
                                     </table>
                                 }
                             </td>
+                            <td>
+                                @if (item.attachments != null && item.attachments.Count() > 0)
+                                {
+                                    foreach (var aitem in item.attachments)
+                                    {
+                                        string path = "../../attachments/" + Model.reimbursementCode + "/" + @aitem.fileName;
+                                        <p>
+                                            <span class="glyphicon glyphicon-paperclip"></span>
+                                            <a href="@path" attaid="@aitem.id" target="_blank" title="点击预览 @Path.GetFileName(aitem.fileName)" file="@aitem.fileName" class="det-attachment">@Path.GetFileName(aitem.fileName)</a>
+                                        </p>
+                                    }
+                                }
+                            </td>
                         </tr>
 
                     }
@@ -119,7 +133,7 @@
         </div>
 
         <div class="form-group">
-            <label class="control-label col-md-2">附件</label>
+            <label class="control-label col-md-2">其它附件</label>
             <div class="col-md-10">
                 @if (Model.attachments != null && Model.attachments.Count() > 0)
                 {

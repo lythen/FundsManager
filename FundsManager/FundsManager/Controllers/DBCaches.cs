@@ -8,7 +8,7 @@ namespace Lythen.Controllers
 {
     public static class DBCaches<T>
     {
-        private static FundsContext db = new FundsContext();
+        private static LythenContext db = new LythenContext();
         public static List<T> getCache(string cache_name)
         {
             List<T> list = (List<T>)DataCache.GetCache(cache_name);

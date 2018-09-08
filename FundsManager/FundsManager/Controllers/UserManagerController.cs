@@ -17,7 +17,7 @@ namespace Lythen.Controllers
 {
     public class UserManagerController : Controller
     {
-        private FundsContext db = new FundsContext();
+        private LythenContext db = new LythenContext();
 
         public ActionResult Index()
         {

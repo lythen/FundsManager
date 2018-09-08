@@ -8,10 +8,10 @@ namespace Lythen.DAL
 {
     public class Statistics
     {
-        private FundsContext db;
-        public Statistics(FundsContext _db)
+        private LythenContext db;
+        public Statistics(LythenContext _db)
         {
-            if (_db == null) db = new FundsContext();
+            if (_db == null) db = new LythenContext();
             else db = _db;
         }
         /// <summary>

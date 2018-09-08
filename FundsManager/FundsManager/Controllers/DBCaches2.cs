@@ -10,7 +10,7 @@ namespace Lythen.Controllers
 {
     public class DBCaches2
     {
-        private static FundsContext db = new FundsContext();
+        private static LythenContext db = new LythenContext();
         private static string cache_depts = "cache_depts";
         private static string dic_module = "dic-module";
         private static string cache_role = "cache_role";

@@ -11,7 +11,7 @@ namespace Lythen.Controllers
 {
     public static class DropDownList
     {
-        private static FundsContext db = new FundsContext();
+        private static LythenContext db = new LythenContext();
         private static string cache_week = "cache_week";
         private static string cache_post = "cache_post";
         private static string cache_sex = "cache_sex";

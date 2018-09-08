@@ -12,7 +12,7 @@ namespace Lythen.Controllers
 {
     public class SystemSetController : Controller
     {
-        private FundsContext db = new FundsContext();
+        private LythenContext db = new LythenContext();
 
         #region 网站设置
         public ActionResult SiteInfo()

@@ -15,7 +15,7 @@ namespace Lythen.Controllers
 {
     public class LoginController : Controller
     {
-        private FundsContext db = new FundsContext();
+        private LythenContext db = new LythenContext();
         // GET: Login
         public ActionResult Index()
         {

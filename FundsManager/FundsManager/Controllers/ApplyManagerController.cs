@@ -18,7 +18,7 @@ namespace Lythen.Controllers
 {
     public class ApplyManagerController : Controller
     {
-        private FundsContext db = new FundsContext();
+        private LythenContext db = new LythenContext();
 
         // GET: ApplyManager
         public ActionResult Index()
@@ -69,8 +69,9 @@ namespace Lythen.Controllers
             foreach(var item in bill.contents)
             {
                 item.details = dal.getContentDetails((int)item.contentId, 0).ToList();
+                item.attachments = dal.getAttachments(bill.reimbursementCode, 0, (int)item.contentId).ToList();
             }
-            bill.attachments = dal.getAttachments(bill.reimbursementCode, 0).ToList();
+            bill.attachments = dal.getAttachments(bill.reimbursementCode, 0,0).ToList();
             bill.responds = dal.getResponds(bill.reimbursementCode, 0).ToList();
 
             bill.userName= AESEncrypt.Decrypt(bill.userName);
@@ -151,6 +152,8 @@ namespace Lythen.Controllers
                     json.msg_text = "报销单提交失败。";
                     goto next;
                 }
+
+                StringBuilder sbErr = new StringBuilder();
                 //添加报销内容
                 foreach (ViewContentModel citem in _sbill.contents)
                 {
@@ -186,24 +189,55 @@ namespace Lythen.Controllers
                             };
                             db.Reimbursement_Detail.Add(detail);
                         }
-                        try
+                    }
+                    //添加附件
+                    if (citem.attachments != null && citem.attachments.Count() > 0)
+                    {
+                        string attachment_path = string.Format("{0}\\{1}\\{2}\\", MyConfiguration.GetAttachmentPath(), bill.reimbursement_code, DateTime.Now.ToString("yyyyMMdd"));
+                        string attachment_temp_path = MyConfiguration.GetAttachmentTempPath(); ;
+                        if (!Directory.Exists(attachment_path)) Directory.CreateDirectory(attachment_path);
+                        string filePath, tempFile, saveFileName = "", storeFileName;
+                        foreach (ViewAttachment item in citem.attachments)
                         {
-                            //干脆都先提交得了
-                            db.SaveChanges();
+                            try
+                            {
+                                saveFileName = Path.GetFileName(item.fileName);
+                                storeFileName = string.Format("{0}/{1}", DateTime.Now.ToString("yyyyMMdd"), saveFileName);
+                                tempFile = attachment_temp_path + item.fileName;
+                                filePath = string.Format("{0}{1}", attachment_path, saveFileName);
+                                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                                System.IO.File.Move(tempFile, filePath);
+                            }
+                            catch (Exception e)
+                            {
+                                ErrorUnit.WriteErrorLog(e.ToString(), GetType().ToString());
+                                sbErr.Append("文件【").Append(saveFileName).Append("】保存失败，请重新上传。\r\n");
+                                continue;
+                            }
+                            Reimbursement_Attachment attachment = new Reimbursement_Attachment
+                            {
+                                attachment_path = storeFileName,
+                                atta_detail_id = content.content_id,
+                                atta_reimbursement_code = bill.reimbursement_code
+                            };
+                            db.Reimbursement_Attachment.Add(attachment);
                         }
-                        catch (Exception e)
-                        {
-                            ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
-                            Delete(bill.reimbursement_code);
-                            json.msg_code = "error";
-                            json.msg_text = "报销单提交失败。";
-                            goto next;
-                        }
+                    }
+                    try
+                    {
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
+                        Delete(bill.reimbursement_code);
+                        json.msg_code = "error";
+                        json.msg_text = "报销单提交失败。";
+                        goto next;
                     }
                 }
 
-                //添加附件
-                StringBuilder sbErr = new StringBuilder();
+                //添加其他附件
                 if (_sbill.attachments != null && _sbill.attachments.Count() > 0)
                 {
                     string attachment_path = string.Format("{0}\\{1}\\{2}\\", MyConfiguration.GetAttachmentPath(), bill.reimbursement_code,DateTime.Now.ToString("yyyyMMdd"));
@@ -224,7 +258,7 @@ namespace Lythen.Controllers
                         catch(Exception e)
                         {
                             ErrorUnit.WriteErrorLog(e.ToString(), GetType().ToString());
-                            sbErr.Append("文件【").Append(saveFileName).Append("】保存失败，请重新上传");
+                            sbErr.Append("文件【").Append(saveFileName).Append("】保存失败，请重新上传。\r\n");
                             continue;
                         }
                         Reimbursement_Attachment attachment = new Reimbursement_Attachment
@@ -237,7 +271,6 @@ namespace Lythen.Controllers
                     }
                     try
                     {
-                        //干脆都先提交得了
                         db.SaveChanges();
                     }
                     catch (Exception e)
@@ -308,8 +341,9 @@ namespace Lythen.Controllers
             foreach (var item in bill.contents)
             {
                 item.details = dal.getContentDetails((int)item.contentId, 0).ToList();
+                item.attachments= dal.getAttachments(bill.reimbursementCode, 0,(int)item.contentId).ToList();
             }
-            bill.attachments = dal.getAttachments(bill.reimbursementCode, 0).ToList();
+            bill.attachments = dal.getAttachments(bill.reimbursementCode, 0,0).ToList();
             var responds = dal.getResponds(bill.reimbursementCode, 0).OrderBy(x => x.num).FirstOrDefault();
             if (responds != null) bill.next = (int)responds.thisRespondUser;
             return View(bill);
@@ -429,16 +463,51 @@ namespace Lythen.Controllers
                                     db.Entry(detail).State = EntityState.Modified;
                                 else db.Reimbursement_Detail.Add(detail);
                             }
-                            try
+                        }
+                        //录入附件
+                        if (citem.attachments != null && citem.attachments.Count() > 0)
+                        {
+                            string attachment_path = string.Format("{0}\\{1}\\{2}\\", MyConfiguration.GetAttachmentPath(), bill.reimbursement_code, DateTime.Now.ToString("yyyyMMdd"));
+                            string attachment_temp_path = MyConfiguration.GetAttachmentTempPath(); ;
+                            if (!Directory.Exists(attachment_path)) Directory.CreateDirectory(attachment_path);
+                            string filePath, tempFile, saveFileName = "", storeFileName;
+                            foreach (ViewAttachment item in citem.attachments)
                             {
-                                db.SaveChanges();
+                                if (item.id > 0) continue;
+                                try
+                                {
+                                    saveFileName = Path.GetFileName(item.fileName);
+                                    storeFileName = string.Format("{0}/{1}", DateTime.Now.ToString("yyyyMMdd"), saveFileName);
+                                    tempFile = attachment_temp_path + item.fileName;
+                                    filePath = string.Format("{0}{1}", attachment_path, saveFileName);
+                                    if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                                    System.IO.File.Move(tempFile, filePath);
+                                }
+                                catch (Exception e)
+                                {
+                                    ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
+                                    sbmsg.Append("文件【").Append(item.fileName).Append("】保存失败，请重新上传");
+                                    continue;
+                                }
+                                Reimbursement_Attachment attachment = new Reimbursement_Attachment
+                                {
+                                    attachment_path = storeFileName,
+                                    atta_detail_id = (int)citem.contentId,
+                                    atta_reimbursement_code = bill.reimbursement_code
+                                };
+                                db.Reimbursement_Attachment.Add(attachment);
                             }
-                            catch (Exception e)
-                            {
-                                ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
-                                sbmsg.Append("报销明细录入失败<br />");
-                                continue;
-                            }
+                        }
+
+                        try
+                        {
+                            db.SaveChanges();
+                        }
+                        catch (Exception e)
+                        {
+                            ErrorUnit.WriteErrorLog(e.ToString(), this.GetType().ToString());
+                            sbmsg.Append("报销明细录入失败<br />");
+                            continue;
                         }
                     }
                     //录入附件

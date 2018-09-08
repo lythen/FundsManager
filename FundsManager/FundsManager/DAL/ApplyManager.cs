@@ -9,9 +9,9 @@ namespace Lythen.DAL
 {
     public class ApplyManager
     {
-        private FundsContext db;
-        public ApplyManager(FundsContext _db) {
-            if (_db == null) db = new FundsContext();
+        private LythenContext db;
+        public ApplyManager(LythenContext _db) {
+            if (_db == null) db = new LythenContext();
             else db = _db;
         }
         /// <summary>
@@ -152,10 +152,10 @@ namespace Lythen.DAL
         /// <param name="reimbursement_code"></param>
         /// <param name="atta_id"></param>
         /// <returns></returns>
-        public IQueryable<ViewAttachment> getAttachments(string reimbursement_code,int atta_id)
+        public IQueryable<ViewAttachment> getAttachments(string reimbursement_code,int atta_id,int contentid=-1)
         {
             var query = from attachment in db.Reimbursement_Attachment
-                        where attachment.atta_reimbursement_code == reimbursement_code
+                        where attachment.atta_reimbursement_code == reimbursement_code&& attachment.atta_detail_id== (contentid==-1? attachment.atta_detail_id : contentid)
                         select new ViewAttachment
                         {
                             fileName = attachment.attachment_path,

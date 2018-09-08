@@ -126,8 +126,8 @@
         <div class="out-form">
             
         </div>
-        <div class="form-group">
-            <label class="control-label col-md-2" style="cursor:pointer" onclick="UploadAttachment();">附件上传</label>
+        <div class="form-group othersAtta">
+            <label class="control-label col-md-2" style="cursor:pointer" onclick="UploadAttachment();">其它附件上传</label>
             <input type="file" id="upAttachment" multiple name="upAttachment" style="display:none;" onchange="FileChange(this);" />
             <div class="col-md-10 atta-div">
                 
@@ -199,7 +199,7 @@
         }
         var div = $('.out-form');
         var txt = $('#ddlContents').find(':checked').text();
-        var contentDiv = '<div class="form-group content-group-' + id + '"><label class="control-label col-md-2">' + txt + '</label><div class="col-md-10"><input type="number" id="amount' + id + '" name="amount' + id + '" class="amount form-control txt-funds fl" onblur="ResetAmount();" />&nbsp;元&nbsp;&nbsp;&nbsp;<input type="button" class="btn btn-danger" value="删除" onclick="DeleteThis(this)" /><input type="button" class="btn btn-success" value="添加明细" onclick="AddDetail(this)" /><input type="hidden" class="hidContent" value="' + id + '" /></div></div><div class="form-group detail-group-' + id + '"><label class="control-label col-md-2"></label><div class="col-md-10"></div></div>';
+        var contentDiv = '<div class="form-group content-group-' + id + '"><label class="control-label col-md-2">' + txt + '</label><div class="col-md-10"><input type="number" id="amount' + id + '" name="amount' + id + '" class="amount form-control txt-funds fl" onblur="ResetAmount();" />&nbsp;元&nbsp;&nbsp;&nbsp;<input type="button" class="btn btn-danger" value="删除" onclick="DeleteThis(this)" />&nbsp;<input type="button" class="btn btn-success" value="添加明细" onclick="AddDetail(this)" />&nbsp;<input type="button" class="btn btn-info" value="上传附件" onclick="UploadAttachForDetail(' + id + ');" /><input type="hidden" class="hidContent" value="' + id + '" /></div></div><div class="form-group detail-group-' + id + '"><label class="control-label col-md-2"></label><div class="col-md-10"></div></div><div class="form-group attachment-group-' + id + '"><label class="control-label col-md-2"></label><div class="col-md-10"></div></div>';
         div.append($(contentDiv));
     }
     function AddDetail(obj) {
@@ -249,6 +249,7 @@
                 $('#msg').text(data.msg_text);
             }
             $('#msg').slideDown("slow");
+            location.href = '#msg';
         }).fail(function (e) {
             alert('服务器拒绝数据，提交失败。');
         });
@@ -329,13 +330,17 @@
                 }
             }
             content.details = details;
+            //添加附件
+            content.attachments = GetAttachment(contentId);
             contents.push(content);
         }
         return contents;
     }
-    function GetAttachment() {
+    function GetAttachment(id) {
         var alist = new Array();
-        var items = $('.det-attachment');
+        var items;
+        if (id) items = $('.attachment-group-'+id).find('.det-attachment');
+        else items = $('.othersAtta').find('.det-attachment');
         var len = items.length;
         if (len == 0) return alist;
         for (var i = 0; i < len; i++) {
@@ -352,7 +357,16 @@
         //ResetAmount();
     }
     //文件上传部份-----------------------------
-    var fl = 0;
+    var fl = 0; var thisID; var timeout;
+    function UploadAttachForDetail(id) {
+        thisID = id;
+        if (fl > 0) {
+            alert("请等待当前操作完成。");
+            return;
+        }
+        document.getElementById('upAttachment').files == null;
+        $('#upAttachment').click();
+    }
     function UploadAttachment() {
         if (fl > 0) {
             alert("请等待当前操作完成。");
@@ -404,13 +418,24 @@
     }
     var fileList = new Array();
     function ReadFile(files) {
+        clearTimeout(timeout);
         //fileList = new Array();
         fileList.length = 0;
         var len = files.length;
         fl = len;
         var per;
         var uploadLength = new Array(len);
-        var attaDiv = $('.atta-div');
+        var attaDiv;
+        if (thisID) {
+            var attaDiv = $('.attachment-group-' + thisID);
+            if (attaDiv.length == 0) {
+                alert("上传位置获取出错，请重试。");
+                return;
+            }
+            thisID = null;
+        }
+        else
+        attaDiv = $('.atta-div');
         $.each(files,function(file_index,file){
             $('#flist').append('<li class="list' + file_index + '"><div class="w100">' + file.name + '&nbsp;&nbsp;&nbsp;&nbsp;' + GetSizeStr(file.size) + '&nbsp;&nbsp;&nbsp;&nbsp;<literal id="lit' + file_index + '"></literal><div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 0%"><span class="sr-only"></span></div></div></li>');
             var formdata = new FormData();
@@ -427,8 +452,9 @@
                         $('.list' + file_index).find('.progress .progress-bar').width('100%');
                         $('#lit' + file_index).text('上传完成 100%。');
                         var name = data.data.split(',');
-                        var atta = '<div onmousemove="ShowDetailDel(this);" onmouseout="HidDetailDel(this);" class="detail-div"><span class="glyphicon glyphicon-paperclip"></span><a href="../temp/' + name[0] + '" title="点击预览' + name[2] + '" file="' + name[1] + '" class="det-attachment">' + name[2] + '</a><span title="点击删除该附件" class="spDel displayN glyphicon glyphicon-remove" onclick="DeleteAtta(this)"></span></div>';
+                        var atta = '<div onmousemove="ShowDetailDel(this);" onmouseout="HidDetailDel(this);" class="detail-div"><span class="glyphicon glyphicon-paperclip"></span><a href="../temp/' + name[0] + '" title="点击预览' + name[2] + '" file="' + name[1] + '" class="det-attachment" target="_blank">' + name[2] + '</a><span title="点击删除该附件" class="spDel displayN glyphicon glyphicon-remove" onclick="DeleteAtta(this)"></span></div>';
                         attaDiv.append($(atta));
+                        timeout=setTimeout('removeProcess(' + file_index + ')', 5000);
                     }
                     else{
                         //发生错误，重新上传
@@ -446,6 +472,9 @@
                 }
             });
         });
+    }
+    function removeProcess(id) {
+        $('.list' + id).remove();
     }
     //----文件上传结束
 </script>

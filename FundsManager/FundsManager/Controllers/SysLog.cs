@@ -10,7 +10,7 @@ namespace Lythen.Controllers
 {
     public static class SysLog
     {
-        public static void WriteLog(int user_id,string info,string ip,string target,int type,string device, FundsContext db)
+        public static void WriteLog(int user_id,string info,string ip,string target,int type,string device, LythenContext db)
         {
             Sys_Log log = new Sys_Log
             {

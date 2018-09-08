@@ -6,7 +6,7 @@ namespace Lythen.Controllers
 {
     public static class SiteInfo
     {
-        private static FundsContext db = new FundsContext();
+        private static LythenContext db = new LythenContext();
         public static string getSiteName()
         {
             object siteName = DataCache.GetCache("site-name");

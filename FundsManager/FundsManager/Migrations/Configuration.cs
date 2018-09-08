@@ -6,14 +6,14 @@ namespace Lythen.Migrations
     using System.Configuration;
     using System.IO;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<Lythen.DAL.FundsContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<Lythen.DAL.LythenContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(DAL.FundsContext context)
+        protected override void Seed(DAL.LythenContext context)
         {
             //  This method will be called after migrating to the latest version.
 
