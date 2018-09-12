@@ -333,8 +333,6 @@ namespace Lythen.Controllers
         public JsonResult AddFromExcel(string file)
         {
             BaseJsonData json = new BaseJsonData();
-            
-        
             if (!User.Identity.IsAuthenticated)
             {
                 json.msg_text = "没有登陆或登陆失效，请重新登陆后操作。";
@@ -357,7 +355,16 @@ namespace Lythen.Controllers
                 return Json(json, JsonRequestBehavior.AllowGet);
             }
             OpenXMLHelper excel = new OpenXMLHelper();
-            DataTable dtExcel = excel.ExcelToDataTable("Sheet1", filePath);
+            DataTable dtExcel = null;
+            try
+            {
+                dtExcel = excel.ExcelToDataTable("Sheet1", filePath);
+            }catch(Exception ee)
+            {
+                json.msg_text = string.Format("excel[{0}]读取出错。",file);
+                json.msg_code = "noThis";
+                return Json(json, JsonRequestBehavior.AllowGet);
+            }
             if (dtExcel == null|| dtExcel.Rows.Count==0)
             {
                 json.msg_text = "表格里没有行。";

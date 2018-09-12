@@ -643,7 +643,7 @@ namespace Lythen.Controllers
                 json.msg_code = "CanNotUpdate";
                 goto next;
             }
-            var same = db.Dic_Post.Where(x => x.post_name == model.role_name && x.post_id != model.role_id);
+            var same = db.Dic_Role.Where(x => x.role_name == model.role_name && x.role_id != model.role_id);
             if (same.Count() > 0)
             {
                 json.msg_text = "该名称已存在。";
@@ -654,7 +654,7 @@ namespace Lythen.Controllers
             try
             {
                 db.SaveChanges();
-                DBCaches<Dic_Post>.ClearCache("cache_post");
+                DBCaches<Dic_Role>.ClearCache("cache_role");
             }
             catch
             {
